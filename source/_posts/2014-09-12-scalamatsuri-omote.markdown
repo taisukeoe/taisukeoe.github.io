@@ -6,7 +6,7 @@ comments: true
 categories: scala scalamatsuri
 ---
 
-{% img /images/20140912/scala_matsuri_A.png 600 450 %}
+{% img /images/20140912/scala_matsuri_A.png %}
 
 9/6,7の2日間、[ScalaMatsuri 2014](http://scalamatsuri.org/)という日本最大（おそらくAsiaでも最大?)のScalaのカンファンレンスを開催し、総来場者数が400人強、[ニコ生視聴者14万人超](http://blog.nicovideo.jp/niconews/ni048403.html)、昨年に引き続き[#ScalaMatsuriがTwitterトレンド入り](https://twitter.com/niw/status/508064126229176320)と、盛会のうちに幕を閉じました。
 ご来場者、スポンサー企業、ニコ生視聴者、スタッフの皆様、本当にありがとうございました。
