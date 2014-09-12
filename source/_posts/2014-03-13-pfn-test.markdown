@@ -1,0 +1,75 @@
+---
+layout: post
+title: "Androidプロジェクト(pfn)のgiter8テンプレート"
+date: 2014-03-14 12:00
+comments: true
+categories: scala android sbt android-sdk-plugin
+---
+
+ScalaでAndroidアプリを作るためのsbtプラグイン、[pfn/android-sdk-plugin](https://github.com/pfn/android-sdk-plugin)の紹介を[前回のブログ](/blog/2014/03/13/pfn-android-sdk-plugin/)でしました。
+
+が、このREADMEの通りにプロジェクトを作るのが面倒なので、giter8テンプレートも作ってみました。
+
+#プロジェクト作成
+```bash
+ g8 taisukeoe/android-pfn-app.g8
+```
+<!--more-->
+からプロジェクトの雛形が作れます。
+giter8が入っていない人は*brew install giter8*とかで。
+
+#ディレクトリ構造
+こんな感じです。
+
+```
+MyAndroidProject
+├── .gitignore
+├── AndroidManifest.xml
+├── build.sbt
+├── local.properties
+├── proguard-project.txt
+├── project/
+│   ├── build.properties
+│   └── plugins.sbt
+├── project.properties
+├── res/
+│   ├── layout/
+│   └── values/
+├── src/.../MainActivity.scala
+└── tests/
+    └── src/.../MainActivityInstrumentationTest.scala
+```    
+
+簡単な説明。
+
+* AndroidManifest.xml ...ActivityやApplicationのもろもろの設定。
+* build.sbt ...sbtのビルド定義
+* local.propeties ...AndroidSDKのpathを記入。また、keyStoreの情報を記入すると、*android:package-release*で簡単にrelease buildできる。
+* proguard-project.txt ...proguardオプションを記入。*-dontwarn*, *-keep*, *-keepclassmembers*, *-libraryjars*あたりのオプションが頻出。詳しくは[ProGuard Usage](http://proguard.sourceforge.net/index.html#manual/usage.html)を参照。
+* project/ ...sbtのバージョンやpluginなどを記入。
+* project.properties... 利用するAndroid APIのバージョン(target api)や、(unmanagedの)libraryプロジェクトのpathを記入。
+* res/ ...レイアウトやテキスト、画像などのリソースファイル置き場。
+* src/ ...ソース。
+
+local.properties, project.propertiesを修正したときは、ちゃんと*sbt reload*しましょう。
+
+proguard-project.textを修正したときは、*sbt reload clean*してclassファイルのキャッシュを消しましょう。
+
+#各種コマンド
+[pfn/android-sdk-plugin](https://github.com/pfn/android-sdk-plugin)より。
+
+##インストール
+```bash
+sbt
+> android:run
+```
+
+##テスト
+```bash
+sbt
+> android:test
+```
+
+ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。
+
+まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。

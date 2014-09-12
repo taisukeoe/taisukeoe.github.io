@@ -1,0 +1,38 @@
+---
+layout: post
+title: "「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた"
+date: 2013-03-11 13:10
+comments: true
+categories: bio R conference
+---
+[Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜](http://www.jsbi.org/event/hosted-events/20130308r/)
+
+###オミックス(omics)とは?
+生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。
+
+[オーミクス - Wikipedia](http://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%9F%E3%82%AF%E3%82%B9)
+
+###なぜ参加したか?
+元々大学ではin vitroな実験系分子生物学の研究室に3年間在籍していたものの、今はプログラミングばっかりやっているので、バイオインフォマティクス(情報生物学)はピッタリじゃないかなーとか。半分は完全に趣味ですが。
+
+###面白かったポイント
+<!-- more -->
+
+* 今はMicroArrayや質量分析機などの発展により、研究のボトルネックがデータ収集速度ではなく解析速度に来ている。これにより実験系の研究者にとっても、バイオインフォマティクスの重要性が上がっている。
+
+* データ解析には元々Fortranを使っていた研究室が多いものの、今は[R言語](http://ja.wikipedia.org/wiki/R%E8%A8%80%E8%AA%9E)が主流。対応解析(CorrespondenceAnalysys)用ライブラリのFactoMineRやネットワーク解析向けにigraphなどのライブラリの紹介もあった。
+
+	参考:
+[R seminar on igraph - supplementary information - Kazuhiro Takemoto](https://sites.google.com/site/kztakemoto/r-seminar-on-igraph---supplementary-information)
+
+* ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。
+
+* 気象学でよく使われる「[データ同化](http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96)」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは[カルマンフィルタ](http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF)(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。
+
+	ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー"Let it crash (クラッシュさせろ)"もそうだけど、こういう雑で実践的なポリシーは大好きwww
+	
+* 	現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO([遺伝子オントロジー](http://ja.wikipedia.org/wiki/Gene_Ontology))と[MeSH](http://ja.wikipedia.org/wiki/MeSH)(Medical Subject Headings)。
+	MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。
+
+###最後に
+バイオの知識だけじゃなく、統計学(とR)の知識が重要な模様。こういう複合領域の戦場にはどんどん攻め入りたいですね。
