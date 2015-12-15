@@ -4,7 +4,7 @@
   <title><![CDATA[OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2015-12-15T23:06:13+09:00</updated>
+  <updated>2015-12-16T00:44:03+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,206 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Scala標準のPromiseがAndroidで便利だという話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/12/15/scala-promise-sample-for-android/"/>
+    <updated>2015-12-15T23:10:05+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/12/15/scala-promise-sample-for-android</id>
+    <content type="html"><![CDATA[<p>この記事は、<a href="http://www.adventar.org/calendars/904">Scala Advent Calendar</a> 13日目です。</p>
+
+<p>今日は<code>scala.concurrent.Promise</code>の話をします。</p>
+
+<p><a href="http://www.scala-lang.org/api/current/index.html#scala.concurrent.Promise">Promise - Scala Standard Library 2.11.7 - scala.concurrent.Promise</a></p>
+
+<p>そもそも<code>Promise</code>って使いどころがわかりにくいですよね。他人のコードで使ってるの、ほとんど見たことがありません。</p>
+
+<p>公式ドキュメントではProducer-Consumerパターンでの使い方を解説していますが、現実にこの使い方が必要になるケースってあまり遭遇せず、たいていの場合はFuture同士のflatMapによる合成で事足りてしまうと思います。</p>
+
+<p><a href="http://docs.scala-lang.org/ja/overviews/core/futures.html">Future と Promise - Scala Documentation</a></p>
+
+<p>ところが、実はAndroidアプリ開発では頻繁に遭遇するあのパターンが、<code>Promise</code>を使うと非常に取り回しが良くなりますので、紹介したいと思います。</p>
+
+<!--more-->
+
+
+<p>それは、<code>Intent</code>で外部<code>Activity</code>から何かしらの値を取得し、<code>onActivityResult</code>でその値を受け取るパターンです。</p>
+
+<p><a href="https://developer.android.com/intl/ja/reference/android/content/Intent.html">Intent | Android Developers</a></p>
+
+<p><a href="http://developer.android.com/intl/ja/reference/android/app/Activity.html#onActivityResult(int,%20int,%20android.content.Intent">Activity#onActivityResult | Android Developers</a></p>
+
+<p>Androidでは、アプリ外部との連携を<code>Intent</code>という仕組みを使って制御しています。</p>
+
+<p>取得したい情報や実行したい処理(Action)を<code>Intent</code>にセットし、<code>startActivityForResult</code>メソッドに渡すことで、外部アプリなどを起動し必要なデータを取得させたうえで、自分のアプリに返ってくる（<code>onActivityResult</code>メソッドが呼ばれ、引数にデータが渡される)ことが出来ます。</p>
+
+<p>この<code>Intent</code>は大変便利な仕組みですが、その一方で<strong><em>一連のパイプラインの記述が<code>startActivityForResult</code>と<code>onActivityResult</code>の間で分断されてしまい、データの流れが追いにくい</em></strong>コードになっています。</p>
+
+<figure class='code'><figcaption><span>Promise無しの例(パイプラインが分断される)</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">MyActivity</span> <span class="k">extends</span> <span class="nc">Activity</span> <span class="k">with</span> <span class="nc">TypedFindView</span><span class="o">{</span>
+</span><span class='line'><span class="k">lazy</span> <span class="k">val</span> <span class="nc">IMAGE_FETCH_ID</span> <span class="k">=</span> <span class="mi">12345</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">override</span> <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">bundle</span><span class="k">:</span> <span class="kt">Bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Activity初期化処理など</span>
+</span><span class='line'>   <span class="c1">//...</span>
+</span><span class='line'>   <span class="n">findView</span><span class="o">(</span><span class="nc">TR</span><span class="o">.</span><span class="n">button_image</span><span class="o">).</span><span class="n">onClick</span><span class="o">{</span>
+</span><span class='line'>     <span class="k">_</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">intent</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Intent</span><span class="o">(</span><span class="nc">Intent</span><span class="o">.</span><span class="nc">ACTION_PICK</span><span class="o">,</span> <span class="nc">MediaStore</span><span class="o">.</span><span class="nc">Images</span><span class="o">.</span><span class="nc">Media</span><span class="o">.</span><span class="nc">EXTERNAL_CONTENT_URI</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">intent</span><span class="o">.</span><span class="n">setType</span><span class="o">(</span><span class="s">&quot;image/*&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">startActivityForResult</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="nc">IMAGE_FETCH_ID</span><span class="o">)</span>
+</span><span class='line'>      <span class="c1">//データパイプラインがここで分断</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="k">override</span> <span class="k">def</span> <span class="n">onActivityResult</span><span class="o">(</span><span class="n">requestCode</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">resultCode</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">data</span><span class="k">:</span> <span class="kt">Intent</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">requestCode</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">IMAGE_FETCH_ID</span> <span class="k">=&gt;</span>
+</span><span class='line'>    <span class="c1">//データパイプラインがここから継続</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">resultCode</span> <span class="o">==</span> <span class="nc">Activity</span><span class="o">.</span><span class="nc">RESULT_OK</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">findView</span><span class="o">(</span><span class="nc">TR</span><span class="o">.</span><span class="n">image</span><span class="o">).</span><span class="n">setImageURI</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">getData</span><span class="o">)</span>
+</span><span class='line'>     <span class="k">else</span><span class="o">{</span>
+</span><span class='line'>       <span class="c1">//failed. Do something if needed.  </span>
+</span><span class='line'>     <span class="o">}</span>
+</span><span class='line'>    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="c1">//do nothing</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>これを<code>Promise</code>を使って書き換えてみましょう。</p>
+
+<p><strong><code>Promise</code>によって、<code>startActivityForResult</code>から <code>onActivityResult</code>までの流れを、単一<code>Future</code>インスタンスの中に閉じ込めたかのように扱うことが出来ます。</strong></p>
+
+<p>これでパイプラインの記述をスッキリ書くことが出来るようになりました。</p>
+
+<figure class='code'><figcaption><span>Promise有りの例</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">MainActivity</span> <span class="k">extends</span> <span class="nc">Activity</span> <span class="k">with</span> <span class="nc">TypedFindView</span> <span class="k">with</span> <span class="nc">ImageLoadable</span><span class="o">{</span>
+</span><span class='line'><span class="k">lazy</span> <span class="k">val</span> <span class="n">uiContext</span> <span class="k">=</span> <span class="nc">UIContext</span><span class="o">(</span><span class="k">this</span><span class="o">)</span>
+</span><span class='line'> <span class="k">override</span> <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">bundle</span><span class="k">:</span> <span class="kt">Bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Activity初期化処理など</span>
+</span><span class='line'>   <span class="c1">//...</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">//データパイプラインを分断させず、そのまま記述できる</span>
+</span><span class='line'>   <span class="n">findView</span><span class="o">(</span><span class="nc">TR</span><span class="o">.</span><span class="n">button_image</span><span class="o">).</span><span class="n">onClick</span><span class="o">{</span>
+</span><span class='line'>    <span class="k">_</span> <span class="k">=&gt;</span> <span class="n">chooseImageUri</span><span class="o">().</span><span class="n">foreach</span><span class="o">{</span>
+</span><span class='line'>      <span class="n">bmp</span> <span class="k">=&gt;</span> <span class="n">findView</span><span class="o">(</span><span class="nc">TR</span><span class="o">.</span><span class="n">image</span><span class="o">).</span><span class="n">setImageURI</span><span class="o">(</span><span class="n">bmp</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}(</span><span class="n">uiContext</span><span class="o">)</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">trait</span> <span class="nc">ImageLoadable</span> <span class="k">extends</span> <span class="nc">Activity</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">lazy</span> <span class="k">val</span> <span class="nc">IMAGE_FETCH_ID</span> <span class="k">=</span> <span class="mi">12345</span>
+</span><span class='line'>  <span class="k">private</span> <span class="k">var</span> <span class="n">promise</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">Promise</span><span class="o">[</span><span class="kt">Uri</span><span class="o">]]</span> <span class="k">=</span> <span class="nc">None</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">chooseImageUri</span><span class="o">()</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Uri</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">promise</span><span class="o">.</span><span class="n">filterNot</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">isCompleted</span><span class="o">).</span><span class="n">foreach</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">failure</span><span class="o">(</span><span class="k">new</span> <span class="nc">InterruptedException</span><span class="o">(</span><span class="s">&quot;Asked to load another image. Aborted.&quot;</span><span class="o">)))</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">p</span> <span class="k">=</span> <span class="nc">Promise</span><span class="o">[</span><span class="kt">Uri</span><span class="o">]()</span>
+</span><span class='line'>    <span class="n">promise</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">p</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">intent</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Intent</span><span class="o">(</span><span class="nc">Intent</span><span class="o">.</span><span class="nc">ACTION_PICK</span><span class="o">,</span> <span class="nc">MediaStore</span><span class="o">.</span><span class="nc">Images</span><span class="o">.</span><span class="nc">Media</span><span class="o">.</span><span class="nc">EXTERNAL_CONTENT_URI</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">intent</span><span class="o">.</span><span class="n">setType</span><span class="o">(</span><span class="s">&quot;image/*&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">startActivityForResult</span><span class="o">(</span><span class="n">intent</span><span class="o">,</span> <span class="nc">IMAGE_FETCH_ID</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">p</span><span class="o">.</span><span class="n">future</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">onActivityResult</span><span class="o">(</span><span class="n">requestCode</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">resultCode</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">data</span><span class="k">:</span> <span class="kt">Intent</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">super</span><span class="o">.</span><span class="n">onActivityResult</span><span class="o">(</span><span class="n">requestCode</span><span class="o">,</span><span class="n">resultCode</span><span class="o">,</span><span class="n">data</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">requestCode</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">IMAGE_FETCH_ID</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">resultCode</span> <span class="o">==</span> <span class="nc">Activity</span><span class="o">.</span><span class="nc">RESULT_OK</span><span class="o">)</span>
+</span><span class='line'>        <span class="n">promise</span><span class="o">.</span><span class="n">foreach</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">success</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="n">getData</span><span class="o">))</span>
+</span><span class='line'>      <span class="k">else</span>
+</span><span class='line'>        <span class="n">promise</span><span class="o">.</span><span class="n">foreach</span><span class="o">(</span><span class="k">_</span><span class="o">.</span><span class="n">failure</span><span class="o">(</span><span class="nc">ImageNotAvailableException</span><span class="o">(</span><span class="s">&quot;Failed to fetch image.&quot;</span><span class="o">)))</span>
+</span><span class='line'>      <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span> <span class="c1">//do nothing</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ビルド可能なサンプルソースコードはこちらです。</p>
+
+<p><a href="https://github.com/taisukeoe/ScalaPromiseDemo">taisukeoe/ScalaPromiseDemo</a></p>
+
+<p>この例と似た、より一般的な例が以下の<code>Promise</code>を使ったCallback APIの<code>Future</code>化です。
+しかしCallback APIの<code>Future</code>化は<code>scalaz.concurrent.Task.async</code>でも実現できますが、上記の例は実現できません（<code>onActivityResult</code>のせい）。</p>
+
+<p><a href="https://github.com/taisukeoe/ScalaFPEvent/blob/aa6f784353e8e9147fd47ff6303407bd6faf345c/src/main/scala/ScalaStdFutureExample.scala">ScalaFPEvent - ScalaStdFutureExmaple</a></p>
+
+<p><code>Promise</code>って意外と使えるジャン、と思ってもらえれば幸いです。</p>
+
+<p>それでは。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Implicitには型注釈をつけましょう]]></title>

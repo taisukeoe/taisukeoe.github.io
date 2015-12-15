@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://taisukeoe.github.io/blog/2015/12/15/scala-promise-sample-for-android/</loc>
+    <lastmod>2015-12-15T23:10:05+09:00</lastmod>
+  </url>
+  <url>
     <loc>http://taisukeoe.github.io/blog/2015/07/11/scala-implicits/</loc>
     <lastmod>2015-07-11T22:52:58+09:00</lastmod>
   </url>
