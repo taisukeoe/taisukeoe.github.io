@@ -34,6 +34,12 @@ Androidでは、アプリ外部との連携を`Intent`という仕組みを使�
 
 この`Intent`は大変便利な仕組みですが、その一方で***一連のパイプラインの記述が`startActivityForResult`と`onActivityResult`の間で分断されてしまい、データの流れが追いにくい***コードになっています。
 
+例えば以下のような、ボタンをクリックすると外部アプリで写真を選択させて、自アプリに表示するだけのアプリについて考えてみましょう。
+
+| ~`startActivityForResult` | `onActivityResult` ~ |
+| :---: | :---: |
+| {% img /images/20151215/app-1-small.png 300 300 %} | {% img /images/20151215/app-2-small.png 300 300 %} |
+
 ```scala Promise無しの例(パイプラインが分断される)
 class MyActivity extends Activity with TypedFindView{
 lazy val IMAGE_FETCH_ID = 12345
