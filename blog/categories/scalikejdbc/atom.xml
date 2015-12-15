@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Scalikejdbc | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/scalikejdbc/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ScalikeJDBC on Android SQLite]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite/"/>
+    <updated>2015-05-06T21:40:25+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite</id>
+    <content type="html"><![CDATA[<p>意外にもまだ試している人がいなさそうなので、<a href="https://rpscala.doorkeeper.jp/events/23383">rpscala合宿</a>でDEMOを作成した。</p>
+
+<p><a href="https://github.com/taisukeoe/scalikejdbc-on-android">scalikejdbc-on-android</a></p>
+
+<p><img src="/images/20150506/scalikejdbc_demo.png"></p>
+
+<!--more-->
+
+
+<h3>使用versionなど:</h3>
+
+<ul>
+<li>Scala 2.11.6</li>
+<li>sbt 0.13.8</li>
+<li>Target: Android 5.1</li>
+<li>MinSDK: Android 4.0.3</li>
+<li>pfn/android-sdk-plugin 1.3.22</li>
+<li>ScalikeJDBC 2.2.6</li>
+<li>SQLDroid 1.0.3</li>
+</ul>
+
+
+<h2>Android in ScalaのDBアクセス事情</h2>
+
+<ul>
+<li>自分は普段Android Database API + <a href="https://github.com/pocorall/scaloid/blob/060fd9b5d330d735be96ac0b9489b4600a6dec09/scaloid-common/src/main/st/org/scaloid/common/implicits.scala#L110-L120">RichCursor</a>を使う</li>
+<li><a href="https://www.typesafe.com/activator/template/agile-scala-android-example">Slickを使用したTypesafe activatorテンプレート</a>などもある</li>
+<li>そもそもDBをローカルに持つ必要のない（DBサーバー+クライアントキャッシュな)Androidアプリも多い</li>
+</ul>
+
+
+<h2><a href="http://scalikejdbc.org/">ScalikeJDBC</a>とは？</h2>
+
+<p><code>a tidy SQL-based access library for Scala Developers</code>(公式ドキュメントより抜粋)</p>
+
+<p>SQL文をそのまま(より型安全な方法で）扱えるのが特長。Androidでいえば<a href="http://developer.android.com/intl/ja/reference/android/database/sqlite/SQLiteDatabase.html">SQLiteDatabase.rawQuery</a>を好んで使う人向け。</p>
+
+<h2>SQLite JDBC Driver</h2>
+
+<p>今回はAndroidのSQLiteを使用するので、SQLite3に対応していることが必須。あとはPure Java実装か、Android NDKでAndroid用のNative Libraryを生成できる必要がある。</p>
+
+<h3><a href="https://github.com/SQLDroid/SQLDroid">SQLDroid</a></h3>
+
+<p>今回使用した、Android Database APIをラップしたJDBC Driver。ただあまり活発にメンテされていないようなので、プロダクションで使用するのは躊躇する。</p>
+
+<h3><a href="http://docs.oracle.com/cd/E17076_02/html/installation/build_android_jdbc.html">Android JDBC Driver (Oracle)</a></h3>
+
+<p>Android NDKを使用しビルドすることで、Android用のNative Library(.so)を生成できる…が、unmanagedDependenciesとして追加する必要があるので、ちょっと扱いずらい。（なお、<a href="http://d.hatena.ne.jp/esmasui/20120918/1347985333">この記事</a>を読む限り、Natvie Libraryを含めなくても動作する（＝Pure Java実装に自動的に切り替わっている？）模様。)</p>
+
+<h3><a href="https://bitbucket.org/xerial/sqlite-jdbc">xerial/sqlite-jdbc</a></h3>
+
+<p>現在Androidはサポートされておらず、実行すると</p>
+
+<blockquote><p>java.lang.UnsatisfiedLinkError: dalvik.system.PathClassLoader[DexPathList[[zip file &ldquo;/system/framework/android.test.runner.jar&rdquo;, zip file &ldquo;/data/app/taisukeoe.scalikeroid-1/base.apk&rdquo;],nativeLibraryDirectories=[/vendor/lib, /system/lib]]] couldn&rsquo;t find &ldquo;libsqlitejdbc.so&rdquo;</p></blockquote>
+
+<p>というRuntimeエラーとともに落ちる。</p>
+
+<p><a href="https://bitbucket.org/xerial/sqlite-jdbc/issue/159/javafx-android-port-crashes-and-fails-to">Pure Java実装に切り替えるAPI</a>のfeatureリクエストは上がっているようなので、これが実装されれば使えるはず。</p>
+
+<h2>落とし穴|Pitfalls</h2>
+
+<h3><a href="https://www.sqlite.org/datatype3.html">SQLite</a>起因のもの</h3>
+
+<ul>
+<li><code>serial</code>データ型が存在しないので、<code>integer autoincrement</code>にする。</li>
+<li><code>timestmap</code>および<code>datetime</code>データ型が存在せず、<code>timestamp</code>指定すると<code>yyyy-MM-dd hh:mm:ss</code>というISO8601フォーマットのTEXT型で保存されるため、WrappedResultSet.jodaDateTimeでDateTime型の値を抽出できない。<code>integer</code>型にしておいてWrappedResultSet.timestampを使う。</li>
+</ul>
+
+
+<h3>Android起因のもの</h3>
+
+<ul>
+<li><code>DatabseUtils.createDbFromSqlStatements</code>から手動でDatabaseを作成する必要がある</li>
+</ul>
+
+
+<h3>Android in Scala起因のもの</h3>
+
+<ul>
+<li><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>のProguard後のclassファイルのキャッシュが重複してしまうことにより、ビルド時に以下のExceptionが投げられる</li>
+</ul>
+
+
+<blockquote><p>java.lang.IllegalArgumentException: already added: Lscala/util/parsing/combinator/JavaTokenParsers$class;</p></blockquote>
+
+<p>これを防ぐために、sbtビルド定義に以下を追加する。</p>
+
+<p><code>proguardCache in Android += ProguardCache("parser-combinators") % "org.scala-lang.modules" %% "scala-parser-combinators"</code></p>
+
+<h2>雑感</h2>
+
+<p>ハッカソンではDEMOまでしか作成できなかったが</p>
+
+<ul>
+<li>ScalikeJDBCの主だった機能は一通り試したい</li>
+<li><a href="http://www.h2database.com/html/tutorial.html#android">h2 database</a>は公式でAndroid対応のJDBC driverを配布しているようなので、h2でも試したい</li>
+<li>Typesafe activator templateにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

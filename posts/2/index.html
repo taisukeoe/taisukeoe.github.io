@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="概要 Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/posts/2">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taisukeoe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/22/scala-2-dot-10-bytecode/">Scala2.10.x Bytecode Problem</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-22T20:32:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>8:32 pm</span></time>
+        
+           | <a href="/blog/2013/03/22/scala-2-dot-10-bytecode/#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h1>概要</h1>
+
+<p>Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。親クラスで実装されたメソッドをそのまま継承した場合、<strong>2.9.x及びJavaではメソッドのqualifying typeの参照が子クラス</strong>になるのに対し、<strong>2.10.xではqualifying typeの参照が親クラス</strong>になってしまうことが直接の原因です。</p>
+
+<p>詳しくは第99回<a href="http://www.scala-users.org/shibuya/">rpscala</a>で発表したスライドをどうぞ。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/2qlZJYZygaqx4y" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android" title="Scala2.10.x bytecode problems in Android" target="_blank">Scala2.10.x bytecode problems in Android</a> </strong> from <strong><a href="http://www.slideshare.net/oeuia" target="_blank">Taisuke Oe</a></strong> </div></p>
+
+<p>このバグと同種のものがJIRAでも見つからなかったので、issue報告を上げた結果、3/23に無事修正されたようです。</p>
+
+<p><a href="https://issues.scala-lang.org/browse/SI-7253">[#SI-7253] SQLiteDatabase cannot be closed in Android 4.0 or below devices, in apps built by Scala 2.10.x w/ Android 4.1 due to Scala 2.10.x bytecode problem. - Scala</a></p>
+
+<p>rpscalaでの発表時によくわからなかった以下のポイントがクリアになったので、フォローアップとして記載しておきます。</p>
+
+<ul>
+<li>これは意図された仕様変更なのか？</li>
+<li>これはバグなのか？</li>
+<li>いつ直るのか？</li>
+</ul>
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/03/22/scala-2-dot-10-bytecode/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/11/omics-r/">「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-11T13:10:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:10 pm</span></time>
+        
+           | <a href="/blog/2013/03/11/omics-r/#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io/blog/2013/03/11/omics-r/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><a href="http://www.jsbi.org/event/hosted-events/20130308r/">Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜</a></p>
+
+<h3>オミックス(omics)とは?</h3>
+
+<p>生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。</p>
+
+<p><a href="http://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%9F%E3%82%AF%E3%82%B9">オーミクス - Wikipedia</a></p>
+
+<h3>なぜ参加したか?</h3>
+
+<p>元々大学ではin vitroな実験系分子生物学の研究室に3年間在籍していたものの、今はプログラミングばっかりやっているので、バイオインフォマティクス(情報生物学)はピッタリじゃないかなーとか。半分は完全に趣味ですが。</p>
+
+<h3>面白かったポイント</h3>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/03/11/omics-r/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/03/10/scalaconfjp/">Scala Conference 2013 in Japanの振り返り</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-10T23:53:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>10</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>11:53 pm</span></time>
+        
+           | <a href="/blog/2013/03/10/scalaconfjp/#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io/blog/2013/03/10/scalaconfjp/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Asia初の大規模なScalaカンファレンス</h3>
+
+<p>2013年3/2から3/3にかけて、プログラミング言語<a href="http://ja.wikipedia.org/wiki/Scala">Scala</a>に関する大規模なイベント <a href="http://www.scalaconf.jp/">Scala Conference 2013 in Japan</a> を開催しました。
+ゲストはScala言語, PlayFramework, Akkaなどを開発している<a href="http://typesafe.com/">Typesafe</a>より4人も招くという豪華仕様。</p>
+
+<p>TypeSafe CTOの<a href="https://twitter.com/jboner">Jonas Bonér</a>さんもこんな感想をつぶやいてくださったり</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Scala Conference Japan was awesome. Scala community is thriving. Next stop is Niseko and Rusutsu for some Japanese powder skiing. <a href="https://twitter.com/hashtag/lovejapan?src=hash">#lovejapan</a></p>&mdash; Jonas Bonér (@jboner) <a href="https://twitter.com/jboner/status/308059379465338881">March 3, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>Twitterのトレンドを日中ずっと独占したり</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">なんと日本のTwitterトレンドのトップに!  <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a> <a href="http://t.co/vwXSoozFI9">pic.twitter.com/vwXSoozFI9</a></p>&mdash; OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/307702444874420224">March 2, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>新興言語のカンファレンスとは思えない盛り上がりを見せました。</p>
+
+<p>既にカンファレンスのレポートを書いてらっしゃる方が沢山いるので、僕は個人的なラーニングを備忘録として書こうかと思います。</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/03/10/scalaconfjp/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/index.html">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/11/scala-implicits/">Implicitには型注釈をつけましょう</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/06/scalikejdbc-on-android-sqlite/">ScalikeJDBC on Android SQLite</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/06/scala-repl-extension/">ScalaのREPLを拡張するには</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/30/akka-transactor-deprecated/">Akka Transactorsはオワコン</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/25/scalamatsuri-code-of-conduct/">ScalaMatsuri 行動規範を掲げた経緯</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

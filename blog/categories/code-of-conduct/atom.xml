@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Code-of-conduct | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/code-of-conduct/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaMatsuri 行動規範を掲げた経緯]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct/"/>
+    <updated>2014-09-25T10:38:17+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct</id>
+    <content type="html"><![CDATA[<p>今年から、<a href="http://scalamatsuri.org/ja/code-of-conduct/">行動規範</a>をScalaMatsuriとして掲げ始めた。
+その目的は<strong>「みんな仲良く」</strong>。噛み砕いて言えば、性別、国籍などに起因するような少数派が居心地の悪い思い、不快な思いをしないことを目指している。</p>
+
+<p>この行動規範について、突然Webサイトに追加されたので驚かれた方も多いかもしれない。この行動規範は、現実に発生しそうになった問題から、必要要件を考え、準備委員内で長期間に渡り議論を重ねた上で公開したものだ。</p>
+
+<p>既にその目的については<a href="http://twitter.com/">@eed3si9n_ja</a>さんが<a href="http://eed3si9n.com/ja/towards-universal-access-at-a-conference">カンファレンスでのユニバーサル・アクセスへ向けて</a>という記事でまとめてくださっているが、来年から本格的に運用するにあたり、この行動規範を掲げた経緯も含めて紹介することが、ご理解とご協力をいただく上では重要ではないかと考えているため、この記事を書くに至った。</p>
+
+<!--more-->
+
+
+<p>この記事では、行動規範が生まれた経緯を3つの側面から説明していきたい。</p>
+
+<ul>
+<li>行動規範が必要となった背景</li>
+<li>どのような必要要件から行動規範が決まったか</li>
+<li>来年以降の行動規範の運用に向けて</li>
+</ul>
+
+
+<h1>行動規範が必要となった背景</h1>
+
+<p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
+
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+
+<p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
+
+<h1>どのような必要要件から行動規範が決まったか</h1>
+
+<p>実運用、公平性、リソース確保などの現実的制約について議論を重ねた結果、以下のような必要要件に至った。</p>
+
+<ul>
+<li>時代を反映するための柔軟性</li>
+<li>事務コスト削減のための、微細なルール(e.g. スカート丈何cm)規定の排除</li>
+<li>退場のような強行手段に出た場合の、公平性の担保</li>
+<li>準備委員全体での都度議論を避けることによる、コミュニケーションコストの低減</li>
+</ul>
+
+
+<p>これらを満たすものとして、実績のあるPNWScala, NE ScalaやScalaDaysといったScalaの国際カンファレンスの行動規範を思想方針として全面的に採用することに決めた。</p>
+
+<p>ScalaMatsuri発起の理由として海外コミュニティとの交流をうたっていること、直近では招待講演者やスポンサーとして、将来的には一般参加者として、先に挙げたカンファレンスに参加している層がScalaMatsuriに来ても居心地の悪い思いをしなくて済むような準備を整えるために、国際カンファレンスに追随した形だ。</p>
+
+<p>これらのカンファレンスに限らず、日本国内でいえばRubyKaigiでも<a href="http://rubykaigi.org/2014/anti-harassment-policy">Anti-harassment-policy</a>について明示している通り、国際的なカンファレンスを視野に入れるためには、同様のガイドラインを掲げることは避けては通れないものだと考えている。但し、細部については実運用や時代の移り変わりに伴い、加筆修正される可能性はある。</p>
+
+<h1>来年以降の行動規範の運用に向けて</h1>
+
+<p>今年のScalaMatsuri 2014では、行動規範の議論に時間を費やした結果、公開が直前となってしまった為、実運用は見送った形となった。ただ来年から運用を開始するにあたり、まだ幾つかの課題は残っている。例えば:</p>
+
+<ul>
+<li>個々の事例について、どのように判断するのか？</li>
+<li>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</li>
+</ul>
+
+
+<p>それぞれについて、まだ議論は続いているものの、どのようにクリアできる可能性があるかについて紹介していきたい。</p>
+
+<h4>個々の事例について、どのように判断するのか？</h4>
+
+<p>審判制度での運用を検討している。具体的には、3人〜5人程度の審判の間で議論して最終的な判断を下すが、その際に、過去の代表事例との間に大きな矛盾が生じないかチェックをするというものだ。</p>
+
+<h5>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</h5>
+
+<p>確かに、幾ばくかのトレードオフがあることは事実だと思う。</p>
+
+<p>しかしながら、ScalaMatsuri 2014のアンカンファレンスの異様な盛り上がりを経験した今振り返ってみると、行動規範を遵守したままでもイベントを盛り上げることは不可能ではないと思える。また代表的な事例をオープンにすることで、自主規制の参考にしていただけることを期待している。</p>
+
+<h1>まとめ</h1>
+
+<p>行動規範は、ScalaMatsuriのコアである海外コミュニティとの交流を実現する上でも、ScalaMatsuriに関わる全ての人をトラブルから守る上でも無くてはならないものだと考えている。ScalaMatsuriを一緒にハラスメント・フリーなイベントするべく、ご理解とご協力を賜われれば幸いである。</p>
+
+<p>最後に、この記事をレビューしてくださった<a href="http://twitter.com/eed3si9n_ja">@eed3si9n_ja</a>さん、<a href="http://twitter.com/gakuzzzz">@gakuzzzz</a>さん、<a href="http://twitter.com/kmizu">@kmizu</a>さん、<a href="http://twitter.com/seratch_ja">@seratch_ja</a>さん、<a href="http://twitter.com/xuwei_k">@xuwei-k</a>さんに感謝します。</p>
+]]></content>
+  </entry>
+  
+</feed>

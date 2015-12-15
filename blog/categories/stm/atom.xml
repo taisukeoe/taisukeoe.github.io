@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Stm | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/stm/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Akka Transactorsはオワコン]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated/"/>
+    <updated>2014-09-30T01:21:47+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated</id>
+    <content type="html"><![CDATA[<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> STM is a failure, since removed from Akka.</p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/516271313258676226">September 28, 2014</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>9/28のAkka Meetupで、AkkaでTransaction処理する話題が出たときに、こんなことをつぶやいたら、<a href="http://shop.oreilly.com/product/0636920028789.do">Effective Akka</a>著者の<a href="https://twitter.com/jamie_allen">@jamie_allen</a>さんに「それはもうオワコンだよ」と教えていただいた(確かに調べてみると、<a href="http://doc.akka.io/docs/akka/snapshot/project/migration-guide-2.2.x-2.3.x.html">Akka 2.3でdeprecated</a>)ので記事化してみる。</p>
+
+<!--more-->
+
+
+<h2>Akka Transactorsとは</h2>
+
+<p><a href="http://doc.akka.io/docs/akka/2.0/scala/transactors.html">Akka Transactors 公式ドキュメント</a>より抜粋,翻訳。</p>
+
+<blockquote><p>Generally, the STM is not needed very often when working with Akka. Some use-cases (that we can think of) are:</p>
+
+<ul>
+<li>When you really need composable message flows across many actors updating their internal local state but need them to do that atomically in one big transaction. Might not be often but when you do need this then you are screwed without it.</li>
+<li>When you want to share a datastructure across actors.</li>
+</ul>
+
+
+<p>一般的に、Akkaを使用しているときにSTMは殆どの場合必要ないけれども、(我々の考えている)ユースケースが幾つかある:</p>
+
+<ul>
+<li>多数のアクター間の内部のローカルな状態を一つの大きなトランザクション内でアトミックに変更する為に合成可能なメッセージフローが必要なとき。こういうケースは余り頻繁にはないが、<strong>必要になったときTransactorsがないととても困るはずだ</strong>。</li>
+<li>データ構造をアクター間で共有したいとき</li>
+</ul>
+</blockquote>
+
+<p>「Transactorsが無いととても困るはずだ」と書いておきながら、なんで削除されたのか気になったので聞いてみた。</p>
+
+<h2>Akka Transactorsが削除された理由</h2>
+
+<ul>
+<li>Jamieさん曰く、非決定点?(some indeterminate point)においてSTMはライブロックに陥る可能性があるから。<em>(STMのライブロックについては<a href="http://ja.wikipedia.org/wiki/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%83%A1%E3%83%A2%E3%83%AA#.E4.B8.8D.E9.80.8F.E6.98.8E.E6.80.A7">このあたり</a>を参照。)</em></li>
+<li>Akka Teamの<a href="https://twitter.com/patriknw">@patriknw</a>さん曰く、Akka Transactorsは<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">ScalableでもDistributableでもない</a>から。</li>
+<li>上記二つは一応分けたけど、これはクラスター環境だとSTMがライブロックに陥りやすい<strong>ので</strong>、ScalabilityやDistributabilityを損なう、ということな気がする(が間違っていたら教えてください)。</li>
+</ul>
+
+
+<h2>Akka Transactorsの代替手段</h2>
+
+<ul>
+<li>複数のActorの内部のローカルな状態をatomicに変更したいときは、short-lived actor(短命のアクター)を実装してその中でトランザクションを書く。</li>
+<li>トランザクションの書き方は、そのshort-lived actorのfailure内にロールバック処理を自前で実装するのが、Jamieさんが<a href="http://www.slideshare.net/shinolajla/effective-akka-scalaio/8">Effective Akka内でも</a>お勧めしている方法。</li>
+<li>でもshort-lived actor内のlocalな環境に限定すれば<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">STMも使える</a>はず…なのだけど、そのことを聞いたら<a href="https://twitter.com/jamie_allen/status/516359268723740672">&ldquo;No, no STM at all&rdquo;</a>と強く否定された。localな環境ならSTMはオーバースペックで、ロールバック処理さえあれば十分というだけのことかしら。</li>
+</ul>
+
+
+<h2>最後に</h2>
+
+<p>Effective AkkaのCameo Patternという項で、short-lived actorで複数のActorのをコーディネートする例が書かれているのでご参考までに(でもコーディネートするところだけで、トランザクションに相当するコードはない）。</p>
+
+<p><iframe src="https://www.slideshare.net/slideshow/embed_code/key/J1JLMjGoC0zu5v" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/shinolajla/effective-akka-scalaio" title="Effective akka scalaio" target="_blank">Effective akka scalaio</a> </strong> from <strong><a href="http://www.slideshare.net/shinolajla" target="_blank">shinolajla</a></strong> </div>
+
+</p>
+]]></content>
+  </entry>
+  
+</feed>

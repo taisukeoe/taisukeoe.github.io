@@ -1,0 +1,813 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Android | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/android/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ScalikeJDBC on Android SQLite]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite/"/>
+    <updated>2015-05-06T21:40:25+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite</id>
+    <content type="html"><![CDATA[<p>意外にもまだ試している人がいなさそうなので、<a href="https://rpscala.doorkeeper.jp/events/23383">rpscala合宿</a>でDEMOを作成した。</p>
+
+<p><a href="https://github.com/taisukeoe/scalikejdbc-on-android">scalikejdbc-on-android</a></p>
+
+<p><img src="/images/20150506/scalikejdbc_demo.png"></p>
+
+<!--more-->
+
+
+<h3>使用versionなど:</h3>
+
+<ul>
+<li>Scala 2.11.6</li>
+<li>sbt 0.13.8</li>
+<li>Target: Android 5.1</li>
+<li>MinSDK: Android 4.0.3</li>
+<li>pfn/android-sdk-plugin 1.3.22</li>
+<li>ScalikeJDBC 2.2.6</li>
+<li>SQLDroid 1.0.3</li>
+</ul>
+
+
+<h2>Android in ScalaのDBアクセス事情</h2>
+
+<ul>
+<li>自分は普段Android Database API + <a href="https://github.com/pocorall/scaloid/blob/060fd9b5d330d735be96ac0b9489b4600a6dec09/scaloid-common/src/main/st/org/scaloid/common/implicits.scala#L110-L120">RichCursor</a>を使う</li>
+<li><a href="https://www.typesafe.com/activator/template/agile-scala-android-example">Slickを使用したTypesafe activatorテンプレート</a>などもある</li>
+<li>そもそもDBをローカルに持つ必要のない（DBサーバー+クライアントキャッシュな)Androidアプリも多い</li>
+</ul>
+
+
+<h2><a href="http://scalikejdbc.org/">ScalikeJDBC</a>とは？</h2>
+
+<p><code>a tidy SQL-based access library for Scala Developers</code>(公式ドキュメントより抜粋)</p>
+
+<p>SQL文をそのまま(より型安全な方法で）扱えるのが特長。Androidでいえば<a href="http://developer.android.com/intl/ja/reference/android/database/sqlite/SQLiteDatabase.html">SQLiteDatabase.rawQuery</a>を好んで使う人向け。</p>
+
+<h2>SQLite JDBC Driver</h2>
+
+<p>今回はAndroidのSQLiteを使用するので、SQLite3に対応していることが必須。あとはPure Java実装か、Android NDKでAndroid用のNative Libraryを生成できる必要がある。</p>
+
+<h3><a href="https://github.com/SQLDroid/SQLDroid">SQLDroid</a></h3>
+
+<p>今回使用した、Android Database APIをラップしたJDBC Driver。ただあまり活発にメンテされていないようなので、プロダクションで使用するのは躊躇する。</p>
+
+<h3><a href="http://docs.oracle.com/cd/E17076_02/html/installation/build_android_jdbc.html">Android JDBC Driver (Oracle)</a></h3>
+
+<p>Android NDKを使用しビルドすることで、Android用のNative Library(.so)を生成できる…が、unmanagedDependenciesとして追加する必要があるので、ちょっと扱いずらい。（なお、<a href="http://d.hatena.ne.jp/esmasui/20120918/1347985333">この記事</a>を読む限り、Natvie Libraryを含めなくても動作する（＝Pure Java実装に自動的に切り替わっている？）模様。)</p>
+
+<h3><a href="https://bitbucket.org/xerial/sqlite-jdbc">xerial/sqlite-jdbc</a></h3>
+
+<p>現在Androidはサポートされておらず、実行すると</p>
+
+<blockquote><p>java.lang.UnsatisfiedLinkError: dalvik.system.PathClassLoader[DexPathList[[zip file &ldquo;/system/framework/android.test.runner.jar&rdquo;, zip file &ldquo;/data/app/taisukeoe.scalikeroid-1/base.apk&rdquo;],nativeLibraryDirectories=[/vendor/lib, /system/lib]]] couldn&rsquo;t find &ldquo;libsqlitejdbc.so&rdquo;</p></blockquote>
+
+<p>というRuntimeエラーとともに落ちる。</p>
+
+<p><a href="https://bitbucket.org/xerial/sqlite-jdbc/issue/159/javafx-android-port-crashes-and-fails-to">Pure Java実装に切り替えるAPI</a>のfeatureリクエストは上がっているようなので、これが実装されれば使えるはず。</p>
+
+<h2>落とし穴|Pitfalls</h2>
+
+<h3><a href="https://www.sqlite.org/datatype3.html">SQLite</a>起因のもの</h3>
+
+<ul>
+<li><code>serial</code>データ型が存在しないので、<code>integer autoincrement</code>にする。</li>
+<li><code>timestmap</code>および<code>datetime</code>データ型が存在せず、<code>timestamp</code>指定すると<code>yyyy-MM-dd hh:mm:ss</code>というISO8601フォーマットのTEXT型で保存されるため、WrappedResultSet.jodaDateTimeでDateTime型の値を抽出できない。<code>integer</code>型にしておいてWrappedResultSet.timestampを使う。</li>
+</ul>
+
+
+<h3>Android起因のもの</h3>
+
+<ul>
+<li><code>DatabseUtils.createDbFromSqlStatements</code>から手動でDatabaseを作成する必要がある</li>
+</ul>
+
+
+<h3>Android in Scala起因のもの</h3>
+
+<ul>
+<li><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>のProguard後のclassファイルのキャッシュが重複してしまうことにより、ビルド時に以下のExceptionが投げられる</li>
+</ul>
+
+
+<blockquote><p>java.lang.IllegalArgumentException: already added: Lscala/util/parsing/combinator/JavaTokenParsers$class;</p></blockquote>
+
+<p>これを防ぐために、sbtビルド定義に以下を追加する。</p>
+
+<p><code>proguardCache in Android += ProguardCache("parser-combinators") % "org.scala-lang.modules" %% "scala-parser-combinators"</code></p>
+
+<h2>雑感</h2>
+
+<p>ハッカソンではDEMOまでしか作成できなかったが</p>
+
+<ul>
+<li>ScalikeJDBCの主だった機能は一通り試したい</li>
+<li><a href="http://www.h2database.com/html/tutorial.html#android">h2 database</a>は公式でAndroid対応のJDBC driverを配布しているようなので、h2でも試したい</li>
+<li>Typesafe activator templateにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaのREPLを拡張するには]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension/"/>
+    <updated>2014-12-06T18:04:35+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension</id>
+    <content type="html"><![CDATA[<p>こちらは<a href="http://qiita.com/advent-calendar/2014/scala">Scala AdventCalendar 2014</a>の7日目の記事です。
+今日はScalaのカスタムREPLの作り方についての話。なお今回は(Scala REPL同様)StandaloneなREPLアプリの作成を目的としているので、<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>は主眼ではありません。</p>
+
+<h1>モチベーション</h1>
+
+<p>ScalaのREPLは手元のローカルマシンでAPIを試してみたいときや、ちょっとした計算をしたいときにはとても便利なのですが、やや凝ったことをしたいときなど、そのまま使うには不便さを感じることがあります。</p>
+
+<p>具体的にはAndroidのAPIをScalaのREPLから叩けるようにしたかったのですが、Android環境をJVMでエミュレートするためにはカスタムClassLoaderを使ってAndroid APIのClassを書き換える必要があって。。。という感じ。</p>
+
+<p>これはちょっと特殊なモチベーションかもしれませんが、クラスター上などの特定の環境で実行させたいとき(e.g.<a href="http://spark.apache.org/docs/latest/quick-start.html#interactive-analysis-with-the-spark-shell"><code>spark-shell</code></a>)、自作ライブラリのsandbox環境を提供するにあたって特定の場面でよく使うコマンドを追加したい、など思われる方はいるかもしれません。</p>
+
+<p>そんなとき、意外とScala REPLを拡張する記事を書いている人が少なかったので、今回はScalaのソースコードを読みながらカスタムClassLoaderを使用する方法、コマンドを追加する方法について書くことにしました。</p>
+
+<p>参考:<a href="http://www.michaelpollmeier.com/create-your-custom-scala-repl/">Create your custom Scala REPL</a> &hellip;  数少ないREPL拡張方法に関する記事。</p>
+
+<h1>成果物</h1>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl"><code>taisukeoe/MyCLRepl</code></a></p>
+
+<pre><code class="scala MyCLRepl DEMO">scala&gt; val hello = "hello"
+
+MyClassLoader loads classOf &lt;root&gt;.$line3
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.collection.mutable.StringBuilder
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+hello: String = hello
+
+scala&gt; :myCommand hello
+
+This is a custom command example. You can do something from value:"hello" with custom Scala interpreter.
+</code></pre>
+
+<p>ClassLoaderの差し替え(Classのロード時にクラス名をprint)と、myCommandというコマンドの追加をしています。</p>
+
+<!--more-->
+
+
+<h1>REPLとは</h1>
+
+<p><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">Read–Eval–Print Loop</a>の略で、対話型の開発環境。ユーザーの入力したコードを一行から評価する。
+ScalaのREPLは<code>scala</code>コマンドから開始できる。</p>
+
+<h1>ScalaのREPLの構成</h1>
+
+<p><a href="https://github.com/scala/scala/tree/v2.11.4/src/repl/scala/tools/nsc"><code>scala.tools.nsc.interpreter</code></a>パッケージがREPLに相当。インタプリタのソースコードがそれなりの量あるので一見大変そうだが、構成自体はシンプル。REPLをカスタマイズする上で最低限見る必要がある場所に絞って、以下では解説します。</p>
+
+<h2>エントリポイント</h2>
+
+<p>scalaのスクリプトの中身を見ると、以下の通り<code>scala.tools.nsc.MainGenericRunner</code>の<code>main</code>関数をエントリポイントとしてREPLを起動していることがわかる。</p>
+
+<pre><code class="bash /usr/local/bin/scala#L202-212">execCommand \
+  "${JAVACMD:=java}" \
+  $JAVA_OPTS \
+  "${java_args[@]}" \
+  $(classpathArgs) \
+  -Dscala.home="$SCALA_HOME" \
+  $OVERRIDE_USEJAVACP \
+  "$EMACS_OPT" \
+  $WINDOWS_OPT \
+  scala.tools.nsc.MainGenericRunner  "$@"
+</code></pre>
+
+<h2>Main関数の中でLoopを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74"><code>scala.tools.nsc.MainGenericRunner</code></a>の<code>main</code>関数の処理は、同コンパニオンクラスの<code>process</code>関数に移譲している。この関数の中で、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>process</code>関数を呼んでおり、このクラスがREPLのLoopに相当。</p>
+
+<pre><code class="scala scala.tools.nsc.MainGenericRunner https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">class MainGenericRunner {
+...
+  def process(args: Array[String]): Boolean = {
+    ...
+    def run(): Boolean = {
+      ....
+
+      def runTarget(): Either[Throwable, Boolean] = howToRun match {
+        ...
+        case _  =&gt;
+          // We start the repl when no arguments are given.
+          Right(new interpreter.ILoop process settings)
+      }
+     ...
+    }
+    ...
+      run()
+  }
+}
+
+object MainGenericRunner extends MainGenericRunner {
+  def main(args: Array[String]): Unit = if (!process(args)) sys.exit(1)
+}
+</code></pre>
+
+<p>参考:<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">scala.tools.nsc.MainGenericRunner.run</a></p>
+
+<h2>Loopの中でインタプリタを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a>はREPLのLoopに相当するクラス。コマンドの判定や、入力したコードのインタプリタへの移譲などを行っている。</p>
+
+<p>REPLのコマンド(e.g.<code>:help</code>)の定義は<code>standardCommands</code>変数。overrideした<code>commands</code>関数において追加することでカスタムCommandを実装できる。</p>
+
+<p>また、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>createInterpreter</code>関数内で、インタプリタのメンバ変数<code>var intp:IMain</code>を初期化している。</p>
+
+<p>なおインタプリタ <code>intp</code>の実装クラスは<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>ILoopInterpreter</code></a>。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.ILoop https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala">class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
+                extends AnyRef
+                   with LoopCommands
+{
+...
+var intp: IMain = _
+...
+
+　  lazy val standardCommands = List(
+    cmd("edit", "&lt;id&gt;|&lt;line&gt;", "edit history", editCommand),
+    cmd("help", "[command]", "print this summary or command-specific help", helpCommand),
+    historyCommand,
+    cmd("h?", "&lt;string&gt;", "search the history", searchHistory),
+    cmd("imports", "[name name ...]", "show import history, identifying sources of names", importsCommand),
+    cmd("implicits", "[-v]", "show the implicits in scope", intp.implicitsCommand),
+    cmd("javap", "&lt;path|class&gt;", "disassemble a file or class name", javapCommand),
+    cmd("line", "&lt;id&gt;|&lt;line&gt;", "place line(s) at the end of history", lineCommand),
+    cmd("load", "&lt;path&gt;", "interpret lines in a file", loadCommand),
+    cmd("paste", "[-raw] [path]", "enter paste mode or paste a file", pasteCommand),
+    nullary("power", "enable power user mode", powerCmd),
+    nullary("quit", "exit the interpreter", () =&gt; Result(keepRunning = false, None)),
+    cmd("replay", "[options]", "reset the repl and replay all previous commands", replayCommand),
+    cmd("require", "&lt;path&gt;", "add a jar to the classpath", require),
+    cmd("reset", "[options]", "reset the repl to its initial state, forgetting all session entries", resetCommand),
+    cmd("save", "&lt;path&gt;", "save replayable session to a file", saveCommand),
+    shCommand,
+    cmd("settings", "&lt;options&gt;", "update compiler options, if possible; see reset", changeSettings),
+    nullary("silent", "disable/enable automatic printing of results", verbosity),
+    cmd("type", "[-v] &lt;expr&gt;", "display the type of an expression without evaluating it", typeCommand),
+    cmd("kind", "[-v] &lt;expr&gt;", "display the kind of expression's type", kindCommand),
+    nullary("warnings", "show the suppressed warnings from the most recent line which had any", warningsCommand)
+  )
+
+  ...
+
+    /** Available commands */
+  def commands: List[LoopCommand] = standardCommands ++ (
+    if (isReplPower) powerCommands else Nil
+  )
+
+  ...
+
+  class ILoopInterpreter extends IMain(settings, out) {
+    outer =&gt;
+
+    override lazy val formatting = new Formatting {
+      def prompt = ILoop.this.prompt
+    }
+    override protected def parentClassLoader =
+      settings.explicitParentLoader.getOrElse( classOf[ILoop].getClassLoader )
+  }     
+  /** Create a new interpreter. */
+  def createInterpreter() {
+    if (addedClasspath != "")
+      settings.classpath append addedClasspath
+
+    intp = new ILoopInterpreter
+  }
+
+  ...
+
+  // start an interpreter with the given settings
+  def process(settings: Settings): Boolean = savingContextLoader {
+    this.settings = settings
+    createInterpreter()
+     ...
+    printWelcome()
+     ...
+    try loop() match {
+      case LineResults.EOF =&gt; out print Properties.shellInterruptedString
+      case _               =&gt;
+    }
+    catch AbstractOrMissingHandler()
+    finally closeInterpreter()
+
+    true
+  }
+  ...
+</code></pre>
+
+<h2>インタプリタの中でClassLoaderを生成</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>がインタプリタの主たるコード。</p>
+
+<p><code>private var _classLoader:ClassLoader</code>がClassLoaderのメンバ変数だが、privateなのでclassLoader関数をoverrideしてカスタムClassLoaderを生成する。</p>
+
+<p>ただし、<code>IMain</code>の<code>classLoader</code>関数の戻り値の型は<a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>になので、カスタムClassLoaderもこれを継承させる必要がある点に注意。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.IMain https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala">class IMain(@BeanProperty val factory: ScriptEngineFactory, initialSettings: Settings, protected val out: JPrintWriter) extends AbstractScriptEngine with Compilable with Imports {
+  imain =&gt;
+
+  ...
+
+  private var _classLoader: util.AbstractFileClassLoader = null                              // active classloader
+  ....
+
+  /** Parent classloader.  Overridable. */
+  protected def parentClassLoader: ClassLoader =
+    settings.explicitParentLoader.getOrElse( this.getClass.getClassLoader() )
+
+  def resetClassLoader() = {
+    repldbg("Setting new classloader: was " + _classLoader)
+    _classLoader = null
+    ensureClassLoader()
+  }
+    final def ensureClassLoader() {
+    if (_classLoader == null)
+      _classLoader = makeClassLoader()
+  }
+  def classLoader: util.AbstractFileClassLoader = {
+    ensureClassLoader()
+    _classLoader
+  }
+</code></pre>
+
+<h1>カスタムREPLを作る</h1>
+
+<p>基本的には解説した以下のクラスに相当するものを継承なり自前で作るなりすれば、カスタムREPLが作れます。</p>
+
+<ul>
+<li><a href=""><code>scala.tools.nsc.MainGenericRunner</code></a> &hellip; REPLを起動するmain関数、Loopの呼び出し</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a> &hellip; Loopの実装。Commandの判定。インタプリタへ処理の移譲。</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>scala.tools.nsc.interpreter.ILoop.ILoopInterpreter</code></a> &hellip; インタプリタの実装。ClassLoaderの生成。</li>
+<li><a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>を継承したカスタムClassLoader &hellip; インタプリタに使用させる。</li>
+</ul>
+
+
+<p>先ほども記載しましたが、完成物は以下の通り。試し方はREADME参照のこと。</p>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl">taisukeoe/MyCLRepl</a></p>
+
+<h1>REPLを拡張している実例</h1>
+
+<p><a href="https://spark.apache.org/">Apache Spark</a>のspark-shellは、REPL上で入力したコマンドをcluster上で実行させるために、REPLを拡張している。以下のファイル群がカスタムREPLに相当する。</p>
+
+<ul>
+<li><a href="https://github.com/apache/spark/blob/master/bin/spark-shell#L61">spark-shell</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/Main.scala">org.apache.spark.repl.Main</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkILoop.scala#L902">org.apache.spark.repl.SparkILoop</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkIMain.scala">org.apache.spark.repl.SparkIMain</a></li>
+</ul>
+
+
+<p><a href="http://scalamatsuri.org/">ScalaMatsuri</a>で発表された<a href="https://github.com/xitrum-framework/scalive">Scalive</a>もREPLを拡張してJVM環境を触れるようにしている。</p>
+
+<h2>余談:Scalaの:power モード</h2>
+
+<p>Scala REPLに備わっている<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>を使用すると、Scala REPLコードのpublicな変数・関数へのアクセスが可能で、varなら置き換えも可能。</p>
+
+<p>例えば上記のカスタムClassLoader挿入は、<code>:power</code>モードを利用してこんな風にも書けます。（ClassLoaderのサイズが膨らんでくるとつらさはありますが）</p>
+
+<pre><code class="scala">scala&gt; :power
+
+** Power User mode enabled - BEEP WHIR GYVE **
+** :phase has been set to 'typer'.          **
+** scala.tools.nsc._ has been imported      **
+** global._, definitions._ also imported    **
+** Try  :help, :vals, power.&lt;tab&gt;           **
+
+scala&gt; :paste
+// Entering paste mode (ctrl-D to finish)
+
+import scala.reflect.internal.util.ScalaClassLoader
+import scala.tools.nsc.interpreter.JPrintWriter
+import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.util
+repl.intp = new repl.ILoopInterpreter {
+   override def classLoader = new util.AbstractFileClassLoader(root:AbstractFile,parent:ClassLoader)  with ScalaClassLoader{
+  override def loadClass(name: String) = {
+    println(s"MyClassLoader loads classOf ${name}")
+    super.loadClass(name)
+  }
+ }
+}
+
+scala&gt; val hoge = "hoge"
+
+MyClassLoader loads classOf &lt;root&gt;.$line2
+MyClassLoader loads classOf $line2
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+MyClassLoader loads classOf scala.runtime.BoxedUnit
+
+hoge: String = hoge
+</code></pre>
+
+<p>ただその一方でREPLのコマンドの判別はILoopクラスで行わており、MainGenericRunnerの内部関数中で直接呼び出されているのでPowerModeからのカスタムCommandの追加は不可能なはず（とはいいつつ、何がしかのhackもありそうな気がするのでもしあればコメント欄で教えてください。）</p>
+
+<h2>余談</h2>
+
+<p>肝心の、オレオレClassLoaderを使ってAndroid APIを叩けるScala REPLアプリは間に合わず。現状でも、未解決のwarningが出る問題とか、タブ補完が効かない問題など、色々と雑な感じにはなっています。。。</p>
+
+<p>そのあたりのフォローはまた後日に(&lsquo;・ω・`)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Androidプロジェクト(pfn)のgiter8テンプレート]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/14/pfn-test/"/>
+    <updated>2014-03-14T12:00:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/14/pfn-test</id>
+    <content type="html"><![CDATA[<p>ScalaでAndroidアプリを作るためのsbtプラグイン、<a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>の紹介を<a href="/blog/2014/03/13/pfn-android-sdk-plugin/">前回のブログ</a>でしました。</p>
+
+<p>が、このREADMEの通りにプロジェクトを作るのが面倒なので、giter8テンプレートも作ってみました。</p>
+
+<h1>プロジェクト作成</h1>
+
+<pre><code class="bash"> g8 taisukeoe/android-pfn-app.g8
+</code></pre>
+
+<!--more-->
+
+
+<p>からプロジェクトの雛形が作れます。
+giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
+
+<h1>ディレクトリ構造</h1>
+
+<p>こんな感じです。</p>
+
+<pre><code>MyAndroidProject
+├── .gitignore
+├── AndroidManifest.xml
+├── build.sbt
+├── local.properties
+├── proguard-project.txt
+├── project/
+│   ├── build.properties
+│   └── plugins.sbt
+├── project.properties
+├── res/
+│   ├── layout/
+│   └── values/
+├── src/.../MainActivity.scala
+└── tests/
+    └── src/.../MainActivityInstrumentationTest.scala
+</code></pre>
+
+<p>簡単な説明。</p>
+
+<ul>
+<li>AndroidManifest.xml &hellip;ActivityやApplicationのもろもろの設定。</li>
+<li>build.sbt &hellip;sbtのビルド定義</li>
+<li>local.propeties &hellip;AndroidSDKのpathを記入。また、keyStoreの情報を記入すると、<em>android:package-release</em>で簡単にrelease buildできる。</li>
+<li>proguard-project.txt &hellip;proguardオプションを記入。<em>-dontwarn</em>, <em>-keep</em>, <em>-keepclassmembers</em>, <em>-libraryjars</em>あたりのオプションが頻出。詳しくは<a href="http://proguard.sourceforge.net/index.html#manual/usage.html">ProGuard Usage</a>を参照。</li>
+<li>project/ &hellip;sbtのバージョンやpluginなどを記入。</li>
+<li>project.properties&hellip; 利用するAndroid APIのバージョン(target api)や、(unmanagedの)libraryプロジェクトのpathを記入。</li>
+<li>res/ &hellip;レイアウトやテキスト、画像などのリソースファイル置き場。</li>
+<li>src/ &hellip;ソース。</li>
+</ul>
+
+
+<p>local.properties, project.propertiesを修正したときは、ちゃんと<em>sbt reload</em>しましょう。</p>
+
+<p>proguard-project.textを修正したときは、<em>sbt reload clean</em>してclassファイルのキャッシュを消しましょう。</p>
+
+<h1>各種コマンド</h1>
+
+<p><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>より。</p>
+
+<h2>インストール</h2>
+
+<pre><code class="bash">sbt
+&gt; android:run
+</code></pre>
+
+<h2>テスト</h2>
+
+<pre><code class="bash">sbt
+&gt; android:test
+</code></pre>
+
+<p>ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。</p>
+
+<p>まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaでAndroidアプリを作るには（pfn/android-sdk-plugin）]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin/"/>
+    <updated>2014-03-13T06:06:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin</id>
+    <content type="html"><![CDATA[<p>表題の件ですが、今は<strong><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>を使うのがオススメです</strong>。</p>
+
+<p>なぜか。</p>
+
+<!-- more -->
+
+
+<p>2013年6月に<a href="/blog/2013/06/08/scala-android-intellij/">ScalaでAndroidアプリを作るには</a>という記事を書いたのですが、その後Android SDKのディレクトリ構造が(r22〜？)変わったものの、記事中で使用していた<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>がその変更に追従しておらず、<em>Could not find tool &ldquo;aapt&rdquo;</em>エラーが出てビルドできない問題が発生しています。</p>
+
+<p>参考のSO記事はこちら。mavenのpluginの話ですが同じ問題。</p>
+
+<p><a href="http://stackoverflow.com/questions/16927306/could-not-find-tool-aapt-please-provide-proper-android-sdk-directory-path-as-co">maven - Could not find tool aapt. Please provide proper Android SDK directory path as configuration parameter - Stack Overflow</a></p>
+
+<h1>pfn/android-sdk-pluginの、<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>との主な違い</h1>
+
+<ul>
+<li>Proguardしたclassファイルをキャッシュしてくれるので、<strong>デバッグ時のビルド時間が半分くらい</strong>になる。</li>
+<li>ディレクトリ構造がsbtではなく、Android SDKデフォルト(android create project &hellip;)。</li>
+<li>local.propeties,project.properties,proguard-project.txtなどAndroidSDKの各種configファイルも使用可能(なのでbuild.sbtが膨れ上がらずに済む)。</li>
+<li>Android NDKサポートがない</li>
+<li>proguardのデフォルトの設定が違うので、書き直しが必要（これが面倒…）</li>
+</ul>
+
+
+<p>また思い出したら上に書き足します。</p>
+
+<h1>pfn/android-sdk-pluginの問題</h1>
+
+<ul>
+<li>sampleコードが古い</li>
+<li>configファイルなどを更新した場合も、reloadが必要</li>
+<li>ScalaTestなどScalaのテストフレームワークと相性悪い？（回避方法模索中）</li>
+</ul>
+
+
+<h1>AndroidアプリをScalaで書くときの問題</h1>
+
+<p>あと、AndroidアプリをScalaで書くと、以下の問題にぶつかりやすくなります（DalvikVM自身の問題も多分に含まれるのですが）。</p>
+
+<ul>
+<li>DalvikVMのmethod数上限65,535個に引っかかる</li>
+<li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
+<li>Scalaの変なバグ(e.g.<a href="/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
+<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
+</ul>
+
+
+<p>ちなみにLinearAlloc問題が起きるのは基本的にAndroid2.3以下だし、DalvikVMに代わるARTがAndroid4.4から試験導入されているので、時間とともに改善するという説もあります。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Deprecated]ScalaでAndroidアプリを作るには(IntelliJ IDEA + Sbt)]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij/"/>
+    <updated>2013-06-08T03:25:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij</id>
+    <content type="html"><![CDATA[<p><strong><em>この記事の内容は執筆当時のものです。最新の内容は<a href="/blog/2014/03/13/pfn-android-sdk-plugin">こちら</a>を参照してください。</em></strong></p>
+
+<p>LinkedInのブログで、EclipseベースのScalaによるAndroidアプリ開発環境が紹介されてました。（と、
+<a href="https://twitter.com/okapies">@okapies</a>さんに教えていただきました。ありがとうございます。)</p>
+
+<p><a href="http://engineering.linkedin.com/incubator/technology-behind-eatin-android-apps-scala-ios-apps-and-play-framework-web-services">The technology behind EatIn: Android apps in Scala, iOS apps, and Play Framework web services</a></p>
+
+<p>うちのAndroid Scala開発環境はIntelliJ IDEA + sbtなので、折角なのでこんな風にも出来ますよと紹介してみます。本当はLinkedInブログに対抗して <em>(sorry eclipse users!!)</em> って書きたかったw のですが、IntelliJはエディタとして使ってるだけなので、Eclipseに変えても大して支障ないです。というわけでお好きな方をどぞ。</p>
+
+<p>Androidに馴染みが無い方にも、Scalaに馴染みが無い方にも試してもらえるよう、クドいぐらいに丁寧に書いてますので、慣れ親しんだ部分は読み飛ばしてください。</p>
+
+<p>また、<strong>「もっとこうした方がいいんじゃない？」みたいな突っ込みは大歓迎</strong>です。</p>
+
+<h1>開発環境</h1>
+
+<p>以下コマンド例はMac/Linux用なので、Windowsの方はお好きな方法で適宜書き換えてください。</p>
+
+<h2>各種インストール</h2>
+
+<!-- more -->
+
+
+<h3>IntelliJ IDEA</h3>
+
+<p>強力なリファクタリングと、Android UI Designer機能が便利なIDE。</p>
+
+<p><a href="http://www.jetbrains.com/idea/">IntelliJ IDEA — The Best Java and Polyglot IDE</a></p>
+
+<p>幸いなことに、IntelliJ IDEAのCommunity Edition(無料版)でもScalaとAndroidのサポートを使えます。
+インストールしたら、以下の手順でScalaのPluginを入れましょう。</p>
+
+<pre><code>Configure =&gt; Plugins =&gt; Browse repositories 
+プラグインの一覧からscalaを右クリック =&gt; Download &amp; Install
+</code></pre>
+
+<p>ちなみにsbtコンソールをIntelliJに追加するプラグインもありますが、このコンソールは<em>Tab補完が効かない</em>ので、コマンドが長めなandroid-pluginには不向き。Terminal経由でsbtコマンドを叩いた方が無難です。</p>
+
+<h3>Android SDK</h3>
+
+<p>Android APIのjarが含まれているほか、ビルドやデバッグに使用する各種便利ツールが入ってます。アップデートの度にちょこちょこ構成が変わるので、各種サードパーティ製のツールとの互換性がなくなったりします。なので<strong>新しいバージョンが出ても1個前のバージョンは消さずに、シンボリックリンクの切り替えで対応しとくと良い</strong>です。</p>
+
+<p><a href="http://developer.android.com/intl/ja/sdk/index.html#ExistingIDE">Android SDK | Android Developers</a></p>
+
+<p>IntelliJ IDEAを使う場合は、ADT Bundleではなく<em>USE AN EXISITING IDE</em>からSDK単体をDLます。ADT Bundleでも特に問題はないですが、余計な物(Eclipse+ADT)が入ってます。</p>
+
+<p>その後、SDK環境変数ANDROID_HOMEとtools, platform-toolsのディレクトリにPATHを通します。</p>
+
+<pre><code class="bash">ln -s &lt;SDK_ROOT_DIR&gt; &lt;SYMBOLIC_LINK_PATH&gt;
+
+export $ANDROID_HOME=&lt;SYMBOLIC_LINK_PATH&gt;
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+</code></pre>
+
+<p>ちなみに上記SDKには最新版のAndroid versionのlibraryしか含まれていないので、回線に余裕があるときに、以下のコマンドでAndroid SDK Manager(GUI)を起動し、各versionのlibraryを落としておくと良いです。</p>
+
+<pre><code class="bash">android
+</code></pre>
+
+<p>なおSDKにAndroidエミュレーター作成用ツールも含まれていますが、起動と各種動作が重い上に、エミュレーターで試せない機能が多い(カメラなど各種ハードウェア、GCMを使用したpush通知、アプリ内課金)など、不便極まりないので実機でデバッグする方が無難です。
+どうしても作りたい(特定のマイナーな解像度での見え方をチェックしたい、など)場合は、以下を参考にどうぞ。</p>
+
+<p><a href="https://sites.google.com/a/techdoctranslator.com/jp/android/developing/tools/emulator">Emulator - Android エミュレータ - ソフトウェア技術ドキュメントを勝手に翻訳</a></p>
+
+<h3>giter8</h3>
+
+<p>Githubのリポジトリに登録しておいたテンプレートからプロジェクトを生成するツール。Androidアプリのプロジェクトは色々構成がややこしいので、giter8経由で作成するのがオヌヌメです。</p>
+
+<pre><code class="bash">brew install giter8
+</code></pre>
+
+<p><a href="https://github.com/n8han/giter8">giter8</a></p>
+
+<h3>scala</h3>
+
+<p>Scala本体。まだ入れていなければ。</p>
+
+<pre><code class="bash">brew install　scala
+</code></pre>
+
+<p><a href="http://docs.scala-lang.org/index.html#">Scala Documentation</a></p>
+
+<h3>sbt</h3>
+
+<p>Scalaプロジェクトのビルドによく使われるビルドツール。まだ入れていなければ。</p>
+
+<pre><code class="bash">brew install　sbt
+</code></pre>
+
+<p><a href="http://scalajp.github.io/sbt-getting-started-guide-ja/">始める sbt - ようこそ</a></p>
+
+<h2>使用する各種コマンド</h2>
+
+<h3>プロジェクトの作成</h3>
+
+<p>giter8を使って作成します。</p>
+
+<pre><code class="bash">g8 taisukeoe/android-app
+
+            Template for Android apps in Scala 
+
+            package [my.android.project]: &lt;YOUR_PACKAGE_NAME&gt;
+            name [My Android Project]: &lt;YOUR_PROJECT_NAME&gt;
+            main_activity [MainActivity]: 
+            scala_version [2.10.2]: 
+            min_api_level [8]: 
+            useProguard [true]: 
+            min_api_level [17]: 
+
+cd &lt;YOUR_PROJECT_NAME&gt;
+
+git init
+
+sbt
+gen-idea
+</code></pre>
+
+<p>各変数の解説</p>
+
+<ul>
+<li>package … Androidアプリのユニーク性の担保に使われているので、絶対にかぶらないように設定する必要があります。同じ端末に同じpackageのアプリは同時に1つしか入れられませんし、GooglePlayには同じパッケージのアプリは常に1つしか存在しません。</li>
+<li>name … プロジェクト名及びディレクトリ名に使われます。お好きに。</li>
+<li>main_activity … アプリ起動時に実行するActivity(画面に相当)の名前。お好きに。</li>
+<li>scala_version … 2.10.2以上推奨です。理由は<a href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">こちらのバグ</a>。2.9系でも別に構いませんが。</li>
+<li>min_api_level … 1がAndroid1.5相当、デフォルトの8はAndroid2.2相当、17が最新のAndroid4.2相当です。このプロジェクトがサポートする最低のAndroid versionの数字を入力します。今使われているAndroid端末の99%程度は2.2以上なので、デフォルトで特に問題ないと思います。</li>
+<li>useProguard … 基本的にtrue一択。あらかじめscala-library.jarをAndroid端末に仕込んだりする場合はfalseでも良いですが。</li>
+<li>target_api_level … 使用したいAndroid APIが含まれている、Android versionを入力します。デフォルトの17(最新4.2)にしておけば全てのAPIを使用できますが、Android4.1以前の端末では該当箇所が実行されないように条件分岐しないと、NoClassDefErrorないしはNoSuchMethodExceptionがthrowされます。もちろんmin_api_levelに揃えておくのも手です。</li>
+</ul>
+
+
+<p>作成したプロジェクトをIntelliJ IDEAで開くとこんな感じ。なおsbt pluginは<a href="https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>及び<a href="https://github.com/mpeltonen/sbt-idea">mpeltonen/sbt-idea</a>を使用しています。</p>
+
+<p><img src="/images/20130608/template.jpg" width="600" height="450"></p>
+
+<h3>ビルド定義の更新</h3>
+
+<p>sbtのビルド定義ファイル(<em>project/build.scala</em>)でAndroid versionを変えたりライブラリ依存性を変更した場合は、忘れずにリロードして再度idea設定ファイルを生成します。でないとIntelliJの補完が効かなくなります。</p>
+
+<pre><code class="bash">sbt
+reload
+gen-idea
+</code></pre>
+
+<h3>ビルド&amp;デプロイ</h3>
+
+<p>USBデバッグモードをONにしたAndroid端末を接続しておくと、以下のコマンドでビルド及びデプロイが実行できます。</p>
+
+<pre><code class="bash">sbt
+android:start-device
+</code></pre>
+
+<p>ビルドした実行ファイルは<em>target/<YOUR_PROJECT_NAME>-<VERSION>.apk</em>に生成されます。
+ちなみに、自分以外の誰かにインストールさせたいときに一番簡単な方法は、このapkファイルをメールで送りつけることです。AndroidデフォルトのGmailアプリからapkを開くとインストールできます。</p>
+
+<p>なおAndroidプロジェクトのビルドには時間がかかりすぎる(MBP Retinaで30秒以上&hellip;)ので、コード書いてる最中は自動コンパイルだけにしておく方が無難です。</p>
+
+<pre><code class="bash">sbt
+~compile
+</code></pre>
+
+<h3>テスト</h3>
+
+<p>Androidアプリのテストは、Android上で行う必要がないもの<em>(ex. Modelやユーティリティークラスの単体テスト)</em>と、Android上で行う必要があるもの<em>(ex. Activity(画面)やViewに関するテスト)</em>の二通りがあり、実行方法も違います。</p>
+
+<p>Android上では行う必要のないテストは、<strong>src/test/</strong>以下に書いて、以下の通りテストを実行。</p>
+
+<pre><code class="bash">sbt
+test
+</code></pre>
+
+<p>Android上で行う必要のあるテストは、サブプロジェクトとして別途ビルド&amp;デプロイします。ここまで記載した手順通りで作成している場合には、<strong>tests/src/main/</strong>以下にテストコードを書く形になります。実行コマンドはこんな感じです。</p>
+
+<pre><code class="bash">sbt
+project tests
+android:install-device
+android:test-device
+</code></pre>
+
+<p>余談ですが、<a href="(https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>のTypedResourcesを利用したプロジェクトのテストをAndroid上で実行すると、IllegalAccessErrorで失敗するようです。TypedResourcesはただのユーティリティー的なtraitなので、使わなくても支障は特にありません。</p>
+
+<h3>デバッグ</h3>
+
+<p>主にAndroidSDK同梱のAndroid Device Monitorを使います。</p>
+
+<p>Logの確認の他、Thread, Heapなどの状態をチェックしたり、スクリーンショットを撮ったり、hprofとったり割と便利です。</p>
+
+<pre><code class="bash">monitor
+</code></pre>
+
+<p>その他、よく使うandroid-pluginのsbtコマンド一覧</p>
+
+<pre><code>android:package-debug   … プロジェクトをビルド。
+android:prepare-market   … プロジェクトをビルドし、指定した署名ファイル(&lt;HOGE&gt;.keystore)で署名。GooglePlayへのアップロード時に使用する。
+
+android:install-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール
+android:start-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール、アプリ実行
+android:uninstall-device   … USB経由でAndroid端末からアンインストール
+android:test-device … USB経由でAndroid端末上でテストを実施。前もってテスト用apkをインストールする必要あり。
+android:screenshot-device   …USB経由でAndroid端末のスクリーンショットを撮影
+
+# emulatorの場合は、上記コマンドのdeviceをemulatorに変えてください。      
+</code></pre>
+
+<p>Wikiにも色々書かれていますので、一読しておくと良いかもです。</p>
+
+<p><a href="https://github.com/jberkel/android-plugin/wiki">jberkel/android-plugin Wiki</a></p>
+
+<h3>補足 Android UI Designer</h3>
+
+<p>上記手順だけでも使えないことは無いですが、IntelliJ IDEAのAndroid UI Designer機能を使うためにはもう少し設定が必要です。ちなみに先日のGoogle I/Oで発表された<a href="http://taisukeoe.github.io/blog/2013/05/16/android-studio/">Android Studio</a>のメイン機能も、このAndroid UI Designerを下敷きにしているぐらい強力だったりするので、折角IntelliJを使うのであれば、ぜひここまで設定しましょう！</p>
+
+<p>以下、IntelliJ IDEAでプロジェクトを開いた後に行います。</p>
+
+<pre><code>File  =&gt; Project Structure =&gt; Modules =&gt; 
+メインプロジェクトを選択して Add =&gt; Android
+</code></pre>
+
+<p><img src="/images/20130608/project_structure_add_sdk.jpg" width="600" height="450"></p>
+
+<p>追加した&#8221;Android&#8221;を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の&#8221;.idea_modules&#8221;を全て&#8221;src/main&#8221;に変更します。Native libs directoryは&#8221;.idea_modules&#8221;を削除しましょう。下記スクリーンショットのような感じです。</p>
+
+<p><img src="/images/20130608/project_structure_path.jpg" width="600" height="450"></p>
+
+<p>続いてAndroid SDKのパスを追加します。</p>
+
+<pre><code>File =&gt; Project Structure =&gt; Platform Settings =&gt; SDKs =&gt;
+ 上の"+"ボタン =&gt; Android SDK =&gt; $ANDROID_HOME/platforms/android-17　を選択
+
+File =&gt; Project Structure =&gt; Modules =&gt; メインプロジェクトのModule SDK =&gt; 今追加したAndroid SDKを選択。
+</code></pre>
+
+<p><img src="/images/20130608/project_structure_project_sdk.jpg" width="600" height="450"></p>
+
+<p>以上を終えた後、src/main/res/layout/main.xmlを開くと、自動でAndroid UI Designer機能が立ち上がります。もちろん画面下タブのTextを選択すれば、xmlを直接編集できます。Previewを見ながらxmlを編集するだけでも便利です。</p>
+
+<p><img src="/images/20130608/ui_designer.jpg" width="600" height="450"></p>
+
+<h2>最後に</h2>
+
+<p>かなり丁寧に書いたので長くなってしまいましたが、突っ込みor質問orコメントなどあれば下記コメント欄か<a href="https://twitter.com/oe_uia">@OE_uia</a>までお願いします。</p>
+]]></content>
+  </entry>
+  
+</feed>

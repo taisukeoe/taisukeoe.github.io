@@ -1,0 +1,323 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた - OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜 オミックス(omics)とは? 生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。 オーミクス &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2013/03/11/omics-r">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taisukeoe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-11T13:10:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:10 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="http://www.jsbi.org/event/hosted-events/20130308r/">Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜</a></p>
+
+<h3>オミックス(omics)とは?</h3>
+
+<p>生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。</p>
+
+<p><a href="http://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%9F%E3%82%AF%E3%82%B9">オーミクス - Wikipedia</a></p>
+
+<h3>なぜ参加したか?</h3>
+
+<p>元々大学ではin vitroな実験系分子生物学の研究室に3年間在籍していたものの、今はプログラミングばっかりやっているので、バイオインフォマティクス(情報生物学)はピッタリじゃないかなーとか。半分は完全に趣味ですが。</p>
+
+<h3>面白かったポイント</h3>
+
+<!-- more -->
+
+
+<ul>
+<li><p>今はMicroArrayや質量分析機などの発展により、研究のボトルネックがデータ収集速度ではなく解析速度に来ている。これにより実験系の研究者にとっても、バイオインフォマティクスの重要性が上がっている。</p></li>
+<li><p>データ解析には元々Fortranを使っていた研究室が多いものの、今は<a href="http://ja.wikipedia.org/wiki/R%E8%A8%80%E8%AA%9E">R言語</a>が主流。対応解析(CorrespondenceAnalysys)用ライブラリのFactoMineRやネットワーク解析向けにigraphなどのライブラリの紹介もあった。</p>
+
+<p>  参考:
+<a href="https://sites.google.com/site/kztakemoto/r-seminar-on-igraph---supplementary-information">R seminar on igraph - supplementary information - Kazuhiro Takemoto</a></p></li>
+<li><p>ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。</p></li>
+<li><p>気象学でよく使われる「<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96">データ同化</a>」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは<a href="http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF">カルマンフィルタ</a>(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。</p>
+
+<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー&#8221;Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
+<li><p>現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO(<a href="http://ja.wikipedia.org/wiki/Gene_Ontology">遺伝子オントロジー</a>)と<a href="http://ja.wikipedia.org/wiki/MeSH">MeSH</a>(Medical Subject Headings)。
+MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。</p></li>
+</ul>
+
+
+<h3>最後に</h3>
+
+<p>バイオの知識だけじゃなく、統計学(とR)の知識が重要な模様。こういう複合領域の戦場にはどんどん攻め入りたいですね。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Taisuke Oe</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-03-11T13:10:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:10 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/bio/'>bio</a>, <a class='category' href='/blog/categories/conference/'>conference</a>, <a class='category' href='/blog/categories/r/'>r</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2013/03/11/omics-r/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2013/03/11/omics-r/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/03/10/scalaconfjp/" title="Previous Post: Scala Conference 2013 in Japanの振り返り">&laquo; Scala Conference 2013 in Japanの振り返り</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/03/22/scala-2-dot-10-bytecode/" title="Next Post: Scala2.10.x bytecode problem">Scala2.10.x bytecode problem &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/11/scala-implicits/">Implicitには型注釈をつけましょう</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/06/scalikejdbc-on-android-sqlite/">ScalikeJDBC on Android SQLite</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/06/scala-repl-extension/">ScalaのREPLを拡張するには</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/30/akka-transactor-deprecated/">Akka Transactorsはオワコン</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/25/scalamatsuri-code-of-conduct/">ScalaMatsuri 行動規範を掲げた経緯</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2013/03/11/omics-r/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2013/03/11/omics-r/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

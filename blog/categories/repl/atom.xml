@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Repl | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/repl/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaのREPLを拡張するには]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension/"/>
+    <updated>2014-12-06T18:04:35+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension</id>
+    <content type="html"><![CDATA[<p>こちらは<a href="http://qiita.com/advent-calendar/2014/scala">Scala AdventCalendar 2014</a>の7日目の記事です。
+今日はScalaのカスタムREPLの作り方についての話。なお今回は(Scala REPL同様)StandaloneなREPLアプリの作成を目的としているので、<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>は主眼ではありません。</p>
+
+<h1>モチベーション</h1>
+
+<p>ScalaのREPLは手元のローカルマシンでAPIを試してみたいときや、ちょっとした計算をしたいときにはとても便利なのですが、やや凝ったことをしたいときなど、そのまま使うには不便さを感じることがあります。</p>
+
+<p>具体的にはAndroidのAPIをScalaのREPLから叩けるようにしたかったのですが、Android環境をJVMでエミュレートするためにはカスタムClassLoaderを使ってAndroid APIのClassを書き換える必要があって。。。という感じ。</p>
+
+<p>これはちょっと特殊なモチベーションかもしれませんが、クラスター上などの特定の環境で実行させたいとき(e.g.<a href="http://spark.apache.org/docs/latest/quick-start.html#interactive-analysis-with-the-spark-shell"><code>spark-shell</code></a>)、自作ライブラリのsandbox環境を提供するにあたって特定の場面でよく使うコマンドを追加したい、など思われる方はいるかもしれません。</p>
+
+<p>そんなとき、意外とScala REPLを拡張する記事を書いている人が少なかったので、今回はScalaのソースコードを読みながらカスタムClassLoaderを使用する方法、コマンドを追加する方法について書くことにしました。</p>
+
+<p>参考:<a href="http://www.michaelpollmeier.com/create-your-custom-scala-repl/">Create your custom Scala REPL</a> &hellip;  数少ないREPL拡張方法に関する記事。</p>
+
+<h1>成果物</h1>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl"><code>taisukeoe/MyCLRepl</code></a></p>
+
+<pre><code class="scala MyCLRepl DEMO">scala&gt; val hello = "hello"
+
+MyClassLoader loads classOf &lt;root&gt;.$line3
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.collection.mutable.StringBuilder
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+hello: String = hello
+
+scala&gt; :myCommand hello
+
+This is a custom command example. You can do something from value:"hello" with custom Scala interpreter.
+</code></pre>
+
+<p>ClassLoaderの差し替え(Classのロード時にクラス名をprint)と、myCommandというコマンドの追加をしています。</p>
+
+<!--more-->
+
+
+<h1>REPLとは</h1>
+
+<p><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">Read–Eval–Print Loop</a>の略で、対話型の開発環境。ユーザーの入力したコードを一行から評価する。
+ScalaのREPLは<code>scala</code>コマンドから開始できる。</p>
+
+<h1>ScalaのREPLの構成</h1>
+
+<p><a href="https://github.com/scala/scala/tree/v2.11.4/src/repl/scala/tools/nsc"><code>scala.tools.nsc.interpreter</code></a>パッケージがREPLに相当。インタプリタのソースコードがそれなりの量あるので一見大変そうだが、構成自体はシンプル。REPLをカスタマイズする上で最低限見る必要がある場所に絞って、以下では解説します。</p>
+
+<h2>エントリポイント</h2>
+
+<p>scalaのスクリプトの中身を見ると、以下の通り<code>scala.tools.nsc.MainGenericRunner</code>の<code>main</code>関数をエントリポイントとしてREPLを起動していることがわかる。</p>
+
+<pre><code class="bash /usr/local/bin/scala#L202-212">execCommand \
+  "${JAVACMD:=java}" \
+  $JAVA_OPTS \
+  "${java_args[@]}" \
+  $(classpathArgs) \
+  -Dscala.home="$SCALA_HOME" \
+  $OVERRIDE_USEJAVACP \
+  "$EMACS_OPT" \
+  $WINDOWS_OPT \
+  scala.tools.nsc.MainGenericRunner  "$@"
+</code></pre>
+
+<h2>Main関数の中でLoopを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74"><code>scala.tools.nsc.MainGenericRunner</code></a>の<code>main</code>関数の処理は、同コンパニオンクラスの<code>process</code>関数に移譲している。この関数の中で、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>process</code>関数を呼んでおり、このクラスがREPLのLoopに相当。</p>
+
+<pre><code class="scala scala.tools.nsc.MainGenericRunner https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">class MainGenericRunner {
+...
+  def process(args: Array[String]): Boolean = {
+    ...
+    def run(): Boolean = {
+      ....
+
+      def runTarget(): Either[Throwable, Boolean] = howToRun match {
+        ...
+        case _  =&gt;
+          // We start the repl when no arguments are given.
+          Right(new interpreter.ILoop process settings)
+      }
+     ...
+    }
+    ...
+      run()
+  }
+}
+
+object MainGenericRunner extends MainGenericRunner {
+  def main(args: Array[String]): Unit = if (!process(args)) sys.exit(1)
+}
+</code></pre>
+
+<p>参考:<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">scala.tools.nsc.MainGenericRunner.run</a></p>
+
+<h2>Loopの中でインタプリタを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a>はREPLのLoopに相当するクラス。コマンドの判定や、入力したコードのインタプリタへの移譲などを行っている。</p>
+
+<p>REPLのコマンド(e.g.<code>:help</code>)の定義は<code>standardCommands</code>変数。overrideした<code>commands</code>関数において追加することでカスタムCommandを実装できる。</p>
+
+<p>また、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>createInterpreter</code>関数内で、インタプリタのメンバ変数<code>var intp:IMain</code>を初期化している。</p>
+
+<p>なおインタプリタ <code>intp</code>の実装クラスは<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>ILoopInterpreter</code></a>。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.ILoop https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala">class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
+                extends AnyRef
+                   with LoopCommands
+{
+...
+var intp: IMain = _
+...
+
+　  lazy val standardCommands = List(
+    cmd("edit", "&lt;id&gt;|&lt;line&gt;", "edit history", editCommand),
+    cmd("help", "[command]", "print this summary or command-specific help", helpCommand),
+    historyCommand,
+    cmd("h?", "&lt;string&gt;", "search the history", searchHistory),
+    cmd("imports", "[name name ...]", "show import history, identifying sources of names", importsCommand),
+    cmd("implicits", "[-v]", "show the implicits in scope", intp.implicitsCommand),
+    cmd("javap", "&lt;path|class&gt;", "disassemble a file or class name", javapCommand),
+    cmd("line", "&lt;id&gt;|&lt;line&gt;", "place line(s) at the end of history", lineCommand),
+    cmd("load", "&lt;path&gt;", "interpret lines in a file", loadCommand),
+    cmd("paste", "[-raw] [path]", "enter paste mode or paste a file", pasteCommand),
+    nullary("power", "enable power user mode", powerCmd),
+    nullary("quit", "exit the interpreter", () =&gt; Result(keepRunning = false, None)),
+    cmd("replay", "[options]", "reset the repl and replay all previous commands", replayCommand),
+    cmd("require", "&lt;path&gt;", "add a jar to the classpath", require),
+    cmd("reset", "[options]", "reset the repl to its initial state, forgetting all session entries", resetCommand),
+    cmd("save", "&lt;path&gt;", "save replayable session to a file", saveCommand),
+    shCommand,
+    cmd("settings", "&lt;options&gt;", "update compiler options, if possible; see reset", changeSettings),
+    nullary("silent", "disable/enable automatic printing of results", verbosity),
+    cmd("type", "[-v] &lt;expr&gt;", "display the type of an expression without evaluating it", typeCommand),
+    cmd("kind", "[-v] &lt;expr&gt;", "display the kind of expression's type", kindCommand),
+    nullary("warnings", "show the suppressed warnings from the most recent line which had any", warningsCommand)
+  )
+
+  ...
+
+    /** Available commands */
+  def commands: List[LoopCommand] = standardCommands ++ (
+    if (isReplPower) powerCommands else Nil
+  )
+
+  ...
+
+  class ILoopInterpreter extends IMain(settings, out) {
+    outer =&gt;
+
+    override lazy val formatting = new Formatting {
+      def prompt = ILoop.this.prompt
+    }
+    override protected def parentClassLoader =
+      settings.explicitParentLoader.getOrElse( classOf[ILoop].getClassLoader )
+  }     
+  /** Create a new interpreter. */
+  def createInterpreter() {
+    if (addedClasspath != "")
+      settings.classpath append addedClasspath
+
+    intp = new ILoopInterpreter
+  }
+
+  ...
+
+  // start an interpreter with the given settings
+  def process(settings: Settings): Boolean = savingContextLoader {
+    this.settings = settings
+    createInterpreter()
+     ...
+    printWelcome()
+     ...
+    try loop() match {
+      case LineResults.EOF =&gt; out print Properties.shellInterruptedString
+      case _               =&gt;
+    }
+    catch AbstractOrMissingHandler()
+    finally closeInterpreter()
+
+    true
+  }
+  ...
+</code></pre>
+
+<h2>インタプリタの中でClassLoaderを生成</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>がインタプリタの主たるコード。</p>
+
+<p><code>private var _classLoader:ClassLoader</code>がClassLoaderのメンバ変数だが、privateなのでclassLoader関数をoverrideしてカスタムClassLoaderを生成する。</p>
+
+<p>ただし、<code>IMain</code>の<code>classLoader</code>関数の戻り値の型は<a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>になので、カスタムClassLoaderもこれを継承させる必要がある点に注意。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.IMain https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala">class IMain(@BeanProperty val factory: ScriptEngineFactory, initialSettings: Settings, protected val out: JPrintWriter) extends AbstractScriptEngine with Compilable with Imports {
+  imain =&gt;
+
+  ...
+
+  private var _classLoader: util.AbstractFileClassLoader = null                              // active classloader
+  ....
+
+  /** Parent classloader.  Overridable. */
+  protected def parentClassLoader: ClassLoader =
+    settings.explicitParentLoader.getOrElse( this.getClass.getClassLoader() )
+
+  def resetClassLoader() = {
+    repldbg("Setting new classloader: was " + _classLoader)
+    _classLoader = null
+    ensureClassLoader()
+  }
+    final def ensureClassLoader() {
+    if (_classLoader == null)
+      _classLoader = makeClassLoader()
+  }
+  def classLoader: util.AbstractFileClassLoader = {
+    ensureClassLoader()
+    _classLoader
+  }
+</code></pre>
+
+<h1>カスタムREPLを作る</h1>
+
+<p>基本的には解説した以下のクラスに相当するものを継承なり自前で作るなりすれば、カスタムREPLが作れます。</p>
+
+<ul>
+<li><a href=""><code>scala.tools.nsc.MainGenericRunner</code></a> &hellip; REPLを起動するmain関数、Loopの呼び出し</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a> &hellip; Loopの実装。Commandの判定。インタプリタへ処理の移譲。</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>scala.tools.nsc.interpreter.ILoop.ILoopInterpreter</code></a> &hellip; インタプリタの実装。ClassLoaderの生成。</li>
+<li><a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>を継承したカスタムClassLoader &hellip; インタプリタに使用させる。</li>
+</ul>
+
+
+<p>先ほども記載しましたが、完成物は以下の通り。試し方はREADME参照のこと。</p>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl">taisukeoe/MyCLRepl</a></p>
+
+<h1>REPLを拡張している実例</h1>
+
+<p><a href="https://spark.apache.org/">Apache Spark</a>のspark-shellは、REPL上で入力したコマンドをcluster上で実行させるために、REPLを拡張している。以下のファイル群がカスタムREPLに相当する。</p>
+
+<ul>
+<li><a href="https://github.com/apache/spark/blob/master/bin/spark-shell#L61">spark-shell</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/Main.scala">org.apache.spark.repl.Main</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkILoop.scala#L902">org.apache.spark.repl.SparkILoop</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkIMain.scala">org.apache.spark.repl.SparkIMain</a></li>
+</ul>
+
+
+<p><a href="http://scalamatsuri.org/">ScalaMatsuri</a>で発表された<a href="https://github.com/xitrum-framework/scalive">Scalive</a>もREPLを拡張してJVM環境を触れるようにしている。</p>
+
+<h2>余談:Scalaの:power モード</h2>
+
+<p>Scala REPLに備わっている<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>を使用すると、Scala REPLコードのpublicな変数・関数へのアクセスが可能で、varなら置き換えも可能。</p>
+
+<p>例えば上記のカスタムClassLoader挿入は、<code>:power</code>モードを利用してこんな風にも書けます。（ClassLoaderのサイズが膨らんでくるとつらさはありますが）</p>
+
+<pre><code class="scala">scala&gt; :power
+
+** Power User mode enabled - BEEP WHIR GYVE **
+** :phase has been set to 'typer'.          **
+** scala.tools.nsc._ has been imported      **
+** global._, definitions._ also imported    **
+** Try  :help, :vals, power.&lt;tab&gt;           **
+
+scala&gt; :paste
+// Entering paste mode (ctrl-D to finish)
+
+import scala.reflect.internal.util.ScalaClassLoader
+import scala.tools.nsc.interpreter.JPrintWriter
+import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.util
+repl.intp = new repl.ILoopInterpreter {
+   override def classLoader = new util.AbstractFileClassLoader(root:AbstractFile,parent:ClassLoader)  with ScalaClassLoader{
+  override def loadClass(name: String) = {
+    println(s"MyClassLoader loads classOf ${name}")
+    super.loadClass(name)
+  }
+ }
+}
+
+scala&gt; val hoge = "hoge"
+
+MyClassLoader loads classOf &lt;root&gt;.$line2
+MyClassLoader loads classOf $line2
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+MyClassLoader loads classOf scala.runtime.BoxedUnit
+
+hoge: String = hoge
+</code></pre>
+
+<p>ただその一方でREPLのコマンドの判別はILoopクラスで行わており、MainGenericRunnerの内部関数中で直接呼び出されているのでPowerModeからのカスタムCommandの追加は不可能なはず（とはいいつつ、何がしかのhackもありそうな気がするのでもしあればコメント欄で教えてください。）</p>
+
+<h2>余談</h2>
+
+<p>肝心の、オレオレClassLoaderを使ってAndroid APIを叩けるScala REPLアプリは間に合わず。現状でも、未解決のwarningが出る問題とか、タブ補完が効かない問題など、色々と雑な感じにはなっています。。。</p>
+
+<p>そのあたりのフォローはまた後日に(&lsquo;・ω・`)</p>
+]]></content>
+  </entry>
+  
+</feed>

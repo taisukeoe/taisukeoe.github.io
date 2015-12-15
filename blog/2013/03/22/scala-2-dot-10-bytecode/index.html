@@ -1,0 +1,450 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Scala2.10.x Bytecode Problem - OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="概要 Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taisukeoe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Scala2.10.x Bytecode Problem</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2013-03-22T20:32:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>8:32 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h1>概要</h1>
+
+<p>Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。親クラスで実装されたメソッドをそのまま継承した場合、<strong>2.9.x及びJavaではメソッドのqualifying typeの参照が子クラス</strong>になるのに対し、<strong>2.10.xではqualifying typeの参照が親クラス</strong>になってしまうことが直接の原因です。</p>
+
+<p>詳しくは第99回<a href="http://www.scala-users.org/shibuya/">rpscala</a>で発表したスライドをどうぞ。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/2qlZJYZygaqx4y" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android" title="Scala2.10.x bytecode problems in Android" target="_blank">Scala2.10.x bytecode problems in Android</a> </strong> from <strong><a href="http://www.slideshare.net/oeuia" target="_blank">Taisuke Oe</a></strong> </div></p>
+
+<p>このバグと同種のものがJIRAでも見つからなかったので、issue報告を上げた結果、3/23に無事修正されたようです。</p>
+
+<p><a href="https://issues.scala-lang.org/browse/SI-7253">[#SI-7253] SQLiteDatabase cannot be closed in Android 4.0 or below devices, in apps built by Scala 2.10.x w/ Android 4.1 due to Scala 2.10.x bytecode problem. - Scala</a></p>
+
+<p>rpscalaでの発表時によくわからなかった以下のポイントがクリアになったので、フォローアップとして記載しておきます。</p>
+
+<ul>
+<li>これは意図された仕様変更なのか？</li>
+<li>これはバグなのか？</li>
+<li>いつ直るのか？</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h1>1. これは意図された仕様変更なのか？</h1>
+
+<p>特段意図されたものではなく、Scala2.10でコンパイラをfjbgからasmへ変更した際に、紛れ込んだ模様です。
+(該当commitのauthorのPaul Phillipsさんが&#8221;I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
+
+<p><a href="https://github.com/scala/scala/commit/0bea2ab5f6">Fix for erroneous bytecode generation. · 0bea2ab · scala/scala</a></p>
+
+<h1>2. これはバグなのか？</h1>
+
+<p>バグのようです。根拠として引用された、Java Language Specification(以下JLS)内の<a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html">Binary Compatibility</a>に関する記述は以下の通り。</p>
+
+<blockquote><ul>
+<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)&#8221;</p></li>
+<li><p>&ldquo;A reference to a method must be resolved at compile time to <strong>a symbolic reference to the erasure (§4.6) of the qualifying type of the invocation</strong>, plus the erasure of the signature of the method (§8.4.2).&rdquo;(メソッド又はコンストラクタへの参照は，そのqualifying typeへの記号参照に，そのメソッド又はコンストラクタのシグネチャを加えて，コンパイル時に解決しなければならない。)</p></li>
+<li><p>If the expression is of the form <strong>Primary.f</strong> then:</p>
+
+<p>   If the compile-time type of Primary is an intersection type (§4.9) V1 &amp; &hellip; &amp; Vn, then the qualifying type of the reference is V1.</p>
+
+<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>&#8221;</p>
+
+<p>   (Pimary.fという表現があったとき、Primaryがintersectional type以外の場合、Primaryがqualifying typeとなる。)</p></li>
+</ul>
+</blockquote>
+
+<p>それに対して、以下のような反論がありました（が、反論の発言主が&#8221;You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
+
+<ul>
+<li>JLSはbackward compatibility(後方互換性)について定めたもので、今回のケースのようなforward compatibility(前方互換性)については当てはまらない。</li>
+<li>異なるバイトコードに大してコンパイルした場合、異なるものが生成されるのは当たり前である。</li>
+</ul>
+
+
+<p>そもそもScalaがJLSに準拠すると明確に宣言しているソースを見つけられなかったのが個人的には気になっていましたが、そこは争点になりませんでした。
+<em>(注:というのも、以前Scala作者のMartin Odersky教授が別のissue <a href="https://issues.scala-lang.org/browse/SI-1806">[#SI-1806] Can&rsquo;t access protected static inner classes of extended classes</a>)] で <strong>&ldquo;I disagree. We can never achieve 100% java interop without becoming Java.&rdquo;(私は反対だ。Javaとの相互運用を100%達成するには、Java自体になる他ない。)</strong>と発言していたので。)</em>
+とはいえ、僕が見落としているだけのような気がするので、もしその辺りご存知の方がいたら教えてください。</p>
+
+<h1>3. いつの直るのか？</h1>
+
+<p>3/23に、本バグ修正のpull request(<a href="https://github.com/scala/scala/pull/2264">SI-7253: respect binary compatibility constraints by Blaisorblade</a>)がmergeされましたので、おそらく2.10.2で反映されるものと思われます。</p>
+
+<p>ここに関して、2.10系のbinary compatibilityを破壊するから2.11まではXfutureオプションに入れておくべきでは？という議論がありましたが、James Iryさん（<a href="http://www.scala-lang.org/node/960">Java to Scala with the Help of Experts | The Scala Programming Language</a>などを書いてる方）の意見が通ったようです。</p>
+
+<blockquote><p>This patch will improve binary compatibility when source changes in the way that happened in SI-7253. That improvement won&rsquo;t be available in prior 2.10.x versions so in that sense this commit is a change in behavior. But since the old behavior was to create a linkage error I&rsquo;m okay with that change.</p>
+
+<p>(このパッチは、SI-7253のようなソースコードの変更において、バイナリ互換性を改善します。以前の2.10.x versionでは使用不可能という意味で、このパッチはバイナリの振る舞いを変更しますが、以前の振る舞いがリンクエラーを生成してしまう以上、私はこの変更を適用しても構わないと思います。)</p></blockquote>
+
+<p>2.10.2がリリースされるまでは繰り返しになりますが、<strong>以下のような構成のプロジェクトは予期せぬNoSuchMethodErrorをruntimeでthrowするため、避けるべきです</strong>。</p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<h3>おまけ1</h3>
+
+<p><a href="https://twitter.com/jsuereth/">@jsuereth</a>に褒められたヽ(・∀・)ﾉ ﾜｰｲ</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> wow, very good catch.   Too much about BC in Java is non-intuitive, this example being one.</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/312553768644395008">March 15, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h3>おまけ2</h3>
+
+<p>バグの再現手順。</p>
+
+<p>再現用のrepositoryはこちら。
+<a href="https://github.com/taisukeoe/scala_2_10_android_error">taisukeoe/scala_2_10_android_error · GitHub</a></p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<p>で以下のようなソースコードのプロジェクトを実行すると、NoSuchMethodErrorがthrowされます。</p>
+
+<h4>Project whole souce codes:</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>    <span class="k">class</span> <span class="nc">DemoActivity</span> <span class="k">extends</span> <span class="nc">Activity</span><span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="k">:</span> <span class="kt">Bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">super</span><span class="o">.</span><span class="n">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">new</span> <span class="nc">SQLHelperDemo</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="n">getReadableDatabase</span><span class="o">.</span><span class="n">close</span><span class="o">()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">val</span> <span class="n">textView</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">TextView</span><span class="o">(</span><span class="k">this</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">textView</span><span class="o">.</span><span class="n">setText</span><span class="o">(</span><span class="s">&quot;Do I still survive?&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">setContentView</span><span class="o">(</span><span class="n">textView</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">SQLHelperDemo</span><span class="o">(</span><span class="n">context</span><span class="k">:</span><span class="kt">Context</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">SQLiteOpenHelper</span><span class="o">(</span><span class="n">context</span><span class="o">,</span><span class="s">&quot;demo&quot;</span><span class="o">,</span><span class="kc">null</span><span class="o">,</span><span class="mi">1</span><span class="o">){</span>
+</span><span class='line'>     <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">p1</span><span class="k">:</span> <span class="kt">SQLiteDatabase</span><span class="o">)</span> <span class="o">{}</span>
+</span><span class='line'>     <span class="k">def</span> <span class="n">onUpgrade</span><span class="o">(</span><span class="n">p1</span><span class="k">:</span> <span class="kt">SQLiteDatabase</span><span class="o">,</span> <span class="n">p2</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">p3</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="o">{}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h4>Full stack traces:</h4>
+
+<pre><code>W/dalvikvm(7951): threadid=1: thread exiting with uncaught exception (group=0x40abd210)
+E/AndroidRuntime(7951): FATAL EXCEPTION: main
+E/AndroidRuntime(7951): java.lang.NoSuchMethodError: android.database.sqlite.SQLiteClosable.close
+E/AndroidRuntime(7951):     at com.hemplant.demo.no_such_method_in_2_10.DemoActivity.onCreate(DemoActivity.scala:18)
+E/AndroidRuntime(7951):     at android.app.Activity.performCreate(Activity.java:4465)
+E/AndroidRuntime(7951):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1049)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1931)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1992)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.access$600(ActivityThread.java:127)
+E/AndroidRuntime(7951):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1158)
+E/AndroidRuntime(7951):     at android.os.Handler.dispatchMessage(Handler.java:99)
+E/AndroidRuntime(7951):     at android.os.Looper.loop(Looper.java:137)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.main(ActivityThread.java:4441)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invokeNative(Native Method)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invoke(Method.java:511)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:823)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:590)
+E/AndroidRuntime(7951):     at dalvik.system.NativeStart.main(Native Method)
+</code></pre>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Taisuke Oe</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2013-03-22T20:32:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2013</span></span> <span class='time'>8:32 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/jvm/'>jvm</a>, <a class='category' href='/blog/categories/scala/'>scala</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/03/11/omics-r/" title="Previous Post: 「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた">&laquo; 「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2013/05/16/android-studio/" title="Next Post: Android Studioを触ってみた">Android Studioを触ってみた &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/07/11/scala-implicits/">Implicitには型注釈をつけましょう</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/06/scalikejdbc-on-android-sqlite/">ScalikeJDBC on Android SQLite</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/06/scala-repl-extension/">ScalaのREPLを拡張するには</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/30/akka-transactor-deprecated/">Akka Transactorsはオワコン</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/25/scalamatsuri-code-of-conduct/">ScalaMatsuri 行動規範を掲げた経緯</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

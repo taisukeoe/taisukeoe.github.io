@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Jvm | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/jvm/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Scala2.10.x Bytecode Problem]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/"/>
+    <updated>2013-03-22T20:32:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode</id>
+    <content type="html"><![CDATA[<h1>概要</h1>
+
+<p>Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。親クラスで実装されたメソッドをそのまま継承した場合、<strong>2.9.x及びJavaではメソッドのqualifying typeの参照が子クラス</strong>になるのに対し、<strong>2.10.xではqualifying typeの参照が親クラス</strong>になってしまうことが直接の原因です。</p>
+
+<p>詳しくは第99回<a href="http://www.scala-users.org/shibuya/">rpscala</a>で発表したスライドをどうぞ。</p>
+
+<p><a href="http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android">http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a>&#8220;>http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android&#8221;>http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a></a></p>
+
+<p>このバグと同種のものがJIRAでも見つからなかったので、issue報告を上げた結果、3/23に無事修正されたようです。</p>
+
+<p><a href="https://issues.scala-lang.org/browse/SI-7253">[#SI-7253] SQLiteDatabase cannot be closed in Android 4.0 or below devices, in apps built by Scala 2.10.x w/ Android 4.1 due to Scala 2.10.x bytecode problem. - Scala</a></p>
+
+<p>rpscalaでの発表時によくわからなかった以下のポイントがクリアになったので、フォローアップとして記載しておきます。</p>
+
+<ul>
+<li>これは意図された仕様変更なのか？</li>
+<li>これはバグなのか？</li>
+<li>いつ直るのか？</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h1>1. これは意図された仕様変更なのか？</h1>
+
+<p>特段意図されたものではなく、Scala2.10でコンパイラをfjbgからasmへ変更した際に、紛れ込んだ模様です。
+(該当commitのauthorのPaul Phillipsさんが&#8221;I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
+
+<p><a href="https://github.com/scala/scala/commit/0bea2ab5f6">Fix for erroneous bytecode generation. · 0bea2ab · scala/scala</a></p>
+
+<h1>2. これはバグなのか？</h1>
+
+<p>バグのようです。根拠として引用された、Java Language Specification(以下JLS)内の<a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html">Binary Compatibility</a>に関する記述は以下の通り。</p>
+
+<blockquote><ul>
+<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)&#8221;</p></li>
+<li><p>&ldquo;A reference to a method must be resolved at compile time to <strong>a symbolic reference to the erasure (§4.6) of the qualifying type of the invocation</strong>, plus the erasure of the signature of the method (§8.4.2).&rdquo;(メソッド又はコンストラクタへの参照は，そのqualifying typeへの記号参照に，そのメソッド又はコンストラクタのシグネチャを加えて，コンパイル時に解決しなければならない。)</p></li>
+<li><p>If the expression is of the form <strong>Primary.f</strong> then:</p>
+
+<p>   If the compile-time type of Primary is an intersection type (§4.9) V1 &amp; &hellip; &amp; Vn, then the qualifying type of the reference is V1.</p>
+
+<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>&#8221;</p>
+
+<p>   (Pimary.fという表現があったとき、Primaryがintersectional type以外の場合、Primaryがqualifying typeとなる。)</p></li>
+</ul>
+</blockquote>
+
+<p>それに対して、以下のような反論がありました（が、反論の発言主が&#8221;You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
+
+<ul>
+<li>JLSはbackward compatibility(後方互換性)について定めたもので、今回のケースのようなforward compatibility(前方互換性)については当てはまらない。</li>
+<li>異なるバイトコードに大してコンパイルした場合、異なるものが生成されるのは当たり前である。</li>
+</ul>
+
+
+<p>そもそもScalaがJLSに準拠すると明確に宣言しているソースを見つけられなかったのが個人的には気になっていましたが、そこは争点になりませんでした。
+<em>(注:というのも、以前Scala作者のMartin Odersky教授が別のissue <a href="https://issues.scala-lang.org/browse/SI-1806">[#SI-1806] Can&rsquo;t access protected static inner classes of extended classes</a>)] で <strong>&ldquo;I disagree. We can never achieve 100% java interop without becoming Java.&rdquo;(私は反対だ。Javaとの相互運用を100%達成するには、Java自体になる他ない。)</strong>と発言していたので。)</em>
+とはいえ、僕が見落としているだけのような気がするので、もしその辺りご存知の方がいたら教えてください。</p>
+
+<h1>3. いつの直るのか？</h1>
+
+<p>3/23に、本バグ修正のpull request(<a href="https://github.com/scala/scala/pull/2264">SI-7253: respect binary compatibility constraints by Blaisorblade</a>)がmergeされましたので、おそらく2.10.2で反映されるものと思われます。</p>
+
+<p>ここに関して、2.10系のbinary compatibilityを破壊するから2.11まではXfutureオプションに入れておくべきでは？という議論がありましたが、James Iryさん（<a href="http://www.scala-lang.org/node/960">Java to Scala with the Help of Experts | The Scala Programming Language</a>などを書いてる方）の意見が通ったようです。</p>
+
+<blockquote><p>This patch will improve binary compatibility when source changes in the way that happened in SI-7253. That improvement won&rsquo;t be available in prior 2.10.x versions so in that sense this commit is a change in behavior. But since the old behavior was to create a linkage error I&rsquo;m okay with that change.</p>
+
+<p>(このパッチは、SI-7253のようなソースコードの変更において、バイナリ互換性を改善します。以前の2.10.x versionでは使用不可能という意味で、このパッチはバイナリの振る舞いを変更しますが、以前の振る舞いがリンクエラーを生成してしまう以上、私はこの変更を適用しても構わないと思います。)</p></blockquote>
+
+<p>2.10.2がリリースされるまでは繰り返しになりますが、<strong>以下のような構成のプロジェクトは予期せぬNoSuchMethodErrorをruntimeでthrowするため、避けるべきです</strong>。</p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<h3>おまけ1</h3>
+
+<p><a href="https://twitter.com/jsuereth/">@jsuereth</a>に褒められたヽ(・∀・)ﾉ ﾜｰｲ</p>
+
+<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> wow, very good catch.   Too much about BC in Java is non-intuitive, this example being one.</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/312553768644395008">March 15, 2013</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<h3>おまけ2</h3>
+
+<p>バグの再現手順。</p>
+
+<p>再現用のrepositoryはこちら。
+<a href="https://github.com/taisukeoe/scala_2_10_android_error">taisukeoe/scala_2_10_android_error · GitHub</a></p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<p>で以下のようなソースコードのプロジェクトを実行すると、NoSuchMethodErrorがthrowされます。</p>
+
+<h4>Project whole souce codes:</h4>
+
+<pre><code class="scala">
+    class DemoActivity extends Activity{
+      override def onCreate(savedInstanceState: Bundle) {
+        super.onCreate(savedInstanceState)
+
+        new SQLHelperDemo(this).getReadableDatabase.close()
+
+        val textView = new TextView(this)
+        textView.setText("Do I still survive?")
+        setContentView(textView)
+        }
+    }
+    class SQLHelperDemo(context:Context) extends SQLiteOpenHelper(context,"demo",null,1){
+       def onCreate(p1: SQLiteDatabase) {}
+       def onUpgrade(p1: SQLiteDatabase, p2: Int, p3: Int) {}
+    }
+</code></pre>
+
+<h4>Full stack traces:</h4>
+
+<pre><code>W/dalvikvm(7951): threadid=1: thread exiting with uncaught exception (group=0x40abd210)
+E/AndroidRuntime(7951): FATAL EXCEPTION: main
+E/AndroidRuntime(7951): java.lang.NoSuchMethodError: android.database.sqlite.SQLiteClosable.close
+E/AndroidRuntime(7951):     at com.hemplant.demo.no_such_method_in_2_10.DemoActivity.onCreate(DemoActivity.scala:18)
+E/AndroidRuntime(7951):     at android.app.Activity.performCreate(Activity.java:4465)
+E/AndroidRuntime(7951):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1049)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1931)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1992)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.access$600(ActivityThread.java:127)
+E/AndroidRuntime(7951):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1158)
+E/AndroidRuntime(7951):     at android.os.Handler.dispatchMessage(Handler.java:99)
+E/AndroidRuntime(7951):     at android.os.Looper.loop(Looper.java:137)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.main(ActivityThread.java:4441)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invokeNative(Native Method)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invoke(Method.java:511)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:823)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:590)
+E/AndroidRuntime(7951):     at dalvik.system.NativeStart.main(Native Method)
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

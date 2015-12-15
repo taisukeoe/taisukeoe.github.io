@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Implicit | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/implicit/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Implicitには型注釈をつけましょう]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/07/11/scala-implicits/"/>
+    <updated>2015-07-11T22:52:58+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/07/11/scala-implicits</id>
+    <content type="html"><![CDATA[<p>Scalaには(とても今更ですが) Implicit/暗黙 というキーワードがあります。Implicitキーワードを宣言する場所をざっくり分けると、以下の4つ。</p>
+
+<p>1) implicit class &hellip;</p>
+
+<p>2) implicit parameter (e.g. (implicit a:A) )</p>
+
+<p>3) implicit def &hellip;</p>
+
+<p>4) implicit (var | val) &hellip;</p>
+
+<p>この中で1,2は(明示的に)型を書かざるを得ませんが、3のdefの戻り値、及び4については、型注釈を明示的に書かずに型推論を働かせることが(少なくとも最新の2.11.7でも)可能です。</p>
+
+<p>しかし型注釈を書かなかった場合、<strong>以下のような（一見理由の分かりにくい）コンパイルエラーに遭遇する可能性が有る</strong>ことはご存知でしょうか？</p>
+
+<!--more-->
+
+
+<pre><code class="scala">//compile success in declaring A, then B
+scala&gt; :paste
+object A {implicit val a = 1}
+object B {import A._;implicitly[Int]}
+
+//compile success in annotating type of A.a
+scala&gt; :paste
+object B {import A._ ; implicitly[Int]}
+object A {implicit val a:Int = 1}
+
+//COMPILE ERROR in declaring B, then A without type annotation
+scala&gt; :paste
+object B {import A._ ; implicitly[Int]}
+object A {implicit val a = 1}
+</code></pre>
+
+<p>JIRAにも同種のissueが多数報告されています。</p>
+
+<ul>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-9130">[SI-9130] destructuring binds, implicit resolution, and declaration order - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5265">[SI-5265] warn on implicit def without explicit result type - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5348">[SI-5348] Type errors overriding implicit vals - Scala</a></p></li>
+</ul>
+
+
+<p>この問題を防ぐために、コンパイラチームは<strong>暗黙の値やメソッドに型注釈をつけることを強く推奨</strong>しています。</p>
+
+<blockquote><p>Implicits must be explicitly type annotated, otherwise the typechecker may ignore them from preceding parts of the same source file. This is done to avoid triggering spurious cycles in type inference.</p>
+
+<p>暗黙(の値及びメソッド)には明示的に型注釈がつける必要があります。もし型注釈がないと、同じソースファイル上の前方から後方に向かって暗黙を参照している際に、型チェッカーが見落としてしまう恐れがあります。これは型推論をする際に、間違ったサイク
+ルを引き起こさないために行っています。</p>
+
+<ul>
+<li>Comment by Jason Zaugg on <a href="https://issues.scala-lang.org/browse/SI-9130?focusedCommentId=71712&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-71712">SI-9130</a></li>
+</ul>
+</blockquote>
+
+<p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
+
+<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
+]]></content>
+  </entry>
+  
+</feed>

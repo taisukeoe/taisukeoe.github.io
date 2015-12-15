@@ -1,0 +1,1998 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Implicitには型注釈をつけましょう]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/07/11/scala-implicits/"/>
+    <updated>2015-07-11T22:52:58+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/07/11/scala-implicits</id>
+    <content type="html"><![CDATA[<p>Scalaには(とても今更ですが) Implicit/暗黙 というキーワードがあります。Implicitキーワードを宣言する場所をざっくり分けると、以下の4つ。</p>
+
+<p>1) implicit class &hellip;</p>
+
+<p>2) implicit parameter (e.g. (implicit a:A) )</p>
+
+<p>3) implicit def &hellip;</p>
+
+<p>4) implicit (var | val) &hellip;</p>
+
+<p>この中で1,2は(明示的に)型を書かざるを得ませんが、3のdefの戻り値、及び4については、型注釈を明示的に書かずに型推論を働かせることが(少なくとも最新の2.11.7でも)可能です。</p>
+
+<p>しかし型注釈を書かなかった場合、<strong>以下のような（一見理由の分かりにくい）コンパイルエラーに遭遇する可能性が有る</strong>ことはご存知でしょうか？</p>
+
+<!--more-->
+
+
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="c1">//compile success in declaring A, then B</span>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">paste</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">A</span> <span class="o">{</span><span class="k">implicit</span> <span class="k">val</span> <span class="n">a</span> <span class="k">=</span> <span class="mi">1</span><span class="o">}</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">B</span> <span class="o">{</span><span class="k">import</span> <span class="nn">A._</span><span class="o">;</span><span class="n">implicitly</span><span class="o">[</span><span class="kt">Int</span><span class="o">]}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//compile success in annotating type of A.a</span>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">paste</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">B</span> <span class="o">{</span><span class="k">import</span> <span class="nn">A._</span> <span class="o">;</span> <span class="n">implicitly</span><span class="o">[</span><span class="kt">Int</span><span class="o">]}</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">A</span> <span class="o">{</span><span class="k">implicit</span> <span class="k">val</span> <span class="n">a</span><span class="k">:</span><span class="kt">Int</span> <span class="o">=</span> <span class="mi">1</span><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">//COMPILE ERROR in declaring B, then A without type annotation</span>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">paste</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">B</span> <span class="o">{</span><span class="k">import</span> <span class="nn">A._</span> <span class="o">;</span> <span class="n">implicitly</span><span class="o">[</span><span class="kt">Int</span><span class="o">]}</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">A</span> <span class="o">{</span><span class="k">implicit</span> <span class="k">val</span> <span class="n">a</span> <span class="k">=</span> <span class="mi">1</span><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>JIRAにも同種のissueが多数報告されています。</p>
+
+<ul>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-9130">[SI-9130] destructuring binds, implicit resolution, and declaration order - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5265">[SI-5265] warn on implicit def without explicit result type - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5348">[SI-5348] Type errors overriding implicit vals - Scala</a></p></li>
+</ul>
+
+
+<p>この問題を防ぐために、コンパイラチームは<strong>暗黙の値やメソッドに型注釈をつけることを強く推奨</strong>しています。</p>
+
+<blockquote><p>Implicits must be explicitly type annotated, otherwise the typechecker may ignore them from preceding parts of the same source file. This is done to avoid triggering spurious cycles in type inference.</p>
+
+<p>暗黙(の値及びメソッド)には明示的に型注釈がつける必要があります。もし型注釈がないと、同じソースファイル上の前方から後方に向かって暗黙を参照している際に、型チェッカーが見落としてしまう恐れがあります。これは型推論をする際に、間違ったサイク
+ルを引き起こさないために行っています。</p>
+
+<ul>
+<li>Comment by Jason Zaugg on <a href="https://issues.scala-lang.org/browse/SI-9130?focusedCommentId=71712&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-71712">SI-9130</a></li>
+</ul>
+</blockquote>
+
+<p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
+
+<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalikeJDBC on Android SQLite]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite/"/>
+    <updated>2015-05-06T21:40:25+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite</id>
+    <content type="html"><![CDATA[<p>意外にもまだ試している人がいなさそうなので、<a href="https://rpscala.doorkeeper.jp/events/23383">rpscala合宿</a>でDEMOを作成した。</p>
+
+<p><a href="https://github.com/taisukeoe/scalikejdbc-on-android">scalikejdbc-on-android</a></p>
+
+<p><img src="http://taisukeoe.github.io/images/20150506/scalikejdbc_demo.png"></p>
+
+<!--more-->
+
+
+<h3>使用versionなど:</h3>
+
+<ul>
+<li>Scala 2.11.6</li>
+<li>sbt 0.13.8</li>
+<li>Target: Android 5.1</li>
+<li>MinSDK: Android 4.0.3</li>
+<li>pfn/android-sdk-plugin 1.3.22</li>
+<li>ScalikeJDBC 2.2.6</li>
+<li>SQLDroid 1.0.3</li>
+</ul>
+
+
+<h2>Android in ScalaのDBアクセス事情</h2>
+
+<ul>
+<li>自分は普段Android Database API + <a href="https://github.com/pocorall/scaloid/blob/060fd9b5d330d735be96ac0b9489b4600a6dec09/scaloid-common/src/main/st/org/scaloid/common/implicits.scala#L110-L120">RichCursor</a>を使う</li>
+<li><a href="https://www.typesafe.com/activator/template/agile-scala-android-example">Slickを使用したTypesafe activatorテンプレート</a>などもある</li>
+<li>そもそもDBをローカルに持つ必要のない（DBサーバー+クライアントキャッシュな)Androidアプリも多い</li>
+</ul>
+
+
+<h2><a href="http://scalikejdbc.org/">ScalikeJDBC</a>とは？</h2>
+
+<p><code>a tidy SQL-based access library for Scala Developers</code>(公式ドキュメントより抜粋)</p>
+
+<p>SQL文をそのまま(より型安全な方法で）扱えるのが特長。Androidでいえば<a href="http://developer.android.com/intl/ja/reference/android/database/sqlite/SQLiteDatabase.html">SQLiteDatabase.rawQuery</a>を好んで使う人向け。</p>
+
+<h2>SQLite JDBC Driver</h2>
+
+<p>今回はAndroidのSQLiteを使用するので、SQLite3に対応していることが必須。あとはPure Java実装か、Android NDKでAndroid用のNative Libraryを生成できる必要がある。</p>
+
+<h3><a href="https://github.com/SQLDroid/SQLDroid">SQLDroid</a></h3>
+
+<p>今回使用した、Android Database APIをラップしたJDBC Driver。ただあまり活発にメンテされていないようなので、プロダクションで使用するのは躊躇する。</p>
+
+<h3><a href="http://docs.oracle.com/cd/E17076_02/html/installation/build_android_jdbc.html">Android JDBC Driver (Oracle)</a></h3>
+
+<p>Android NDKを使用しビルドすることで、Android用のNative Library(.so)を生成できる…が、unmanagedDependenciesとして追加する必要があるので、ちょっと扱いずらい。（なお、<a href="http://d.hatena.ne.jp/esmasui/20120918/1347985333">この記事</a>を読む限り、Natvie Libraryを含めなくても動作する（＝Pure Java実装に自動的に切り替わっている？）模様。)</p>
+
+<h3><a href="https://bitbucket.org/xerial/sqlite-jdbc">xerial/sqlite-jdbc</a></h3>
+
+<p>現在Androidはサポートされておらず、実行すると</p>
+
+<blockquote><p>java.lang.UnsatisfiedLinkError: dalvik.system.PathClassLoader[DexPathList[[zip file &ldquo;/system/framework/android.test.runner.jar&rdquo;, zip file &ldquo;/data/app/taisukeoe.scalikeroid-1/base.apk&rdquo;],nativeLibraryDirectories=[/vendor/lib, /system/lib]]] couldn&rsquo;t find &ldquo;libsqlitejdbc.so&rdquo;</p></blockquote>
+
+<p>というRuntimeエラーとともに落ちる。</p>
+
+<p><a href="https://bitbucket.org/xerial/sqlite-jdbc/issue/159/javafx-android-port-crashes-and-fails-to">Pure Java実装に切り替えるAPI</a>のfeatureリクエストは上がっているようなので、これが実装されれば使えるはず。</p>
+
+<h2>落とし穴|Pitfalls</h2>
+
+<h3><a href="https://www.sqlite.org/datatype3.html">SQLite</a>起因のもの</h3>
+
+<ul>
+<li><code>serial</code>データ型が存在しないので、<code>integer autoincrement</code>にする。</li>
+<li><code>timestmap</code>および<code>datetime</code>データ型が存在せず、<code>timestamp</code>指定すると<code>yyyy-MM-dd hh:mm:ss</code>というISO8601フォーマットのTEXT型で保存されるため、WrappedResultSet.jodaDateTimeでDateTime型の値を抽出できない。<code>integer</code>型にしておいてWrappedResultSet.timestampを使う。</li>
+</ul>
+
+
+<h3>Android起因のもの</h3>
+
+<ul>
+<li><code>DatabseUtils.createDbFromSqlStatements</code>から手動でDatabaseを作成する必要がある</li>
+</ul>
+
+
+<h3>Android in Scala起因のもの</h3>
+
+<ul>
+<li><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>のProguard後のclassファイルのキャッシュが重複してしまうことにより、ビルド時に以下のExceptionが投げられる</li>
+</ul>
+
+
+<blockquote><p>java.lang.IllegalArgumentException: already added: Lscala/util/parsing/combinator/JavaTokenParsers$class;</p></blockquote>
+
+<p>これを防ぐために、sbtビルド定義に以下を追加する。</p>
+
+<p><code>proguardCache in Android += ProguardCache("parser-combinators") % "org.scala-lang.modules" %% "scala-parser-combinators"</code></p>
+
+<h2>雑感</h2>
+
+<p>ハッカソンではDEMOまでしか作成できなかったが</p>
+
+<ul>
+<li>ScalikeJDBCの主だった機能は一通り試したい</li>
+<li><a href="http://www.h2database.com/html/tutorial.html#android">h2 database</a>は公式でAndroid対応のJDBC driverを配布しているようなので、h2でも試したい</li>
+<li>Typesafe activator templateにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaのREPLを拡張するには]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension/"/>
+    <updated>2014-12-06T18:04:35+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension</id>
+    <content type="html"><![CDATA[<p>こちらは<a href="http://qiita.com/advent-calendar/2014/scala">Scala AdventCalendar 2014</a>の7日目の記事です。
+今日はScalaのカスタムREPLの作り方についての話。なお今回は(Scala REPL同様)StandaloneなREPLアプリの作成を目的としているので、<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>は主眼ではありません。</p>
+
+<h1>モチベーション</h1>
+
+<p>ScalaのREPLは手元のローカルマシンでAPIを試してみたいときや、ちょっとした計算をしたいときにはとても便利なのですが、やや凝ったことをしたいときなど、そのまま使うには不便さを感じることがあります。</p>
+
+<p>具体的にはAndroidのAPIをScalaのREPLから叩けるようにしたかったのですが、Android環境をJVMでエミュレートするためにはカスタムClassLoaderを使ってAndroid APIのClassを書き換える必要があって。。。という感じ。</p>
+
+<p>これはちょっと特殊なモチベーションかもしれませんが、クラスター上などの特定の環境で実行させたいとき(e.g.<a href="http://spark.apache.org/docs/latest/quick-start.html#interactive-analysis-with-the-spark-shell"><code>spark-shell</code></a>)、自作ライブラリのsandbox環境を提供するにあたって特定の場面でよく使うコマンドを追加したい、など思われる方はいるかもしれません。</p>
+
+<p>そんなとき、意外とScala REPLを拡張する記事を書いている人が少なかったので、今回はScalaのソースコードを読みながらカスタムClassLoaderを使用する方法、コマンドを追加する方法について書くことにしました。</p>
+
+<p>参考:<a href="http://www.michaelpollmeier.com/create-your-custom-scala-repl/">Create your custom Scala REPL</a> &hellip;  数少ないREPL拡張方法に関する記事。</p>
+
+<h1>成果物</h1>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl"><code>taisukeoe/MyCLRepl</code></a></p>
+
+<figure class='code'><figcaption><span>MyCLRepl DEMO</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">hello</span> <span class="k">=</span> <span class="s">&quot;hello&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="o">&lt;</span><span class="n">root</span><span class="o">&gt;.</span><span class="nc">$line3</span>
+</span><span class='line'><span class="o">&lt;&lt;</span><span class="n">中略</span><span class="o">&gt;&gt;</span>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="n">scala</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">mutable</span><span class="o">.</span><span class="nc">StringBuilder</span>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="n">scala</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="nc">ScalaRunTime</span><span class="n">$</span>
+</span><span class='line'><span class="n">hello</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">hello</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">myCommand</span> <span class="kt">hello</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">This</span> <span class="n">is</span> <span class="n">a</span> <span class="n">custom</span> <span class="n">command</span> <span class="n">example</span><span class="o">.</span> <span class="nc">You</span> <span class="n">can</span> <span class="k">do</span> <span class="n">something</span> <span class="n">from</span> <span class="n">value</span><span class="k">:</span><span class="err">&quot;</span><span class="kt">hello</span><span class="err">&quot;</span> <span class="kt">with</span> <span class="kt">custom</span> <span class="kt">Scala</span> <span class="kt">interpreter.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ClassLoaderの差し替え(Classのロード時にクラス名をprint)と、myCommandというコマンドの追加をしています。</p>
+
+<!--more-->
+
+
+<h1>REPLとは</h1>
+
+<p><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">Read–Eval–Print Loop</a>の略で、対話型の開発環境。ユーザーの入力したコードを一行から評価する。
+ScalaのREPLは<code>scala</code>コマンドから開始できる。</p>
+
+<h1>ScalaのREPLの構成</h1>
+
+<p><a href="https://github.com/scala/scala/tree/v2.11.4/src/repl/scala/tools/nsc"><code>scala.tools.nsc.interpreter</code></a>パッケージがREPLに相当。インタプリタのソースコードがそれなりの量あるので一見大変そうだが、構成自体はシンプル。REPLをカスタマイズする上で最低限見る必要がある場所に絞って、以下では解説します。</p>
+
+<h2>エントリポイント</h2>
+
+<p>scalaのスクリプトの中身を見ると、以下の通り<code>scala.tools.nsc.MainGenericRunner</code>の<code>main</code>関数をエントリポイントとしてREPLを起動していることがわかる。</p>
+
+<figure class='code'><figcaption><span>/usr/local/bin/scala#L202-212</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>execCommand <span class="se">\</span>
+</span><span class='line'>  <span class="s2">&quot;${JAVACMD:=java}&quot;</span> <span class="se">\</span>
+</span><span class='line'>  <span class="nv">$JAVA_OPTS</span> <span class="se">\</span>
+</span><span class='line'>  <span class="s2">&quot;${java_args[@]}&quot;</span> <span class="se">\</span>
+</span><span class='line'>  <span class="k">$(</span>classpathArgs<span class="k">)</span> <span class="se">\</span>
+</span><span class='line'>  -Dscala.home<span class="o">=</span><span class="s2">&quot;$SCALA_HOME&quot;</span> <span class="se">\</span>
+</span><span class='line'>  <span class="nv">$OVERRIDE_USEJAVACP</span> <span class="se">\</span>
+</span><span class='line'>  <span class="s2">&quot;$EMACS_OPT&quot;</span> <span class="se">\</span>
+</span><span class='line'>  <span class="nv">$WINDOWS_OPT</span> <span class="se">\</span>
+</span><span class='line'>  scala.tools.nsc.MainGenericRunner  <span class="s2">&quot;$@&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Main関数の中でLoopを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74"><code>scala.tools.nsc.MainGenericRunner</code></a>の<code>main</code>関数の処理は、同コンパニオンクラスの<code>process</code>関数に移譲している。この関数の中で、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>process</code>関数を呼んでおり、このクラスがREPLのLoopに相当。</p>
+
+<figure class='code'><figcaption><span>scala.tools.nsc.MainGenericRunner</span><a href='https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">MainGenericRunner</span> <span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">process</span><span class="o">(</span><span class="n">args</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">run</span><span class="o">()</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>      <span class="o">....</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">def</span> <span class="n">runTarget</span><span class="o">()</span><span class="k">:</span> <span class="kt">Either</span><span class="o">[</span><span class="kt">Throwable</span>, <span class="kt">Boolean</span><span class="o">]</span> <span class="k">=</span> <span class="n">howToRun</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">...</span>
+</span><span class='line'>        <span class="k">case</span> <span class="k">_</span>  <span class="k">=&gt;</span>
+</span><span class='line'>          <span class="c1">// We start the repl when no arguments are given.</span>
+</span><span class='line'>          <span class="nc">Right</span><span class="o">(</span><span class="k">new</span> <span class="n">interpreter</span><span class="o">.</span><span class="nc">ILoop</span> <span class="n">process</span> <span class="n">settings</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>     <span class="o">...</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>      <span class="n">run</span><span class="o">()</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">MainGenericRunner</span> <span class="k">extends</span> <span class="nc">MainGenericRunner</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">main</span><span class="o">(</span><span class="n">args</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">String</span><span class="o">])</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="k">if</span> <span class="o">(!</span><span class="n">process</span><span class="o">(</span><span class="n">args</span><span class="o">))</span> <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="o">(</span><span class="mi">1</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>参考:<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">scala.tools.nsc.MainGenericRunner.run</a></p>
+
+<h2>Loopの中でインタプリタを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a>はREPLのLoopに相当するクラス。コマンドの判定や、入力したコードのインタプリタへの移譲などを行っている。</p>
+
+<p>REPLのコマンド(e.g.<code>:help</code>)の定義は<code>standardCommands</code>変数。overrideした<code>commands</code>関数において追加することでカスタムCommandを実装できる。</p>
+
+<p>また、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>createInterpreter</code>関数内で、インタプリタのメンバ変数<code>var intp:IMain</code>を初期化している。</p>
+
+<p>なおインタプリタ <code>intp</code>の実装クラスは<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>ILoopInterpreter</code></a>。</p>
+
+<figure class='code'><figcaption><span>scala.tools.nsc.interpreter.ILoop</span><a href='https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">ILoop</span><span class="o">(</span><span class="n">in0</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">BufferedReader</span><span class="o">],</span> <span class="k">protected</span> <span class="k">val</span> <span class="n">out</span><span class="k">:</span> <span class="kt">JPrintWriter</span><span class="o">)</span>
+</span><span class='line'>                <span class="k">extends</span> <span class="nc">AnyRef</span>
+</span><span class='line'>                   <span class="k">with</span> <span class="nc">LoopCommands</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="k">var</span> <span class="n">intp</span><span class="k">:</span> <span class="kt">IMain</span> <span class="o">=</span> <span class="k">_</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">　</span>  <span class="k">lazy</span> <span class="k">val</span> <span class="n">standardCommands</span> <span class="k">=</span> <span class="nc">List</span><span class="o">(</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;edit&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;id&gt;|&lt;line&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;edit history&quot;</span><span class="o">,</span> <span class="n">editCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;help&quot;</span><span class="o">,</span> <span class="s">&quot;[command]&quot;</span><span class="o">,</span> <span class="s">&quot;print this summary or command-specific help&quot;</span><span class="o">,</span> <span class="n">helpCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">historyCommand</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;h?&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;string&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;search the history&quot;</span><span class="o">,</span> <span class="n">searchHistory</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;imports&quot;</span><span class="o">,</span> <span class="s">&quot;[name name ...]&quot;</span><span class="o">,</span> <span class="s">&quot;show import history, identifying sources of names&quot;</span><span class="o">,</span> <span class="n">importsCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;implicits&quot;</span><span class="o">,</span> <span class="s">&quot;[-v]&quot;</span><span class="o">,</span> <span class="s">&quot;show the implicits in scope&quot;</span><span class="o">,</span> <span class="n">intp</span><span class="o">.</span><span class="n">implicitsCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;javap&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;path|class&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;disassemble a file or class name&quot;</span><span class="o">,</span> <span class="n">javapCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;line&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;id&gt;|&lt;line&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;place line(s) at the end of history&quot;</span><span class="o">,</span> <span class="n">lineCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;load&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;path&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;interpret lines in a file&quot;</span><span class="o">,</span> <span class="n">loadCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;paste&quot;</span><span class="o">,</span> <span class="s">&quot;[-raw] [path]&quot;</span><span class="o">,</span> <span class="s">&quot;enter paste mode or paste a file&quot;</span><span class="o">,</span> <span class="n">pasteCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">nullary</span><span class="o">(</span><span class="s">&quot;power&quot;</span><span class="o">,</span> <span class="s">&quot;enable power user mode&quot;</span><span class="o">,</span> <span class="n">powerCmd</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">nullary</span><span class="o">(</span><span class="s">&quot;quit&quot;</span><span class="o">,</span> <span class="s">&quot;exit the interpreter&quot;</span><span class="o">,</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="nc">Result</span><span class="o">(</span><span class="n">keepRunning</span> <span class="k">=</span> <span class="kc">false</span><span class="o">,</span> <span class="nc">None</span><span class="o">)),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;replay&quot;</span><span class="o">,</span> <span class="s">&quot;[options]&quot;</span><span class="o">,</span> <span class="s">&quot;reset the repl and replay all previous commands&quot;</span><span class="o">,</span> <span class="n">replayCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;require&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;path&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;add a jar to the classpath&quot;</span><span class="o">,</span> <span class="n">require</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;reset&quot;</span><span class="o">,</span> <span class="s">&quot;[options]&quot;</span><span class="o">,</span> <span class="s">&quot;reset the repl to its initial state, forgetting all session entries&quot;</span><span class="o">,</span> <span class="n">resetCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;save&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;path&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;save replayable session to a file&quot;</span><span class="o">,</span> <span class="n">saveCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">shCommand</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;settings&quot;</span><span class="o">,</span> <span class="s">&quot;&lt;options&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;update compiler options, if possible; see reset&quot;</span><span class="o">,</span> <span class="n">changeSettings</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">nullary</span><span class="o">(</span><span class="s">&quot;silent&quot;</span><span class="o">,</span> <span class="s">&quot;disable/enable automatic printing of results&quot;</span><span class="o">,</span> <span class="n">verbosity</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;type&quot;</span><span class="o">,</span> <span class="s">&quot;[-v] &lt;expr&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;display the type of an expression without evaluating it&quot;</span><span class="o">,</span> <span class="n">typeCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">cmd</span><span class="o">(</span><span class="s">&quot;kind&quot;</span><span class="o">,</span> <span class="s">&quot;[-v] &lt;expr&gt;&quot;</span><span class="o">,</span> <span class="s">&quot;display the kind of expression&#39;s type&quot;</span><span class="o">,</span> <span class="n">kindCommand</span><span class="o">),</span>
+</span><span class='line'>    <span class="n">nullary</span><span class="o">(</span><span class="s">&quot;warnings&quot;</span><span class="o">,</span> <span class="s">&quot;show the suppressed warnings from the most recent line which had any&quot;</span><span class="o">,</span> <span class="n">warningsCommand</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Available commands */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">commands</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">LoopCommand</span><span class="o">]</span> <span class="k">=</span> <span class="n">standardCommands</span> <span class="o">++</span> <span class="o">(</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">isReplPower</span><span class="o">)</span> <span class="n">powerCommands</span> <span class="k">else</span> <span class="nc">Nil</span>
+</span><span class='line'>  <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">ILoopInterpreter</span> <span class="k">extends</span> <span class="nc">IMain</span><span class="o">(</span><span class="n">settings</span><span class="o">,</span> <span class="n">out</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">outer</span> <span class="k">=&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">override</span> <span class="k">lazy</span> <span class="k">val</span> <span class="n">formatting</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">Formatting</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">def</span> <span class="n">prompt</span> <span class="k">=</span> <span class="nc">ILoop</span><span class="o">.</span><span class="k">this</span><span class="o">.</span><span class="n">prompt</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">protected</span> <span class="k">def</span> <span class="n">parentClassLoader</span> <span class="k">=</span>
+</span><span class='line'>      <span class="n">settings</span><span class="o">.</span><span class="n">explicitParentLoader</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span> <span class="n">classOf</span><span class="o">[</span><span class="kt">ILoop</span><span class="o">].</span><span class="n">getClassLoader</span> <span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="cm">/** Create a new interpreter. */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">createInterpreter</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">addedClasspath</span> <span class="o">!=</span> <span class="s">&quot;&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">settings</span><span class="o">.</span><span class="n">classpath</span> <span class="n">append</span> <span class="n">addedClasspath</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">intp</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">ILoopInterpreter</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// start an interpreter with the given settings</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">process</span><span class="o">(</span><span class="n">settings</span><span class="k">:</span> <span class="kt">Settings</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="n">savingContextLoader</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="n">settings</span> <span class="k">=</span> <span class="n">settings</span>
+</span><span class='line'>    <span class="n">createInterpreter</span><span class="o">()</span>
+</span><span class='line'>     <span class="o">...</span>
+</span><span class='line'>    <span class="n">printWelcome</span><span class="o">()</span>
+</span><span class='line'>     <span class="o">...</span>
+</span><span class='line'>    <span class="k">try</span> <span class="n">loop</span><span class="o">()</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">LineResults</span><span class="o">.</span><span class="nc">EOF</span> <span class="k">=&gt;</span> <span class="n">out</span> <span class="n">print</span> <span class="nc">Properties</span><span class="o">.</span><span class="n">shellInterruptedString</span>
+</span><span class='line'>      <span class="k">case</span> <span class="k">_</span>               <span class="k">=&gt;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">catch</span> <span class="nc">AbstractOrMissingHandler</span><span class="o">()</span>
+</span><span class='line'>    <span class="k">finally</span> <span class="n">closeInterpreter</span><span class="o">()</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kc">true</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>インタプリタの中でClassLoaderを生成</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>がインタプリタの主たるコード。</p>
+
+<p><code>private var _classLoader:ClassLoader</code>がClassLoaderのメンバ変数だが、privateなのでclassLoader関数をoverrideしてカスタムClassLoaderを生成する。</p>
+
+<p>ただし、<code>IMain</code>の<code>classLoader</code>関数の戻り値の型は<a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>になので、カスタムClassLoaderもこれを継承させる必要がある点に注意。</p>
+
+<figure class='code'><figcaption><span>scala.tools.nsc.interpreter.IMain</span><a href='https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">class</span> <span class="nc">IMain</span><span class="o">(</span><span class="nd">@BeanProperty</span> <span class="k">val</span> <span class="n">factory</span><span class="k">:</span> <span class="kt">ScriptEngineFactory</span><span class="o">,</span> <span class="n">initialSettings</span><span class="k">:</span> <span class="kt">Settings</span><span class="o">,</span> <span class="k">protected</span> <span class="k">val</span> <span class="n">out</span><span class="k">:</span> <span class="kt">JPrintWriter</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">AbstractScriptEngine</span> <span class="k">with</span> <span class="nc">Compilable</span> <span class="k">with</span> <span class="nc">Imports</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">imain</span> <span class="k">=&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">private</span> <span class="k">var</span> <span class="nc">_classLoader</span><span class="k">:</span> <span class="kt">util.AbstractFileClassLoader</span> <span class="o">=</span> <span class="kc">null</span>                              <span class="c1">// active classloader</span>
+</span><span class='line'>  <span class="o">....</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Parent classloader.  Overridable. */</span>
+</span><span class='line'>  <span class="k">protected</span> <span class="k">def</span> <span class="n">parentClassLoader</span><span class="k">:</span> <span class="kt">ClassLoader</span> <span class="o">=</span>
+</span><span class='line'>    <span class="n">settings</span><span class="o">.</span><span class="n">explicitParentLoader</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span> <span class="k">this</span><span class="o">.</span><span class="n">getClass</span><span class="o">.</span><span class="n">getClassLoader</span><span class="o">()</span> <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">resetClassLoader</span><span class="o">()</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">repldbg</span><span class="o">(</span><span class="s">&quot;Setting new classloader: was &quot;</span> <span class="o">+</span> <span class="nc">_classLoader</span><span class="o">)</span>
+</span><span class='line'>    <span class="nc">_classLoader</span> <span class="k">=</span> <span class="kc">null</span>
+</span><span class='line'>    <span class="n">ensureClassLoader</span><span class="o">()</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>    <span class="k">final</span> <span class="k">def</span> <span class="n">ensureClassLoader</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="nc">_classLoader</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span>
+</span><span class='line'>      <span class="nc">_classLoader</span> <span class="k">=</span> <span class="n">makeClassLoader</span><span class="o">()</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">classLoader</span><span class="k">:</span> <span class="kt">util.AbstractFileClassLoader</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">ensureClassLoader</span><span class="o">()</span>
+</span><span class='line'>    <span class="nc">_classLoader</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>カスタムREPLを作る</h1>
+
+<p>基本的には解説した以下のクラスに相当するものを継承なり自前で作るなりすれば、カスタムREPLが作れます。</p>
+
+<ul>
+<li><a href=""><code>scala.tools.nsc.MainGenericRunner</code></a> &hellip; REPLを起動するmain関数、Loopの呼び出し</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a> &hellip; Loopの実装。Commandの判定。インタプリタへ処理の移譲。</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>scala.tools.nsc.interpreter.ILoop.ILoopInterpreter</code></a> &hellip; インタプリタの実装。ClassLoaderの生成。</li>
+<li><a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>を継承したカスタムClassLoader &hellip; インタプリタに使用させる。</li>
+</ul>
+
+
+<p>先ほども記載しましたが、完成物は以下の通り。試し方はREADME参照のこと。</p>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl">taisukeoe/MyCLRepl</a></p>
+
+<h1>REPLを拡張している実例</h1>
+
+<p><a href="https://spark.apache.org/">Apache Spark</a>のspark-shellは、REPL上で入力したコマンドをcluster上で実行させるために、REPLを拡張している。以下のファイル群がカスタムREPLに相当する。</p>
+
+<ul>
+<li><a href="https://github.com/apache/spark/blob/master/bin/spark-shell#L61">spark-shell</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/Main.scala">org.apache.spark.repl.Main</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkILoop.scala#L902">org.apache.spark.repl.SparkILoop</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkIMain.scala">org.apache.spark.repl.SparkIMain</a></li>
+</ul>
+
+
+<p><a href="http://scalamatsuri.org/">ScalaMatsuri</a>で発表された<a href="https://github.com/xitrum-framework/scalive">Scalive</a>もREPLを拡張してJVM環境を触れるようにしている。</p>
+
+<h2>余談:Scalaの:power モード</h2>
+
+<p>Scala REPLに備わっている<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>を使用すると、Scala REPLコードのpublicな変数・関数へのアクセスが可能で、varなら置き換えも可能。</p>
+
+<p>例えば上記のカスタムClassLoader挿入は、<code>:power</code>モードを利用してこんな風にも書けます。（ClassLoaderのサイズが膨らんでくるとつらさはありますが）</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">power</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">**</span> <span class="nc">Power</span> <span class="nc">User</span> <span class="n">mode</span> <span class="n">enabled</span> <span class="o">-</span> <span class="nc">BEEP</span> <span class="nc">WHIR</span> <span class="nc">GYVE</span> <span class="o">**</span>
+</span><span class='line'><span class="o">**</span> <span class="k">:</span><span class="kt">phase</span> <span class="kt">has</span> <span class="kt">been</span> <span class="kt">set</span> <span class="kt">to</span> <span class="err">&#39;</span><span class="k">type</span><span class="kt">r</span><span class="err">&#39;</span><span class="kt">.</span>          <span class="kt">**</span>
+</span><span class='line'><span class="o">**</span> <span class="n">scala</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">nsc</span><span class="o">.</span><span class="k">_</span> <span class="n">has</span> <span class="n">been</span> <span class="n">imported</span>      <span class="o">**</span>
+</span><span class='line'><span class="o">**</span> <span class="n">global</span><span class="o">.</span><span class="k">_</span><span class="o">,</span> <span class="n">definitions</span><span class="o">.</span><span class="k">_</span> <span class="n">also</span> <span class="n">imported</span>    <span class="o">**</span>
+</span><span class='line'><span class="o">**</span> <span class="nc">Try</span>  <span class="k">:</span><span class="kt">help</span><span class="o">,</span> <span class="k">:</span><span class="kt">vals</span><span class="o">,</span> <span class="n">power</span><span class="o">.&lt;</span><span class="n">tab</span><span class="o">&gt;</span>           <span class="o">**</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">:</span><span class="kt">paste</span>
+</span><span class='line'><span class="c1">// Entering paste mode (ctrl-D to finish)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.reflect.internal.util.ScalaClassLoader</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.tools.nsc.interpreter.JPrintWriter</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.tools.nsc.io.AbstractFile</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.tools.nsc.util</span>
+</span><span class='line'><span class="n">repl</span><span class="o">.</span><span class="n">intp</span> <span class="k">=</span> <span class="k">new</span> <span class="n">repl</span><span class="o">.</span><span class="nc">ILoopInterpreter</span> <span class="o">{</span>
+</span><span class='line'>   <span class="k">override</span> <span class="k">def</span> <span class="n">classLoader</span> <span class="k">=</span> <span class="k">new</span> <span class="n">util</span><span class="o">.</span><span class="nc">AbstractFileClassLoader</span><span class="o">(</span><span class="n">root</span><span class="k">:</span><span class="kt">AbstractFile</span><span class="o">,</span><span class="n">parent</span><span class="k">:</span><span class="kt">ClassLoader</span><span class="o">)</span>  <span class="k">with</span> <span class="nc">ScalaClassLoader</span><span class="o">{</span>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">loadClass</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="n">s</span><span class="s">&quot;MyClassLoader loads classOf ${name}&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">super</span><span class="o">.</span><span class="n">loadClass</span><span class="o">(</span><span class="n">name</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'> <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">scala</span><span class="o">&gt;</span> <span class="k">val</span> <span class="n">hoge</span> <span class="k">=</span> <span class="s">&quot;hoge&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="o">&lt;</span><span class="n">root</span><span class="o">&gt;.</span><span class="nc">$line2</span>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="nc">$line2</span>
+</span><span class='line'><span class="o">&lt;&lt;</span><span class="n">中略</span><span class="o">&gt;&gt;</span>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="n">scala</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="nc">ScalaRunTime</span><span class="n">$</span>
+</span><span class='line'><span class="nc">MyClassLoader</span> <span class="n">loads</span> <span class="n">classOf</span> <span class="n">scala</span><span class="o">.</span><span class="n">runtime</span><span class="o">.</span><span class="nc">BoxedUnit</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">hoge</span><span class="k">:</span> <span class="kt">String</span> <span class="o">=</span> <span class="n">hoge</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ただその一方でREPLのコマンドの判別はILoopクラスで行わており、MainGenericRunnerの内部関数中で直接呼び出されているのでPowerModeからのカスタムCommandの追加は不可能なはず（とはいいつつ、何がしかのhackもありそうな気がするのでもしあればコメント欄で教えてください。）</p>
+
+<h2>余談</h2>
+
+<p>肝心の、オレオレClassLoaderを使ってAndroid APIを叩けるScala REPLアプリは間に合わず。現状でも、未解決のwarningが出る問題とか、タブ補完が効かない問題など、色々と雑な感じにはなっています。。。</p>
+
+<p>そのあたりのフォローはまた後日に(&lsquo;・ω・`)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Akka Transactorsはオワコン]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated/"/>
+    <updated>2014-09-30T01:21:47+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated</id>
+    <content type="html"><![CDATA[<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> STM is a failure, since removed from Akka.</p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/516271313258676226">September 28, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>9/28のAkka Meetupで、AkkaでTransaction処理する話題が出たときに、こんなことをつぶやいたら、<a href="http://shop.oreilly.com/product/0636920028789.do">Effective Akka</a>著者の<a href="https://twitter.com/jamie_allen">@jamie_allen</a>さんに「それはもうオワコンだよ」と教えていただいた(確かに調べてみると、<a href="http://doc.akka.io/docs/akka/snapshot/project/migration-guide-2.2.x-2.3.x.html">Akka 2.3でdeprecated</a>)ので記事化してみる。</p>
+
+<!--more-->
+
+
+<h2>Akka Transactorsとは</h2>
+
+<p><a href="http://doc.akka.io/docs/akka/2.0/scala/transactors.html">Akka Transactors 公式ドキュメント</a>より抜粋,翻訳。</p>
+
+<blockquote><p>Generally, the STM is not needed very often when working with Akka. Some use-cases (that we can think of) are:</p>
+
+<ul>
+<li>When you really need composable message flows across many actors updating their internal local state but need them to do that atomically in one big transaction. Might not be often but when you do need this then you are screwed without it.</li>
+<li>When you want to share a datastructure across actors.</li>
+</ul>
+
+
+<p>一般的に、Akkaを使用しているときにSTMは殆どの場合必要ないけれども、(我々の考えている)ユースケースが幾つかある:</p>
+
+<ul>
+<li>多数のアクター間の内部のローカルな状態を一つの大きなトランザクション内でアトミックに変更する為に合成可能なメッセージフローが必要なとき。こういうケースは余り頻繁にはないが、<strong>必要になったときTransactorsがないととても困るはずだ</strong>。</li>
+<li>データ構造をアクター間で共有したいとき</li>
+</ul>
+</blockquote>
+
+<p>「Transactorsが無いととても困るはずだ」と書いておきながら、なんで削除されたのか気になったので聞いてみた。</p>
+
+<h2>Akka Transactorsが削除された理由</h2>
+
+<ul>
+<li>Jamieさん曰く、非決定点?(some indeterminate point)においてSTMはライブロックに陥る可能性があるから。<em>(STMのライブロックについては<a href="http://ja.wikipedia.org/wiki/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%83%A1%E3%83%A2%E3%83%AA#.E4.B8.8D.E9.80.8F.E6.98.8E.E6.80.A7">このあたり</a>を参照。)</em></li>
+<li>Akka Teamの<a href="https://twitter.com/patriknw">@patriknw</a>さん曰く、Akka Transactorsは<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">ScalableでもDistributableでもない</a>から。</li>
+<li>上記二つは一応分けたけど、これはクラスター環境だとSTMがライブロックに陥りやすい<strong>ので</strong>、ScalabilityやDistributabilityを損なう、ということな気がする(が間違っていたら教えてください)。</li>
+</ul>
+
+
+<h2>Akka Transactorsの代替手段</h2>
+
+<ul>
+<li>複数のActorの内部のローカルな状態をatomicに変更したいときは、short-lived actor(短命のアクター)を実装してその中でトランザクションを書く。</li>
+<li>トランザクションの書き方は、そのshort-lived actorのfailure内にロールバック処理を自前で実装するのが、Jamieさんが<a href="http://www.slideshare.net/shinolajla/effective-akka-scalaio/8">Effective Akka内でも</a>お勧めしている方法。</li>
+<li>でもshort-lived actor内のlocalな環境に限定すれば<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">STMも使える</a>はず…なのだけど、そのことを聞いたら<a href="https://twitter.com/jamie_allen/status/516359268723740672">&ldquo;No, no STM at all&rdquo;</a>と強く否定された。localな環境ならSTMはオーバースペックで、ロールバック処理さえあれば十分というだけのことかしら。</li>
+</ul>
+
+
+<h2>最後に</h2>
+
+<p>Effective AkkaのCameo Patternという項で、short-lived actorで複数のActorのをコーディネートする例が書かれているのでご参考までに(でもコーディネートするところだけで、トランザクションに相当するコードはない）。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/J1JLMjGoC0zu5v" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/shinolajla/effective-akka-scalaio" title="Effective akka scalaio" target="_blank">Effective akka scalaio</a> </strong> from <strong><a href="http://www.slideshare.net/shinolajla" target="_blank">shinolajla</a></strong> </div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaMatsuri 行動規範を掲げた経緯]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct/"/>
+    <updated>2014-09-25T10:38:17+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct</id>
+    <content type="html"><![CDATA[<p>今年から、<a href="http://scalamatsuri.org/ja/code-of-conduct/">行動規範</a>をScalaMatsuriとして掲げ始めた。
+その目的は<strong>「みんな仲良く」</strong>。噛み砕いて言えば、性別、国籍などに起因するような少数派が居心地の悪い思い、不快な思いをしないことを目指している。</p>
+
+<p>この行動規範について、突然Webサイトに追加されたので驚かれた方も多いかもしれない。この行動規範は、現実に発生しそうになった問題から、必要要件を考え、準備委員内で長期間に渡り議論を重ねた上で公開したものだ。</p>
+
+<p>既にその目的については<a href="http://twitter.com/">@eed3si9n_ja</a>さんが<a href="http://eed3si9n.com/ja/towards-universal-access-at-a-conference">カンファレンスでのユニバーサル・アクセスへ向けて</a>という記事でまとめてくださっているが、来年から本格的に運用するにあたり、この行動規範を掲げた経緯も含めて紹介することが、ご理解とご協力をいただく上では重要ではないかと考えているため、この記事を書くに至った。</p>
+
+<!--more-->
+
+
+<p>この記事では、行動規範が生まれた経緯を3つの側面から説明していきたい。</p>
+
+<ul>
+<li>行動規範が必要となった背景</li>
+<li>どのような必要要件から行動規範が決まったか</li>
+<li>来年以降の行動規範の運用に向けて</li>
+</ul>
+
+
+<h1>行動規範が必要となった背景</h1>
+
+<p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
+
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+
+<p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
+
+<h1>どのような必要要件から行動規範が決まったか</h1>
+
+<p>実運用、公平性、リソース確保などの現実的制約について議論を重ねた結果、以下のような必要要件に至った。</p>
+
+<ul>
+<li>時代を反映するための柔軟性</li>
+<li>事務コスト削減のための、微細なルール(e.g. スカート丈何cm)規定の排除</li>
+<li>退場のような強行手段に出た場合の、公平性の担保</li>
+<li>準備委員全体での都度議論を避けることによる、コミュニケーションコストの低減</li>
+</ul>
+
+
+<p>これらを満たすものとして、実績のあるPNWScala, NE ScalaやScalaDaysといったScalaの国際カンファレンスの行動規範を思想方針として全面的に採用することに決めた。</p>
+
+<p>ScalaMatsuri発起の理由として海外コミュニティとの交流をうたっていること、直近では招待講演者やスポンサーとして、将来的には一般参加者として、先に挙げたカンファレンスに参加している層がScalaMatsuriに来ても居心地の悪い思いをしなくて済むような準備を整えるために、国際カンファレンスに追随した形だ。</p>
+
+<p>これらのカンファレンスに限らず、日本国内でいえばRubyKaigiでも<a href="http://rubykaigi.org/2014/anti-harassment-policy">Anti-harassment-policy</a>について明示している通り、国際的なカンファレンスを視野に入れるためには、同様のガイドラインを掲げることは避けては通れないものだと考えている。但し、細部については実運用や時代の移り変わりに伴い、加筆修正される可能性はある。</p>
+
+<h1>来年以降の行動規範の運用に向けて</h1>
+
+<p>今年のScalaMatsuri 2014では、行動規範の議論に時間を費やした結果、公開が直前となってしまった為、実運用は見送った形となった。ただ来年から運用を開始するにあたり、まだ幾つかの課題は残っている。例えば:</p>
+
+<ul>
+<li>個々の事例について、どのように判断するのか？</li>
+<li>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</li>
+</ul>
+
+
+<p>それぞれについて、まだ議論は続いているものの、どのようにクリアできる可能性があるかについて紹介していきたい。</p>
+
+<h4>個々の事例について、どのように判断するのか？</h4>
+
+<p>審判制度での運用を検討している。具体的には、3人〜5人程度の審判の間で議論して最終的な判断を下すが、その際に、過去の代表事例との間に大きな矛盾が生じないかチェックをするというものだ。</p>
+
+<h5>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</h5>
+
+<p>確かに、幾ばくかのトレードオフがあることは事実だと思う。</p>
+
+<p>しかしながら、ScalaMatsuri 2014のアンカンファレンスの異様な盛り上がりを経験した今振り返ってみると、行動規範を遵守したままでもイベントを盛り上げることは不可能ではないと思える。また代表的な事例をオープンにすることで、自主規制の参考にしていただけることを期待している。</p>
+
+<h1>まとめ</h1>
+
+<p>行動規範は、ScalaMatsuriのコアである海外コミュニティとの交流を実現する上でも、ScalaMatsuriに関わる全ての人をトラブルから守る上でも無くてはならないものだと考えている。ScalaMatsuriを一緒にハラスメント・フリーなイベントするべく、ご理解とご協力を賜われれば幸いである。</p>
+
+<p>最後に、この記事をレビューしてくださった<a href="http://twitter.com/eed3si9n_ja">@eed3si9n_ja</a>さん、<a href="http://twitter.com/gakuzzzz">@gakuzzzz</a>さん、<a href="http://twitter.com/kmizu">@kmizu</a>さん、<a href="http://twitter.com/seratch_ja">@seratch_ja</a>さん、<a href="http://twitter.com/xuwei_k">@xuwei-k</a>さんに感謝します。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaMatsuri 2014 OMOTE/表]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/12/scalamatsuri-omote/"/>
+    <updated>2014-09-12T10:33:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/12/scalamatsuri-omote</id>
+    <content type="html"><![CDATA[<p><img src="http://taisukeoe.github.io/images/20140912/scala_matsuri_happi_m.png" width="250" height="200"></p>
+
+<p>9/6,7の2日間、<a href="http://scalamatsuri.org/">ScalaMatsuri 2014</a>という日本最大（おそらくAsiaでも最大?)のScalaのカンファンレンスを開催し、総来場者数が400人強、<a href="http://blog.nicovideo.jp/niconews/ni048403.html">ニコ生視聴者14万人超</a>、昨年に引き続き<a href="https://twitter.com/niw/status/508064126229176320">#ScalaMatsuriがTwitterトレンド入り</a>と、盛会のうちに幕を閉じました。
+ご来場者、スポンサー企業、ニコ生視聴者、スタッフの皆様、本当にありがとうございました。</p>
+
+<p>今回は、主にOMOTE / 表側の紹介です。写真なども後日この記事に追加予定。裏側紹介はアンケートデータの整理などが終わり次第、また書きます。</p>
+
+<!--more-->
+
+
+<h1>1日目:カンファレンス</h1>
+
+<p><a href="https://twitter.com/okapie">@okapie</a>さんによるtogetterは<a href="http://togetter.com/li/717717">こちら</a>。</p>
+
+<h2>会場A</h2>
+
+<h3>■基調講演 - Scala進化論</h3>
+
+<p>Scala作者の<a href="http://twitter.com/odersky">Martin Odersky教授 @odersky</a>による、Pizza, FunnelといったScalaの前身の言語の紹介からDot計算の話まで含めた、Scalaの歴史と展望の紹介。Scalaが生まれてからの時間が、ちゃんとScalaMatsuriの日に合わせてあるという凝りっぷり、とは<a href="https://twitter.com/qtamaki">@qtamaki</a>さんの談。</p>
+
+<p><a href="http://d.hatena.ne.jp/xuwei/20140911/1410398113">ScalaはPizzaで作られていた？</a>という<a href="https://twitter.com/xuwei_k">@xuwei_k</a>さんの記事もご覧になると、より楽しめるかも。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/9jRK2qJmw1NAUp" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala" title="The Evolution of Scala / Scala進化論" target="_blank">The Evolution of Scala / Scala進化論</a> </strong> from <strong><a href="http://www.slideshare.net/scalaconfjp" target="_blank">scalaconfjp</a></strong> </div></p>
+
+<h3>■sbt,傾向と対策</h3>
+
+<p>sbtコミッタで、最近はほぼ一人？でsbtのコードを書いている<a href="https://twitter.com/eed3si9n_ja">Eugene Yokota氏 @eed3si9n_ja</a>のセッション。昨年のカンファレンスから、ずっと翻訳チームリーダーとしても活躍されています。</p>
+
+<p>今回はmkdirから始まるライブコーディングや、sbt server,　Auto Plugins, Consolidated resolutionといった新機能の紹介まで盛りだくさんなセッション。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/cR4VPTVOnbfEAi" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374" title="sbt, past and future / sbt, 傾向と対策" target="_blank">sbt, past and future / sbt, 傾向と対策</a> </strong> from <strong><a href="http://www.slideshare.net/scalaconfjp" target="_blank">scalaconfjp</a></strong> </div></p>
+
+<h3>■Fifty Rapture One-Liners in Forty Minutes</h3>
+
+<p><a href="http://okapies.hateblo.jp/entry/2013/07/15/232456">Cake Patternの名付け親</a>でもある<a href="https://twitter.com/propensive">Jon Pretty氏 @propensive</a>によるセッション。<a href="http://rapture.io/">Rapture I/O</a>の1行コードを、50個一気に紹介するという構成でした。1行でパワフルなI/O操作ができるRapture I/Oの魅せ方として、大変上手いなと感心していました。
+HTTPやFileのI/Oも簡単で魅力的ですが、JSON周り、特にString InterporlationでExtractor作れるあたりはすごく面白いなと。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">vote</span> <span class="k">match</span> <span class="o">{</span><span class="k">case</span> <span class="n">json</span><span class="s">&quot;&quot;&quot;{&quot;vote&quot;:{&quot;name&quot;:$c}}&quot;&quot;&quot;</span> <span class="k">=&gt;</span> <span class="s">&quot;Voted for&quot;</span><span class="o">+</span><span class="n">c</span><span class="o">.</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">]}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c1">// res:String = &quot;Voted for Barak Obama&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>また2日目のアンカンファレンスではRapture I/OのWorkshopも開催してくださいました。海外からJon Prettyさんのような方がもっと来やすくなるような仕組みを作って行きたい。</p>
+
+<h3>■Node.js vs Play Framework</h3>
+
+<p>LinkedInでPlayチームのリーダーを務めていたYevgeniy(Jim) Brikman氏。
+LinkedIn内で行っているWeb Framework比較結果の、一番良いところだけ見せていただいているという大変贅沢なセッション。網羅的で内容も大変参考になりますし、翻訳に先んじて日本人聴衆の笑いをかっさらっていく話の上手さ。後述しますが色んな意味でイケメン。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/2iDCuS1wW5G0aY" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles" title="Node.js vs Play Framework (with Japanese subtitles)" target="_blank">Node.js vs Play Framework (with Japanese subtitles)</a> </strong> from <strong><a href="http://www.slideshare.net/brikis98" target="_blank">Yevgeniy Brikman</a></strong> </div></p>
+
+<p>あと築地の寿司が大変美味しかったそうで、感激されていました。</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Best sushi I&#39;ve ever had. Really, one of the best meals I&#39;ve ever had. <a href="http://t.co/04Db2O1PMe">pic.twitter.com/04Db2O1PMe</a></p>&mdash; Yevgeniy Brikman (@brikis98) <a href="https://twitter.com/brikis98/status/507372251369320448">September 4, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/jamie_allen">@jamie_allen</a> All I can say is Tokyo is a good place for a Scala conference :) <a href="http://t.co/sTwdrPaUpE">http://t.co/sTwdrPaUpE</a></p>&mdash; Yevgeniy Brikman (@brikis98) <a href="https://twitter.com/brikis98/status/507421447006855168">September 4, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h3>■Building a Unified &ldquo;BigData&rdquo; Pipeline in ApacheSpark</h3>
+
+<p>Apache SparkコミッタのAaron Davidson氏による、Sparkの解説とLive Demo。</p>
+
+<p>実はこのとき直前の映像関係のトラブルでAaron Davidson氏のPCがプロジェクタに映らず、急遽私のPCで発表からLive Demoまでやる(しかもハイクオリティ)という離れ業をやってのけました。昨年の<a href="http://scalamatsuri.org/2013/ja/program/index.html#A16402">James Roper氏のデモ</a>といい、どうもScalaMatsuriのゲストはLive Demoが抜群に上手い傾向にあるようです。でもJISキーボードはだいぶ苦戦されてました。プレゼン中、私が隣に座って「&#8221;_&ldquo;はどこ？」「ここだよ」みたいなことをずっとやっていたり。</p>
+
+<p>皆さんの声を聞いていると、Databricks Cloudのvisualization機能に驚いた方も多かったようです。このサービスは現在closedβで、価格は未定なもののフリーミアムモデルを検討されているとか。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/RC8HNh33gohXj" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark" title="Building a Unified Data Pipline in Spark / Apache Sparkを用いたBig Dataパイプラインの統一" target="_blank">Building a Unified Data Pipline in Spark / Apache Sparkを用いたBig Dataパイプラインの統一</a> </strong> from <strong><a href="http://www.slideshare.net/scalaconfjp" target="_blank">scalaconfjp</a></strong> </div></p>
+
+<h3>■Getting started with Scalding, Storm and Summingbird</h3>
+
+<p>Twitter Inc.にお務めの<a href="https://twitter.com/niw">丹羽さん @niwさん</a>が、はるばる日本までいらしてくださいました。</p>
+
+<p>バルス! => TPS(tweets per second)がやばい => じゃあどうやって測るの？</p>
+
+<p>という風に、ネタスライドからScalding,Storm,Summingbirdに繋げる話の上手さ。</p>
+
+<iframe allowfullscreen="true" allowtransparency="true" frameborder="0" height="596" id="talk_frame_117501" mozallowfullscreen="true" src="//speakerdeck.com/player/b7b4acc017df0132d2a956002d6aedf7" style="border:0; padding:0; margin:0; background:transparent;" webkitallowfullscreen="true" width="710"></iframe>
+
+
+<p>あと<a href="https://twitter.com/xuwei_k">@xuwei_k</a>さんがこんなことを仰ってるぐらい、講演以外のトークも面白かったです。ありがとうございました。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">みんな小田好先生に会って話聞いて、感動などあったと思うし運営側の1人としてはそういう体験をしてもらうために頑張ったのもあるのでよかったのだけど、&#10;個人としては小田好先生の発表内容の大半は既にネットで見れるものだしそれよりtwitterの中の人と直接話して色々聞けたのが一番よかった</p>&mdash; Kenji Yoshida (@xuwei_k) <a href="https://twitter.com/xuwei_k/status/508665375530049536">September 7, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>あと、SwiftとScalaの話は何かの機会にぜひ聞きたい(やりたい)です。<a href="http://www.slideshare.net/lewuathe/swift-seminar2">Swiftで、Scalaのパターンマッチの文法を実装する話</a>とか楽しい。</p>
+
+<h3>■Scala 上で実現された制約プログラミングシステム Scarab について</h3>
+
+<p>SAT型制約プログラミングシステムScarabのお話。ドキュメントは<a href="http://kix.istc.kobe-u.ac.jp/~soh/scarab/">こちら</a>にまとまっています。</p>
+
+<p>私は不勉強ゆえ内容をよく理解できなかったのですが、どうやらsbt内でもSATを利用しているらしく、sbtコミッタのYokotaさんと熱く語ってらっしゃるのを隣でみていました。</p>
+
+<p>宋さんのようなアカデミアにいらっしゃる方が、ScalaMatsuriのCFPに応募してくださって嬉しいですし、アカデミアの方が市井のScalaのコアな開発者と出会う機会をもっと作りたい。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/AjF8kfzcnxc7hS" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben" title="Scarab: SAT-based Constraint Programming System in Scala / Scala上で実現された制約プログラミングシステムScarabについて" target="_blank">Scarab: SAT-based Constraint Programming System in Scala / Scala上で実現された制約プログラミングシステムScarabについて</a> </strong> from <strong><a href="http://www.slideshare.net/scalaconfjp" target="_blank">scalaconfjp</a></strong> </div></p>
+
+<h3>■懇親会</h3>
+
+<p>実は、この前日の9/5がOdersky教授の56歳の誕生日。というわけで、サプライズで歌ってケーキをプレゼントしました。すごく喜んでいただけて良かった。</p>
+
+<p>このアイディアをあの忙しい中考えついた<a href="(http://twitter.com/takezoux2">@takezoux2</a>さんの幹事力の高さが半端ない。</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">In some part of the world it is still <a href="https://twitter.com/odersky">@odersky</a>&#39;s birthday, so he gets a cake! <a href="https://twitter.com/hashtag/ScalaMatsuri?src=hash">#ScalaMatsuri</a> <a href="http://t.co/cLal8xODiG">pic.twitter.com/cLal8xODiG</a></p>&mdash; Jon Pretty (@propensive) <a href="https://twitter.com/propensive/status/508216380785557504">September 6, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h1>2日目:アンカンファレンス</h1>
+
+<p>アンカンファレンスは、参加者がその場で聞きたいセッション、話したいセッションのアイディアを出し合いながら、その場で作って行くイベントです。今回初の試みでしたが、大いに盛り上がり、本当に良かった(内心結構心配でした)。。。</p>
+
+<p><a href="https://twitter.com/okapie">@okapie</a>さんによるtogetterは<a href="http://togetter.com/li/717660">こちら</a>。</p>
+
+<h3>■DDDの話</h3>
+
+<p><a href="https://twitter.com/j5ik2o">@j5ik2o</a>さんによる、DDD(<del>Diet</del> Domain Driven Design)の解説。比喩から具体例まで、とても分かりやすく大変好評でした。</p>
+
+<h3>■Akkaの話</h3>
+
+<p><a href="https://twitter.com/xuwei_k">@xuwei_k</a>さんによる、Akkaの初心者向けセッション。
+そういえばTypesafe社のAkkaコミッタが今月日本にいらっしゃるので、<a href="http://connpass.com/event/8622/">Akka Meetup</a>がドワンゴさんで9/28に開催されるとか。</p>
+
+<h3>■ランチ</h3>
+
+<p>最近転職した人の話を聞いた後、今すぐ転職したい人！と<a href="https://twitter.com/kiris">@kiris</a>さんが聞いたら、数十人が一気に手をあげて大いに盛り上がり、運営側が逆に驚くくらいでした(@kirisさん、ナイス！)。ScalaMatsuri 2014が縁となって転職した方、ブログ待ってます！</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">是非よろしくお願いします。転職に限らず、 <a href="https://twitter.com/hashtag/ScalaMatsuri?src=hash">#ScalaMatsuri</a> がきっかけでScalaを導入できた、PullReq送りはじめたなど、なにか変化があった方は教えてください！ RT: <a href="https://twitter.com/numa08">@numa08</a> ScalaMatsuriで転職しましたエントリーが求められてる？</p>&mdash; scala_jp (@scala_jp) <a href="https://twitter.com/scala_jp/status/509229988587896832">September 9, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h3>■Scala &ndash;the simple parts&ndash;</h3>
+
+<p>Odersky教授によるセッション2個目。一時期Twitterでも話題になった、CanBuildFromの話を直接聞けたのが私としては良かった。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/C1BZFnGLbSjIv4" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/Odersky/scala-the-simple-parts" title="Scala - The Simple Parts, SFScala presentation" target="_blank">Scala - The Simple Parts, SFScala presentation</a> </strong> from <strong><a href="http://www.slideshare.net/Odersky" target="_blank">Martin Odersky</a></strong> </div></p>
+
+<h3>■Code clinic by guest speakers</h3>
+
+<p>Odersky教授を始めとしたゲストに、マサカリを直接投げてもらえるセッション。
+ランチでぽろっと出たアイディアなのですが、Odersky教授が超乗り気で非常に盛り上がりました。</p>
+
+<p>フィードバックの抜粋</p>
+
+<ul>
+<li>不要な括弧は外す</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">if</span><span class="o">(</span><span class="n">config</span><span class="o">.</span><span class="n">isUser</span><span class="o">){</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="s">&quot;He is a user!&quot;</span><span class="o">)</span>  
+</span><span class='line'><span class="o">}</span><span class="k">else</span><span class="o">{</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="s">&quot;He is not a user!&quot;</span><span class="o">)</span>      
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>より</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">if</span><span class="o">(</span><span class="n">config</span><span class="o">.</span><span class="n">isUser</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="s">&quot;He is a user!&quot;</span><span class="o">)</span>  
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>  <span class="n">println</span><span class="o">(</span><span class="s">&quot;He is not a user!&quot;</span><span class="o">)</span>      
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>コメントは「何をしているか」ではなく「なぜそうなったのかという経緯」を書くべき</li>
+<li>メソッドのドットと括弧を外すかどうかについて、例えば</li>
+</ul>
+
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">hoge</span><span class="o">.</span><span class="n">startsWith</span><span class="o">(</span><span class="s">&quot;h&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>より</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">hoge</span> <span class="n">startsWith</span> <span class="s">&quot;h&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>という風に英語風に書いた方がScalaっぽいと言われる(<a href="http://www.slideshare.net/scalaconfjp/coding-in-style">去年のJoshua Suereth氏のセッション</a>など参照)けど、最近はOdersky教授自身はその判断に迷う事が多くなったそう。実際最近Odersky教授のも、ドットと括弧を付けて書いたりしているらしい。</p>
+
+<p>但し</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="n">numList</span> <span class="n">map</span> <span class="o">{</span><span class="k">_</span> <span class="o">*</span> <span class="mi">5</span> <span class="o">+</span> <span class="mi">1</span><span class="o">}</span> <span class="n">filter</span> <span class="o">{</span><span class="k">_</span> <span class="o">&gt;</span> <span class="mi">13</span><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>みたいなのはダメ。ドットと括弧を使った方が確実に見やすい、との談。</p>
+
+<p>そして実はこのセッション、ゲストのYevgeniy Brikman氏によるアイディア。でもそれを紹介しようとしたら「自分のアイディアだっていうとバイアスがかかるから」といって固辞されたりで、本当にイケメン。</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">One of the highlights of <a href="https://twitter.com/hashtag/ScalaMatsuri?src=hash">#ScalaMatsuri</a>: code review session w/ Martin <a href="https://twitter.com/odersky">@odersky</a>. Great way to learn. I hope other conferences follow suit.</p>&mdash; Yevgeniy Brikman (@brikis98) <a href="https://twitter.com/brikis98/status/509087498438340608">September 8, 2014</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>ScalaMatsuri発のセッションとして、世界に広まってくれると嬉しいですね。</p>
+
+<h3>■パネルディスカッション</h3>
+
+<p>大変盛り上がっていたようですが、他の仕事をしていて聞けなかった(&lsquo;；ω；`)ﾌﾞﾜｯ ので@okapieさんのtogetterの<a href="http://togetter.com/li/717660?page=12">このへん</a>をご参照ください。</p>
+
+<h1>総括</h1>
+
+<p>昨年に比べて発表内容が非常に幅広くなり、日本でScalaの普及が進んでいる事をまざまざと感じさせるイベントとなりました。また予想を上回る数のスポンサー企業さまにお申し込みをいただきまして、逆にスポンサーLT枠が枯渇するというほどの盛況ぶりでした。特典枯渇のためお断りしてしまったスポンサー企業のみなさま、大変申し訳ありませんでした。もしよろしければ、また次回お声がけください。</p>
+
+<p>あと、海外ゲストや一般参加者、スポンサー企業の多くの方から、日本のScalaコミュティが熱い &amp; 勢いありますね！というお声を沢山、本当に沢山かけていただき、イベント運営を担っている身としては非常に嬉しく感じております。皆さんのお陰です。これからも一緒に盛り上げて行きましょう！</p>
+
+<p>その一方で、初心者向けセッションが手薄になってしまったのは反省点。翻訳が足りない、という声も真摯に受け止めており、来年は同時音声通訳の導入を真剣に検討しております。その辺りはまた次回のエントリにて。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Androidプロジェクト(pfn)のgiter8テンプレート]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/14/pfn-test/"/>
+    <updated>2014-03-14T12:00:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/14/pfn-test</id>
+    <content type="html"><![CDATA[<p>ScalaでAndroidアプリを作るためのsbtプラグイン、<a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>の紹介を<a href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin/">前回のブログ</a>でしました。</p>
+
+<p>が、このREADMEの通りにプロジェクトを作るのが面倒なので、giter8テンプレートも作ってみました。</p>
+
+<h1>プロジェクト作成</h1>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'> g8 taisukeoe/android-pfn-app.g8
+</span></code></pre></td></tr></table></div></figure>
+
+
+<!--more-->
+
+
+<p>からプロジェクトの雛形が作れます。
+giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
+
+<h1>ディレクトリ構造</h1>
+
+<p>こんな感じです。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>MyAndroidProject
+</span><span class='line'>├── .gitignore
+</span><span class='line'>├── AndroidManifest.xml
+</span><span class='line'>├── build.sbt
+</span><span class='line'>├── local.properties
+</span><span class='line'>├── proguard-project.txt
+</span><span class='line'>├── project/
+</span><span class='line'>│   ├── build.properties
+</span><span class='line'>│   └── plugins.sbt
+</span><span class='line'>├── project.properties
+</span><span class='line'>├── res/
+</span><span class='line'>│   ├── layout/
+</span><span class='line'>│   └── values/
+</span><span class='line'>├── src/.../MainActivity.scala
+</span><span class='line'>└── tests/
+</span><span class='line'>    └── src/.../MainActivityInstrumentationTest.scala
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>簡単な説明。</p>
+
+<ul>
+<li>AndroidManifest.xml &hellip;ActivityやApplicationのもろもろの設定。</li>
+<li>build.sbt &hellip;sbtのビルド定義</li>
+<li>local.propeties &hellip;AndroidSDKのpathを記入。また、keyStoreの情報を記入すると、<em>android:package-release</em>で簡単にrelease buildできる。</li>
+<li>proguard-project.txt &hellip;proguardオプションを記入。<em>-dontwarn</em>, <em>-keep</em>, <em>-keepclassmembers</em>, <em>-libraryjars</em>あたりのオプションが頻出。詳しくは<a href="http://proguard.sourceforge.net/index.html#manual/usage.html">ProGuard Usage</a>を参照。</li>
+<li>project/ &hellip;sbtのバージョンやpluginなどを記入。</li>
+<li>project.properties&hellip; 利用するAndroid APIのバージョン(target api)や、(unmanagedの)libraryプロジェクトのpathを記入。</li>
+<li>res/ &hellip;レイアウトやテキスト、画像などのリソースファイル置き場。</li>
+<li>src/ &hellip;ソース。</li>
+</ul>
+
+
+<p>local.properties, project.propertiesを修正したときは、ちゃんと<em>sbt reload</em>しましょう。</p>
+
+<p>proguard-project.textを修正したときは、<em>sbt reload clean</em>してclassファイルのキャッシュを消しましょう。</p>
+
+<h1>各種コマンド</h1>
+
+<p><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>より。</p>
+
+<h2>インストール</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>&gt; android:run
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>テスト</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>&gt; android:test
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。</p>
+
+<p>まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaでAndroidアプリを作るには（pfn/android-sdk-plugin）]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin/"/>
+    <updated>2014-03-13T06:06:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin</id>
+    <content type="html"><![CDATA[<p>表題の件ですが、今は<strong><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>を使うのがオススメです</strong>。</p>
+
+<p>なぜか。</p>
+
+<!-- more -->
+
+
+<p>2013年6月に<a href="http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij/">ScalaでAndroidアプリを作るには</a>という記事を書いたのですが、その後Android SDKのディレクトリ構造が(r22〜？)変わったものの、記事中で使用していた<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>がその変更に追従しておらず、<em>Could not find tool &ldquo;aapt&rdquo;</em>エラーが出てビルドできない問題が発生しています。</p>
+
+<p>参考のSO記事はこちら。mavenのpluginの話ですが同じ問題。</p>
+
+<p><a href="http://stackoverflow.com/questions/16927306/could-not-find-tool-aapt-please-provide-proper-android-sdk-directory-path-as-co">maven - Could not find tool aapt. Please provide proper Android SDK directory path as configuration parameter - Stack Overflow</a></p>
+
+<h1>pfn/android-sdk-pluginの、<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>との主な違い</h1>
+
+<ul>
+<li>Proguardしたclassファイルをキャッシュしてくれるので、<strong>デバッグ時のビルド時間が半分くらい</strong>になる。</li>
+<li>ディレクトリ構造がsbtではなく、Android SDKデフォルト(android create project &hellip;)。</li>
+<li>local.propeties,project.properties,proguard-project.txtなどAndroidSDKの各種configファイルも使用可能(なのでbuild.sbtが膨れ上がらずに済む)。</li>
+<li>Android NDKサポートがない</li>
+<li>proguardのデフォルトの設定が違うので、書き直しが必要（これが面倒…）</li>
+</ul>
+
+
+<p>また思い出したら上に書き足します。</p>
+
+<h1>pfn/android-sdk-pluginの問題</h1>
+
+<ul>
+<li>sampleコードが古い</li>
+<li>configファイルなどを更新した場合も、reloadが必要</li>
+<li>ScalaTestなどScalaのテストフレームワークと相性悪い？（回避方法模索中）</li>
+</ul>
+
+
+<h1>AndroidアプリをScalaで書くときの問題</h1>
+
+<p>あと、AndroidアプリをScalaで書くと、以下の問題にぶつかりやすくなります（DalvikVM自身の問題も多分に含まれるのですが）。</p>
+
+<ul>
+<li>DalvikVMのmethod数上限65,535個に引っかかる</li>
+<li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
+<li>Scalaの変なバグ(e.g.<a href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
+<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
+</ul>
+
+
+<p>ちなみにLinearAlloc問題が起きるのは基本的にAndroid2.3以下だし、DalvikVMに代わるARTがAndroid4.4から試験導入されているので、時間とともに改善するという説もあります。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Deprecated]ScalaでAndroidアプリを作るには(IntelliJ IDEA + Sbt)]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij/"/>
+    <updated>2013-06-08T03:25:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij</id>
+    <content type="html"><![CDATA[<p><strong><em>この記事の内容は執筆当時のものです。最新の内容は<a href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin">こちら</a>を参照してください。</em></strong></p>
+
+<p>LinkedInのブログで、EclipseベースのScalaによるAndroidアプリ開発環境が紹介されてました。（と、
+<a href="https://twitter.com/okapies">@okapies</a>さんに教えていただきました。ありがとうございます。)</p>
+
+<p><a href="http://engineering.linkedin.com/incubator/technology-behind-eatin-android-apps-scala-ios-apps-and-play-framework-web-services">The technology behind EatIn: Android apps in Scala, iOS apps, and Play Framework web services</a></p>
+
+<p>うちのAndroid Scala開発環境はIntelliJ IDEA + sbtなので、折角なのでこんな風にも出来ますよと紹介してみます。本当はLinkedInブログに対抗して <em>(sorry eclipse users!!)</em> って書きたかったw のですが、IntelliJはエディタとして使ってるだけなので、Eclipseに変えても大して支障ないです。というわけでお好きな方をどぞ。</p>
+
+<p>Androidに馴染みが無い方にも、Scalaに馴染みが無い方にも試してもらえるよう、クドいぐらいに丁寧に書いてますので、慣れ親しんだ部分は読み飛ばしてください。</p>
+
+<p>また、<strong>「もっとこうした方がいいんじゃない？」みたいな突っ込みは大歓迎</strong>です。</p>
+
+<h1>開発環境</h1>
+
+<p>以下コマンド例はMac/Linux用なので、Windowsの方はお好きな方法で適宜書き換えてください。</p>
+
+<h2>各種インストール</h2>
+
+<!-- more -->
+
+
+<h3>IntelliJ IDEA</h3>
+
+<p>強力なリファクタリングと、Android UI Designer機能が便利なIDE。</p>
+
+<p><a href="http://www.jetbrains.com/idea/">IntelliJ IDEA — The Best Java and Polyglot IDE</a></p>
+
+<p>幸いなことに、IntelliJ IDEAのCommunity Edition(無料版)でもScalaとAndroidのサポートを使えます。
+インストールしたら、以下の手順でScalaのPluginを入れましょう。</p>
+
+<pre><code>Configure =&gt; Plugins =&gt; Browse repositories 
+プラグインの一覧からscalaを右クリック =&gt; Download &amp; Install
+</code></pre>
+
+<p>ちなみにsbtコンソールをIntelliJに追加するプラグインもありますが、このコンソールは<em>Tab補完が効かない</em>ので、コマンドが長めなandroid-pluginには不向き。Terminal経由でsbtコマンドを叩いた方が無難です。</p>
+
+<h3>Android SDK</h3>
+
+<p>Android APIのjarが含まれているほか、ビルドやデバッグに使用する各種便利ツールが入ってます。アップデートの度にちょこちょこ構成が変わるので、各種サードパーティ製のツールとの互換性がなくなったりします。なので<strong>新しいバージョンが出ても1個前のバージョンは消さずに、シンボリックリンクの切り替えで対応しとくと良い</strong>です。</p>
+
+<p><a href="http://developer.android.com/intl/ja/sdk/index.html#ExistingIDE">Android SDK | Android Developers</a></p>
+
+<p>IntelliJ IDEAを使う場合は、ADT Bundleではなく<em>USE AN EXISITING IDE</em>からSDK単体をDLます。ADT Bundleでも特に問題はないですが、余計な物(Eclipse+ADT)が入ってます。</p>
+
+<p>その後、SDK環境変数ANDROID_HOMEとtools, platform-toolsのディレクトリにPATHを通します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ln -s &lt;SDK_ROOT_DIR&gt; &lt;SYMBOLIC_LINK_PATH&gt;
+</span><span class='line'>
+</span><span class='line'><span class="nb">export</span> <span class="nv">$ANDROID_HOME</span><span class="o">=</span>&lt;SYMBOLIC_LINK_PATH&gt;
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$ANDROID_HOME</span>/tools
+</span><span class='line'><span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="nv">$PATH</span>:<span class="nv">$ANDROID_HOME</span>/platform-tools
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ちなみに上記SDKには最新版のAndroid versionのlibraryしか含まれていないので、回線に余裕があるときに、以下のコマンドでAndroid SDK Manager(GUI)を起動し、各versionのlibraryを落としておくと良いです。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>android
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>なおSDKにAndroidエミュレーター作成用ツールも含まれていますが、起動と各種動作が重い上に、エミュレーターで試せない機能が多い(カメラなど各種ハードウェア、GCMを使用したpush通知、アプリ内課金)など、不便極まりないので実機でデバッグする方が無難です。
+どうしても作りたい(特定のマイナーな解像度での見え方をチェックしたい、など)場合は、以下を参考にどうぞ。</p>
+
+<p><a href="https://sites.google.com/a/techdoctranslator.com/jp/android/developing/tools/emulator">Emulator - Android エミュレータ - ソフトウェア技術ドキュメントを勝手に翻訳</a></p>
+
+<h3>giter8</h3>
+
+<p>Githubのリポジトリに登録しておいたテンプレートからプロジェクトを生成するツール。Androidアプリのプロジェクトは色々構成がややこしいので、giter8経由で作成するのがオヌヌメです。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install giter8
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="https://github.com/n8han/giter8">giter8</a></p>
+
+<h3>scala</h3>
+
+<p>Scala本体。まだ入れていなければ。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install　scala
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://docs.scala-lang.org/index.html#">Scala Documentation</a></p>
+
+<h3>sbt</h3>
+
+<p>Scalaプロジェクトのビルドによく使われるビルドツール。まだ入れていなければ。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install　sbt
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://scalajp.github.io/sbt-getting-started-guide-ja/">始める sbt - ようこそ</a></p>
+
+<h2>使用する各種コマンド</h2>
+
+<h3>プロジェクトの作成</h3>
+
+<p>giter8を使って作成します。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>g8 taisukeoe/android-app
+</span><span class='line'>      
+</span><span class='line'>          Template <span class="k">for</span> Android apps in Scala
+</span><span class='line'>
+</span><span class='line'>          package <span class="o">[</span>my.android.project<span class="o">]</span>: &lt;YOUR_PACKAGE_NAME&gt;
+</span><span class='line'>          name <span class="o">[</span>My Android Project<span class="o">]</span>: &lt;YOUR_PROJECT_NAME&gt;
+</span><span class='line'>          main_activity <span class="o">[</span>MainActivity<span class="o">]</span>:
+</span><span class='line'>          scala_version <span class="o">[</span>2.10.2<span class="o">]</span>:
+</span><span class='line'>          min_api_level <span class="o">[</span>8<span class="o">]</span>:
+</span><span class='line'>          useProguard <span class="o">[</span><span class="nb">true</span><span class="o">]</span>:
+</span><span class='line'>          min_api_level <span class="o">[</span>17<span class="o">]</span>:
+</span><span class='line'>              
+</span><span class='line'><span class="nb">cd</span> &lt;YOUR_PROJECT_NAME&gt;
+</span><span class='line'>
+</span><span class='line'>git init
+</span><span class='line'>      
+</span><span class='line'>sbt
+</span><span class='line'>gen-idea
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>各変数の解説</p>
+
+<ul>
+<li>package … Androidアプリのユニーク性の担保に使われているので、絶対にかぶらないように設定する必要があります。同じ端末に同じpackageのアプリは同時に1つしか入れられませんし、GooglePlayには同じパッケージのアプリは常に1つしか存在しません。</li>
+<li>name … プロジェクト名及びディレクトリ名に使われます。お好きに。</li>
+<li>main_activity … アプリ起動時に実行するActivity(画面に相当)の名前。お好きに。</li>
+<li>scala_version … 2.10.2以上推奨です。理由は<a href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">こちらのバグ</a>。2.9系でも別に構いませんが。</li>
+<li>min_api_level … 1がAndroid1.5相当、デフォルトの8はAndroid2.2相当、17が最新のAndroid4.2相当です。このプロジェクトがサポートする最低のAndroid versionの数字を入力します。今使われているAndroid端末の99%程度は2.2以上なので、デフォルトで特に問題ないと思います。</li>
+<li>useProguard … 基本的にtrue一択。あらかじめscala-library.jarをAndroid端末に仕込んだりする場合はfalseでも良いですが。</li>
+<li>target_api_level … 使用したいAndroid APIが含まれている、Android versionを入力します。デフォルトの17(最新4.2)にしておけば全てのAPIを使用できますが、Android4.1以前の端末では該当箇所が実行されないように条件分岐しないと、NoClassDefErrorないしはNoSuchMethodExceptionがthrowされます。もちろんmin_api_levelに揃えておくのも手です。</li>
+</ul>
+
+
+<p>作成したプロジェクトをIntelliJ IDEAで開くとこんな感じ。なおsbt pluginは<a href="https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>及び<a href="https://github.com/mpeltonen/sbt-idea">mpeltonen/sbt-idea</a>を使用しています。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130608/template.jpg" width="600" height="450"></p>
+
+<h3>ビルド定義の更新</h3>
+
+<p>sbtのビルド定義ファイル(<em>project/build.scala</em>)でAndroid versionを変えたりライブラリ依存性を変更した場合は、忘れずにリロードして再度idea設定ファイルを生成します。でないとIntelliJの補完が効かなくなります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>reload
+</span><span class='line'>gen-idea
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>ビルド&amp;デプロイ</h3>
+
+<p>USBデバッグモードをONにしたAndroid端末を接続しておくと、以下のコマンドでビルド及びデプロイが実行できます。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>android:start-device
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>ビルドした実行ファイルは<em>target/<YOUR_PROJECT_NAME>-<VERSION>.apk</em>に生成されます。
+ちなみに、自分以外の誰かにインストールさせたいときに一番簡単な方法は、このapkファイルをメールで送りつけることです。AndroidデフォルトのGmailアプリからapkを開くとインストールできます。</p>
+
+<p>なおAndroidプロジェクトのビルドには時間がかかりすぎる(MBP Retinaで30秒以上&hellip;)ので、コード書いてる最中は自動コンパイルだけにしておく方が無難です。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>~compile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>テスト</h3>
+
+<p>Androidアプリのテストは、Android上で行う必要がないもの<em>(ex. Modelやユーティリティークラスの単体テスト)</em>と、Android上で行う必要があるもの<em>(ex. Activity(画面)やViewに関するテスト)</em>の二通りがあり、実行方法も違います。</p>
+
+<p>Android上では行う必要のないテストは、<strong>src/test/</strong>以下に書いて、以下の通りテストを実行。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'><span class="nb">test</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Android上で行う必要のあるテストは、サブプロジェクトとして別途ビルド&amp;デプロイします。ここまで記載した手順通りで作成している場合には、<strong>tests/src/main/</strong>以下にテストコードを書く形になります。実行コマンドはこんな感じです。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sbt
+</span><span class='line'>project tests
+</span><span class='line'>android:install-device
+</span><span class='line'>android:test-device
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>余談ですが、<a href="(https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>のTypedResourcesを利用したプロジェクトのテストをAndroid上で実行すると、IllegalAccessErrorで失敗するようです。TypedResourcesはただのユーティリティー的なtraitなので、使わなくても支障は特にありません。</p>
+
+<h3>デバッグ</h3>
+
+<p>主にAndroidSDK同梱のAndroid Device Monitorを使います。</p>
+
+<p>Logの確認の他、Thread, Heapなどの状態をチェックしたり、スクリーンショットを撮ったり、hprofとったり割と便利です。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>monitor
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>その他、よく使うandroid-pluginのsbtコマンド一覧</p>
+
+<pre><code>android:package-debug   … プロジェクトをビルド。
+android:prepare-market   … プロジェクトをビルドし、指定した署名ファイル(&lt;HOGE&gt;.keystore)で署名。GooglePlayへのアップロード時に使用する。
+
+android:install-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール
+android:start-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール、アプリ実行
+android:uninstall-device   … USB経由でAndroid端末からアンインストール
+android:test-device … USB経由でAndroid端末上でテストを実施。前もってテスト用apkをインストールする必要あり。
+android:screenshot-device   …USB経由でAndroid端末のスクリーンショットを撮影
+
+# emulatorの場合は、上記コマンドのdeviceをemulatorに変えてください。      
+</code></pre>
+
+<p>Wikiにも色々書かれていますので、一読しておくと良いかもです。</p>
+
+<p><a href="https://github.com/jberkel/android-plugin/wiki">jberkel/android-plugin Wiki</a></p>
+
+<h3>補足 Android UI Designer</h3>
+
+<p>上記手順だけでも使えないことは無いですが、IntelliJ IDEAのAndroid UI Designer機能を使うためにはもう少し設定が必要です。ちなみに先日のGoogle I/Oで発表された<a href="http://taisukeoe.github.io/blog/2013/05/16/android-studio/">Android Studio</a>のメイン機能も、このAndroid UI Designerを下敷きにしているぐらい強力だったりするので、折角IntelliJを使うのであれば、ぜひここまで設定しましょう！</p>
+
+<p>以下、IntelliJ IDEAでプロジェクトを開いた後に行います。</p>
+
+<pre><code>File  =&gt; Project Structure =&gt; Modules =&gt; 
+メインプロジェクトを選択して Add =&gt; Android
+</code></pre>
+
+<p><img src="http://taisukeoe.github.io/images/20130608/project_structure_add_sdk.jpg" width="600" height="450"></p>
+
+<p>追加した&#8221;Android&#8221;を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の&#8221;.idea_modules&#8221;を全て&#8221;src/main&#8221;に変更します。Native libs directoryは&#8221;.idea_modules&#8221;を削除しましょう。下記スクリーンショットのような感じです。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130608/project_structure_path.jpg" width="600" height="450"></p>
+
+<p>続いてAndroid SDKのパスを追加します。</p>
+
+<pre><code>File =&gt; Project Structure =&gt; Platform Settings =&gt; SDKs =&gt;
+ 上の"+"ボタン =&gt; Android SDK =&gt; $ANDROID_HOME/platforms/android-17　を選択
+
+File =&gt; Project Structure =&gt; Modules =&gt; メインプロジェクトのModule SDK =&gt; 今追加したAndroid SDKを選択。
+</code></pre>
+
+<p><img src="http://taisukeoe.github.io/images/20130608/project_structure_project_sdk.jpg" width="600" height="450"></p>
+
+<p>以上を終えた後、src/main/res/layout/main.xmlを開くと、自動でAndroid UI Designer機能が立ち上がります。もちろん画面下タブのTextを選択すれば、xmlを直接編集できます。Previewを見ながらxmlを編集するだけでも便利です。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130608/ui_designer.jpg" width="600" height="450"></p>
+
+<h2>最後に</h2>
+
+<p>かなり丁寧に書いたので長くなってしまいましたが、突っ込みor質問orコメントなどあれば下記コメント欄か<a href="https://twitter.com/oe_uia">@OE_uia</a>までお願いします。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Android Studioを触ってみた]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/05/16/android-studio/"/>
+    <updated>2013-05-16T15:09:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/05/16/android-studio</id>
+    <content type="html"><![CDATA[<h1>概要</h1>
+
+<p><a href="https://developers.google.com/events/io/">Google I/O 2013</a> 初日(日本時間5/16 1:00)にて発表されました。<a href="http://www.jetbrains.com/idea/">IntelliJ IDEA</a>ベースのAndroidに特化したオープンソースのIDEだそうです。</p>
+
+<p>そのほかの、Google I/O関連のまとめはこちら。Galaxy S4のNexus化モデルの販売やら、Google Mapの強化、PlatformとしてのChrome、GmailとGoogle Walletの統合など、他にも盛りだくさんな発表がありました。</p>
+
+<p>これら発表を受けて、Googleの株価は過去1年間で最高の915ドルまで急騰した模様。</p>
+
+<p><a href="http://www.itmedia.co.jp/mobile/articles/1305/16/news051.html">Google、Android向け統合開発環境「Android Studio」を発表 - ITmedia Mobile</a></p>
+
+<p><a href="http://japanese.engadget.com/2013/05/15/google-i-o-2013/">Google I/O 2013 開幕、初日キーノート速報 - Engadget Japanese</a></p>
+
+<p><a href="http://u-note.me/note/47484899">【速報】 Google I/O 2013キーノート講演まとめ #io13-ノート｜U-NOTE【ユーノート】-イベントまとめプラットフォーム</a></p>
+
+<p><a href="http://jp.techcrunch.com/2013/05/16/20130515google-stock-price-closes-at-52-week-high-of-915-on-first-day-of-google-io-as-apple-takes-another-drop/">Google株、Google I/O初日に52週最高の915ドルで引ける。Apple再び下げる | TechCrunch Japan</a></p>
+
+<h1>1.Android Studioインストール</h1>
+
+<p>もうWindows/Mac/Linux版が公開されています。ただしv0.1の<em>early access preview</em>なので、productionには使わない方が良いとのこと。</p>
+
+<!-- more -->
+
+
+<p><a href="http://developer.android.com/intl/ja/sdk/installing/studio.html">Getting Started with Android Studio | Android Developers</a></p>
+
+<p>(5/16追記) Macの場合、<em>/Applications ディレクトリにコピーしないとエラーが出る模様</em>。情報ありがとうございます！</p>
+
+<p>インストールが完了して起動すると、IntelliJ IDEAっぽいスプラッシュ画面。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130516/android_studio_splash.jpg" width="200" height="150"></p>
+
+<p>生成されるプロジェクトはこんな感じ。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130516/android_studio_project.jpg" width="400" height="300"></p>
+
+<p>ビルドは<a href="http://www.gradle.org/">Gradle</a>なんですねー。<a href="http://d.hatena.ne.jp/bluepapa32/20110308/1299602195">Gradle Wrapper</a>つき。</p>
+
+<pre><code>build.gradle
+settings.gradle
+gradlew
+gradlew.bat 
+</code></pre>
+
+<p>そしてIDEの設定ファイルは、IntelliJ IDEAと似たような構成みたい。</p>
+
+<pre><code>.idea/
+&lt;HOGEHOGE&gt;.iml
+</code></pre>
+
+<h1>2.便利なPalette機能</h1>
+
+<pre><code>Androidアプリ開発者のために、複数のディスプレイサイズでのレイアウトをプレビューできるレイアウトエディタ&lt;中略&gt;が用意されている
+</code></pre>
+
+<p>とのことなので、早速チェックしてみることに。どうやらIntelliJ IDEAのAndroid UI Designerをベースにしつつ、機能追加/画面の修正をして<em>Palette</em>という名前に変更したようです。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20130516/android_studio_screens.jpg" width="400" height="300"></p>
+
+<p>なんと、レイアウトファイルの<strong>各解像度での見え方のプレビューを一覧表示できる！！</strong></p>
+
+<p><strong>これは便利すぎる…</strong></p>
+
+<h1>3.IntelliJ IDEAとの互換性</h1>
+
+<ul>
+<li>PluginはIntelliJ IDEAのものを一部(VCS系、Inspector系など)利用可能。<strong>Scala pluginは使用不可</strong>。</li>
+<li>IDE設定ファイルは<strong>IntelliJ IDEAとの互換性無し</strong>。一応開けるけど、PaletteないしはAndroid UI Designer画面で、こんなエラーが発生する。IntelliJ IDEAベースで開発しつつ、Android Studioをレイアウトファイルのエディタとして使用するのは無理ぽ。</li>
+<li><strong>(5/18追記)</strong>どうやらAndroidStudioは<a href="http://blogs.jetbrains.com/idea/2013/05/intellij-idea-13-early-preview-is-out/">IntelliJ IDEA 13 EarlyPreview版</a>をベースにしている模様。IntelliJ v13のプロジェクトをAndroidStudioで開けるそうなので、AndroidStudioをレイアウトファイルエディタとして使うというのが現実味を帯びてきました(ぇ。    参考:<a href="http://d.hatena.ne.jp/masanobuimai/20130516/1368708416">Android Studio試してみたよ - marsのメモ</a></li>
+</ul>
+
+
+<p><img src="http://taisukeoe.github.io/images/20130516/android_studio_error.jpg" width="400" height="300"></p>
+
+<p>…Android Studioの<em>エラーの報告先がJetBrains(IntellIJ開発元)になってる</em>のは、すごく迷惑だと思うけどw</p>
+
+<h1>4.その他雑感</h1>
+
+<ul>
+<li>Android Studio単体で使っててもちょこちょこエラーが発生するので、メインで使うのはまだ厳しいかもしれない。</li>
+<li>というか、IntelliJ IDEA本体にAndroidの各解像度プレビュー機能を追加してくれるのが僕にとってはBEST (w</li>
+<li>今後のアップデートに期待！</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scala2.10.x Bytecode Problem]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/"/>
+    <updated>2013-03-22T20:32:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode</id>
+    <content type="html"><![CDATA[<h1>概要</h1>
+
+<p>Scala 2.10以上でAndroid4.1以上のライブラリと一緒にコンパイルしたプロジェクトを、Android4.0以下の端末で動作させるとNoSuchMethodErrorがthrowされます。原因はScala2.10.x系のコンパイラの不具合。親クラスで実装されたメソッドをそのまま継承した場合、<strong>2.9.x及びJavaではメソッドのqualifying typeの参照が子クラス</strong>になるのに対し、<strong>2.10.xではqualifying typeの参照が親クラス</strong>になってしまうことが直接の原因です。</p>
+
+<p>詳しくは第99回<a href="http://www.scala-users.org/shibuya/">rpscala</a>で発表したスライドをどうぞ。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/2qlZJYZygaqx4y" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android" title="Scala2.10.x bytecode problems in Android" target="_blank">Scala2.10.x bytecode problems in Android</a> </strong> from <strong><a href="http://www.slideshare.net/oeuia" target="_blank">Taisuke Oe</a></strong> </div></p>
+
+<p>このバグと同種のものがJIRAでも見つからなかったので、issue報告を上げた結果、3/23に無事修正されたようです。</p>
+
+<p><a href="https://issues.scala-lang.org/browse/SI-7253">[#SI-7253] SQLiteDatabase cannot be closed in Android 4.0 or below devices, in apps built by Scala 2.10.x w/ Android 4.1 due to Scala 2.10.x bytecode problem. - Scala</a></p>
+
+<p>rpscalaでの発表時によくわからなかった以下のポイントがクリアになったので、フォローアップとして記載しておきます。</p>
+
+<ul>
+<li>これは意図された仕様変更なのか？</li>
+<li>これはバグなのか？</li>
+<li>いつ直るのか？</li>
+</ul>
+
+
+<!-- more -->
+
+
+<h1>1. これは意図された仕様変更なのか？</h1>
+
+<p>特段意図されたものではなく、Scala2.10でコンパイラをfjbgからasmへ変更した際に、紛れ込んだ模様です。
+(該当commitのauthorのPaul Phillipsさんが&#8221;I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
+
+<p><a href="https://github.com/scala/scala/commit/0bea2ab5f6">Fix for erroneous bytecode generation. · 0bea2ab · scala/scala</a></p>
+
+<h1>2. これはバグなのか？</h1>
+
+<p>バグのようです。根拠として引用された、Java Language Specification(以下JLS)内の<a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html">Binary Compatibility</a>に関する記述は以下の通り。</p>
+
+<blockquote><ul>
+<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)&#8221;</p></li>
+<li><p>&ldquo;A reference to a method must be resolved at compile time to <strong>a symbolic reference to the erasure (§4.6) of the qualifying type of the invocation</strong>, plus the erasure of the signature of the method (§8.4.2).&rdquo;(メソッド又はコンストラクタへの参照は，そのqualifying typeへの記号参照に，そのメソッド又はコンストラクタのシグネチャを加えて，コンパイル時に解決しなければならない。)</p></li>
+<li><p>If the expression is of the form <strong>Primary.f</strong> then:</p>
+
+<p>   If the compile-time type of Primary is an intersection type (§4.9) V1 &amp; &hellip; &amp; Vn, then the qualifying type of the reference is V1.</p>
+
+<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>&#8221;</p>
+
+<p>   (Pimary.fという表現があったとき、Primaryがintersectional type以外の場合、Primaryがqualifying typeとなる。)</p></li>
+</ul>
+</blockquote>
+
+<p>それに対して、以下のような反論がありました（が、反論の発言主が&#8221;You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
+
+<ul>
+<li>JLSはbackward compatibility(後方互換性)について定めたもので、今回のケースのようなforward compatibility(前方互換性)については当てはまらない。</li>
+<li>異なるバイトコードに大してコンパイルした場合、異なるものが生成されるのは当たり前である。</li>
+</ul>
+
+
+<p>そもそもScalaがJLSに準拠すると明確に宣言しているソースを見つけられなかったのが個人的には気になっていましたが、そこは争点になりませんでした。
+<em>(注:というのも、以前Scala作者のMartin Odersky教授が別のissue <a href="https://issues.scala-lang.org/browse/SI-1806">[#SI-1806] Can&rsquo;t access protected static inner classes of extended classes</a>)] で <strong>&ldquo;I disagree. We can never achieve 100% java interop without becoming Java.&rdquo;(私は反対だ。Javaとの相互運用を100%達成するには、Java自体になる他ない。)</strong>と発言していたので。)</em>
+とはいえ、僕が見落としているだけのような気がするので、もしその辺りご存知の方がいたら教えてください。</p>
+
+<h1>3. いつの直るのか？</h1>
+
+<p>3/23に、本バグ修正のpull request(<a href="https://github.com/scala/scala/pull/2264">SI-7253: respect binary compatibility constraints by Blaisorblade</a>)がmergeされましたので、おそらく2.10.2で反映されるものと思われます。</p>
+
+<p>ここに関して、2.10系のbinary compatibilityを破壊するから2.11まではXfutureオプションに入れておくべきでは？という議論がありましたが、James Iryさん（<a href="http://www.scala-lang.org/node/960">Java to Scala with the Help of Experts | The Scala Programming Language</a>などを書いてる方）の意見が通ったようです。</p>
+
+<blockquote><p>This patch will improve binary compatibility when source changes in the way that happened in SI-7253. That improvement won&rsquo;t be available in prior 2.10.x versions so in that sense this commit is a change in behavior. But since the old behavior was to create a linkage error I&rsquo;m okay with that change.</p>
+
+<p>(このパッチは、SI-7253のようなソースコードの変更において、バイナリ互換性を改善します。以前の2.10.x versionでは使用不可能という意味で、このパッチはバイナリの振る舞いを変更しますが、以前の振る舞いがリンクエラーを生成してしまう以上、私はこの変更を適用しても構わないと思います。)</p></blockquote>
+
+<p>2.10.2がリリースされるまでは繰り返しになりますが、<strong>以下のような構成のプロジェクトは予期せぬNoSuchMethodErrorをruntimeでthrowするため、避けるべきです</strong>。</p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<h3>おまけ1</h3>
+
+<p><a href="https://twitter.com/jsuereth/">@jsuereth</a>に褒められたヽ(・∀・)ﾉ ﾜｰｲ</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> wow, very good catch.   Too much about BC in Java is non-intuitive, this example being one.</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/312553768644395008">March 15, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h3>おまけ2</h3>
+
+<p>バグの再現手順。</p>
+
+<p>再現用のrepositoryはこちら。
+<a href="https://github.com/taisukeoe/scala_2_10_android_error">taisukeoe/scala_2_10_android_error · GitHub</a></p>
+
+<pre><code>Android platform version 16以上 (4.1以上に相当)
+Android minSDKversion 15以下 (4.0以下に相当)
+scalaVersion 2.10.x
+</code></pre>
+
+<p>で以下のようなソースコードのプロジェクトを実行すると、NoSuchMethodErrorがthrowされます。</p>
+
+<h4>Project whole souce codes:</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>    <span class="k">class</span> <span class="nc">DemoActivity</span> <span class="k">extends</span> <span class="nc">Activity</span><span class="o">{</span>
+</span><span class='line'>    <span class="k">override</span> <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="k">:</span> <span class="kt">Bundle</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">super</span><span class="o">.</span><span class="n">onCreate</span><span class="o">(</span><span class="n">savedInstanceState</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">new</span> <span class="nc">SQLHelperDemo</span><span class="o">(</span><span class="k">this</span><span class="o">).</span><span class="n">getReadableDatabase</span><span class="o">.</span><span class="n">close</span><span class="o">()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">val</span> <span class="n">textView</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">TextView</span><span class="o">(</span><span class="k">this</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">textView</span><span class="o">.</span><span class="n">setText</span><span class="o">(</span><span class="s">&quot;Do I still survive?&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">setContentView</span><span class="o">(</span><span class="n">textView</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">SQLHelperDemo</span><span class="o">(</span><span class="n">context</span><span class="k">:</span><span class="kt">Context</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">SQLiteOpenHelper</span><span class="o">(</span><span class="n">context</span><span class="o">,</span><span class="s">&quot;demo&quot;</span><span class="o">,</span><span class="kc">null</span><span class="o">,</span><span class="mi">1</span><span class="o">){</span>
+</span><span class='line'>     <span class="k">def</span> <span class="n">onCreate</span><span class="o">(</span><span class="n">p1</span><span class="k">:</span> <span class="kt">SQLiteDatabase</span><span class="o">)</span> <span class="o">{}</span>
+</span><span class='line'>     <span class="k">def</span> <span class="n">onUpgrade</span><span class="o">(</span><span class="n">p1</span><span class="k">:</span> <span class="kt">SQLiteDatabase</span><span class="o">,</span> <span class="n">p2</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> <span class="n">p3</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span> <span class="o">{}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h4>Full stack traces:</h4>
+
+<pre><code>W/dalvikvm(7951): threadid=1: thread exiting with uncaught exception (group=0x40abd210)
+E/AndroidRuntime(7951): FATAL EXCEPTION: main
+E/AndroidRuntime(7951): java.lang.NoSuchMethodError: android.database.sqlite.SQLiteClosable.close
+E/AndroidRuntime(7951):     at com.hemplant.demo.no_such_method_in_2_10.DemoActivity.onCreate(DemoActivity.scala:18)
+E/AndroidRuntime(7951):     at android.app.Activity.performCreate(Activity.java:4465)
+E/AndroidRuntime(7951):     at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1049)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:1931)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:1992)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.access$600(ActivityThread.java:127)
+E/AndroidRuntime(7951):     at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1158)
+E/AndroidRuntime(7951):     at android.os.Handler.dispatchMessage(Handler.java:99)
+E/AndroidRuntime(7951):     at android.os.Looper.loop(Looper.java:137)
+E/AndroidRuntime(7951):     at android.app.ActivityThread.main(ActivityThread.java:4441)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invokeNative(Native Method)
+E/AndroidRuntime(7951):     at java.lang.reflect.Method.invoke(Method.java:511)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:823)
+E/AndroidRuntime(7951):     at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:590)
+E/AndroidRuntime(7951):     at dalvik.system.NativeStart.main(Native Method)
+</code></pre>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/03/11/omics-r/"/>
+    <updated>2013-03-11T13:10:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/03/11/omics-r</id>
+    <content type="html"><![CDATA[<p><a href="http://www.jsbi.org/event/hosted-events/20130308r/">Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜</a></p>
+
+<h3>オミックス(omics)とは?</h3>
+
+<p>生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。</p>
+
+<p><a href="http://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%9F%E3%82%AF%E3%82%B9">オーミクス - Wikipedia</a></p>
+
+<h3>なぜ参加したか?</h3>
+
+<p>元々大学ではin vitroな実験系分子生物学の研究室に3年間在籍していたものの、今はプログラミングばっかりやっているので、バイオインフォマティクス(情報生物学)はピッタリじゃないかなーとか。半分は完全に趣味ですが。</p>
+
+<h3>面白かったポイント</h3>
+
+<!-- more -->
+
+
+<ul>
+<li><p>今はMicroArrayや質量分析機などの発展により、研究のボトルネックがデータ収集速度ではなく解析速度に来ている。これにより実験系の研究者にとっても、バイオインフォマティクスの重要性が上がっている。</p></li>
+<li><p>データ解析には元々Fortranを使っていた研究室が多いものの、今は<a href="http://ja.wikipedia.org/wiki/R%E8%A8%80%E8%AA%9E">R言語</a>が主流。対応解析(CorrespondenceAnalysys)用ライブラリのFactoMineRやネットワーク解析向けにigraphなどのライブラリの紹介もあった。</p>
+
+<p>  参考:
+<a href="https://sites.google.com/site/kztakemoto/r-seminar-on-igraph---supplementary-information">R seminar on igraph - supplementary information - Kazuhiro Takemoto</a></p></li>
+<li><p>ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。</p></li>
+<li><p>気象学でよく使われる「<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96">データ同化</a>」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは<a href="http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF">カルマンフィルタ</a>(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。</p>
+
+<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー&#8221;Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
+<li><p>現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO(<a href="http://ja.wikipedia.org/wiki/Gene_Ontology">遺伝子オントロジー</a>)と<a href="http://ja.wikipedia.org/wiki/MeSH">MeSH</a>(Medical Subject Headings)。
+MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。</p></li>
+</ul>
+
+
+<h3>最後に</h3>
+
+<p>バイオの知識だけじゃなく、統計学(とR)の知識が重要な模様。こういう複合領域の戦場にはどんどん攻め入りたいですね。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scala Conference 2013 in Japanの振り返り]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/03/10/scalaconfjp/"/>
+    <updated>2013-03-10T23:53:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/03/10/scalaconfjp</id>
+    <content type="html"><![CDATA[<h3>Asia初の大規模なScalaカンファレンス</h3>
+
+<p>2013年3/2から3/3にかけて、プログラミング言語<a href="http://ja.wikipedia.org/wiki/Scala">Scala</a>に関する大規模なイベント <a href="http://www.scalaconf.jp/">Scala Conference 2013 in Japan</a> を開催しました。
+ゲストはScala言語, PlayFramework, Akkaなどを開発している<a href="http://typesafe.com/">Typesafe</a>より4人も招くという豪華仕様。</p>
+
+<p>TypeSafe CTOの<a href="https://twitter.com/jboner">Jonas Bonér</a>さんもこんな感想をつぶやいてくださったり</p>
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Scala Conference Japan was awesome. Scala community is thriving. Next stop is Niseko and Rusutsu for some Japanese powder skiing. <a href="https://twitter.com/hashtag/lovejapan?src=hash">#lovejapan</a></p>&mdash; Jonas Bonér (@jboner) <a href="https://twitter.com/jboner/status/308059379465338881">March 3, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>Twitterのトレンドを日中ずっと独占したり</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">なんと日本のTwitterトレンドのトップに!  <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a> <a href="http://t.co/vwXSoozFI9">pic.twitter.com/vwXSoozFI9</a></p>&mdash; OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/307702444874420224">March 2, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>新興言語のカンファレンスとは思えない盛り上がりを見せました。</p>
+
+<p>既にカンファレンスのレポートを書いてらっしゃる方が沢山いるので、僕は個人的なラーニングを備忘録として書こうかと思います。</p>
+
+<!-- more -->
+
+
+<h3>「迷ったらやってみる」</h3>
+
+<p>カンファレンス実行委員の中で会計チームリーダー、当日の司会、英語講演のゲリラ的翻訳など色々やらせてもらいましたが、今回のラーニングはこの一言につきました。「迷った末、やってみたらすごく良かった」というのもあったし、「迷った末、やらなかったらすごく後悔した」というのもありました。その辺りを書き下しておこうと思います。</p>
+
+<h4>「迷った末、やってみたら良かったこと」</h4>
+
+<ul>
+<li><p>カンファレンスの実行委員に参加したこと。 当時、座長@kmizuさんはおろか、他のスタッフとも殆ど面識ない中飛び込んでみたら、たまたま会計を出来る人がいなかった。そこにちょうど僕のスキルセット(経営管理の業務経験有り)とマッチしてたので、会計としてjoinすることになった、というのが経緯。思い切って飛び込むって大事だなと改めて実感。</p></li>
+<li><p>今回来てくれたゲストに、お土産として「こことここに行くと良いよ！」と書き込んだ観光マップをあげたこと。Nice Service!!と喜ばれました。</p></li>
+</ul>
+
+
+<p><img src="https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-prn1/s320x320/525192_10200417515034085_419545240_n.jpg" alt="w/ Josh" /></p>
+
+<ul>
+<li>英語講演をゲリラ的に翻訳し、twitterに流したこと。翻訳チームの神速タイピングがある中too muchかなと思ったのですが、助かったとの声を懇親会で複数の方からいただきました。とはいえ、細かなところはtsudaる速度が追いつかず訳せなかったりしたので、反省もあります。</li>
+</ul>
+
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">同時翻訳のためのサブスクリーンが小さくて、後ろの方から見づらいということがあり、　別途 .<a href="https://twitter.com/OE_uia">@OE_uia</a> さんに発表内容の要約をTsudaってもらっています。 <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a></p>&mdash; 水島 宏太(肩こり中) (@kmizu) <a href="https://twitter.com/kmizu/status/307664957548404736">March 2, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<ul>
+<li>ゲストに色々疑問をぶつけたこと。正直ちょっと緊張しましたが、皆さんナイスな人なので、sbtに関する本がもうじき出ること、ScalaでAndroidアプリ開発するときのTipsなど、色々教えてくれました。また話の流れで、2日目のHackathonでは<a href="https://twitter.com/jsuereth">Josh</a>とペアプロ状態になるなど、超贅沢な展開にも。彼のデバッグを横目でずーっと眺めているのは凄くexcitingでinspiringな経験でした！この辺のラーニングはまた詳しくブログに書きたい。</li>
+</ul>
+
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> Maybe we should try some Android Scala work here. I&#39;d like to get more familiar with these issues and build tools&#8230;</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/308051543037472768">March 3, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h4>「迷った末、やらなかったら後悔したこと」</h4>
+
+<ul>
+<li><p>AkkaとPlayを事前にちゃんと触れなかったこと。
+カンファレンスの準備と仕事の納期と会社の決算締めが重なって全く余裕がなかったことが敗因。。。</p></li>
+<li><p>なにも発表できなかったこと。これもキャパシティ的に無理でした。。。</p></li>
+<li><p>思い出のお菓子を準備できなかったこと。キリンレモンとチョコボールのキャラメル味は用意しておきたかった。(チョコボールのピーナッツ味は見つかったので差し上げたところ、Jamieさんの娘さんが喜んでくれたみたいですw)</p></li>
+</ul>
+
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">For the life of me, I can&#39;t find any Kirin Lemon, a favorite soda from my childhood here. Nor any caramel ChocoBalls. Bummed. <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a></p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/308080921960132609">March 3, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">My daughters love the kokusai (the pink one) and daruma dolls I got them. And now they love ChocoBalls, too! <a href="http://t.co/xHUihxeAjf">pic.twitter.com/xHUihxeAjf</a></p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/309478481098588162">March 7, 2013</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h3>レポート/感想ブログへのリンク(順次追記)</h3>
+
+<p>先ほどちょっと触れましたが、ありがたいことに参加者で既にレポート/感想ブログなどを書いてくださっている方が沢山。</p>
+
+<p><a href="http://togetter.com/li/464683">2013/03/02 Scala Conference in Japan 2013 #scalaconfjp - Togetter</a></p>
+
+<p>実行委員の<a href="https://twitter.com/sawakun/">@sawakun</a>くんの<a href="http://storys.jp/yohei.sawayama/story/Scala%20Conference%20in%20Japan%202013%E3%81%AE%E8%A3%8F%E5%81%B4">stories.jp</a></p>
+
+<p><a href="http://d.hatena.ne.jp/tototoshi/20130305/1362488819">Scala Conference in Japan の感想 - tototoshiの日記</a></p>
+
+<p><a href="http://mironal-memo.blogspot.jp/2013/03/scala-conference-in-japan-2013.html">Wokashi: Scala Conference in Japan 2013に行って、型安全という言葉を沢山聞いて来ました。</a></p>
+
+<p><a href="http://labs.enrapt.jp/2013/03/scala-conference-in-japan-2013.html?spref=tw">Scala Conference in Japan 2013 に参加しました | Enrapt Labs</a></p>
+
+<p><a href="http://teppei.hateblo.jp/entry/2013/03/09/165000">Scala Conference in Japan 2013に参加してきました - TEPPEI STUDIO</a></p>
+
+<p><a href="http://d.hatena.ne.jp/aoe-tk/20130310/1362909741">Scala Conference in Japan 2013に参加してきました - AOEの日記</a></p>
+
+<h3>最後に</h3>
+
+<p>これからはもっと<strong>攻め攻めでいきます</strong> ©高城れに。</p>
+]]></content>
+  </entry>
+  
+</feed>

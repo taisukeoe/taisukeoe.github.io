@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Android-sdk-plugin | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/android-sdk-plugin/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Androidプロジェクト(pfn)のgiter8テンプレート]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/14/pfn-test/"/>
+    <updated>2014-03-14T12:00:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/14/pfn-test</id>
+    <content type="html"><![CDATA[<p>ScalaでAndroidアプリを作るためのsbtプラグイン、<a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>の紹介を<a href="/blog/2014/03/13/pfn-android-sdk-plugin/">前回のブログ</a>でしました。</p>
+
+<p>が、このREADMEの通りにプロジェクトを作るのが面倒なので、giter8テンプレートも作ってみました。</p>
+
+<h1>プロジェクト作成</h1>
+
+<pre><code class="bash"> g8 taisukeoe/android-pfn-app.g8
+</code></pre>
+
+<!--more-->
+
+
+<p>からプロジェクトの雛形が作れます。
+giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
+
+<h1>ディレクトリ構造</h1>
+
+<p>こんな感じです。</p>
+
+<pre><code>MyAndroidProject
+├── .gitignore
+├── AndroidManifest.xml
+├── build.sbt
+├── local.properties
+├── proguard-project.txt
+├── project/
+│   ├── build.properties
+│   └── plugins.sbt
+├── project.properties
+├── res/
+│   ├── layout/
+│   └── values/
+├── src/.../MainActivity.scala
+└── tests/
+    └── src/.../MainActivityInstrumentationTest.scala
+</code></pre>
+
+<p>簡単な説明。</p>
+
+<ul>
+<li>AndroidManifest.xml &hellip;ActivityやApplicationのもろもろの設定。</li>
+<li>build.sbt &hellip;sbtのビルド定義</li>
+<li>local.propeties &hellip;AndroidSDKのpathを記入。また、keyStoreの情報を記入すると、<em>android:package-release</em>で簡単にrelease buildできる。</li>
+<li>proguard-project.txt &hellip;proguardオプションを記入。<em>-dontwarn</em>, <em>-keep</em>, <em>-keepclassmembers</em>, <em>-libraryjars</em>あたりのオプションが頻出。詳しくは<a href="http://proguard.sourceforge.net/index.html#manual/usage.html">ProGuard Usage</a>を参照。</li>
+<li>project/ &hellip;sbtのバージョンやpluginなどを記入。</li>
+<li>project.properties&hellip; 利用するAndroid APIのバージョン(target api)や、(unmanagedの)libraryプロジェクトのpathを記入。</li>
+<li>res/ &hellip;レイアウトやテキスト、画像などのリソースファイル置き場。</li>
+<li>src/ &hellip;ソース。</li>
+</ul>
+
+
+<p>local.properties, project.propertiesを修正したときは、ちゃんと<em>sbt reload</em>しましょう。</p>
+
+<p>proguard-project.textを修正したときは、<em>sbt reload clean</em>してclassファイルのキャッシュを消しましょう。</p>
+
+<h1>各種コマンド</h1>
+
+<p><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>より。</p>
+
+<h2>インストール</h2>
+
+<pre><code class="bash">sbt
+&gt; android:run
+</code></pre>
+
+<h2>テスト</h2>
+
+<pre><code class="bash">sbt
+&gt; android:test
+</code></pre>
+
+<p>ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。</p>
+
+<p>まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。</p>
+]]></content>
+  </entry>
+  
+</feed>

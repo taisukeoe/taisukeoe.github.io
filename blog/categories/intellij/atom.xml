@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Intellij | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/intellij/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaでAndroidアプリを作るには（pfn/android-sdk-plugin）]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin/"/>
+    <updated>2014-03-13T06:06:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin</id>
+    <content type="html"><![CDATA[<p>表題の件ですが、今は<strong><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>を使うのがオススメです</strong>。</p>
+
+<p>なぜか。</p>
+
+<!-- more -->
+
+
+<p>2013年6月に<a href="/blog/2013/06/08/scala-android-intellij/">ScalaでAndroidアプリを作るには</a>という記事を書いたのですが、その後Android SDKのディレクトリ構造が(r22〜？)変わったものの、記事中で使用していた<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>がその変更に追従しておらず、<em>Could not find tool &ldquo;aapt&rdquo;</em>エラーが出てビルドできない問題が発生しています。</p>
+
+<p>参考のSO記事はこちら。mavenのpluginの話ですが同じ問題。</p>
+
+<p><a href="http://stackoverflow.com/questions/16927306/could-not-find-tool-aapt-please-provide-proper-android-sdk-directory-path-as-co">maven - Could not find tool aapt. Please provide proper Android SDK directory path as configuration parameter - Stack Overflow</a></p>
+
+<h1>pfn/android-sdk-pluginの、<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>との主な違い</h1>
+
+<ul>
+<li>Proguardしたclassファイルをキャッシュしてくれるので、<strong>デバッグ時のビルド時間が半分くらい</strong>になる。</li>
+<li>ディレクトリ構造がsbtではなく、Android SDKデフォルト(android create project &hellip;)。</li>
+<li>local.propeties,project.properties,proguard-project.txtなどAndroidSDKの各種configファイルも使用可能(なのでbuild.sbtが膨れ上がらずに済む)。</li>
+<li>Android NDKサポートがない</li>
+<li>proguardのデフォルトの設定が違うので、書き直しが必要（これが面倒…）</li>
+</ul>
+
+
+<p>また思い出したら上に書き足します。</p>
+
+<h1>pfn/android-sdk-pluginの問題</h1>
+
+<ul>
+<li>sampleコードが古い</li>
+<li>configファイルなどを更新した場合も、reloadが必要</li>
+<li>ScalaTestなどScalaのテストフレームワークと相性悪い？（回避方法模索中）</li>
+</ul>
+
+
+<h1>AndroidアプリをScalaで書くときの問題</h1>
+
+<p>あと、AndroidアプリをScalaで書くと、以下の問題にぶつかりやすくなります（DalvikVM自身の問題も多分に含まれるのですが）。</p>
+
+<ul>
+<li>DalvikVMのmethod数上限65,535個に引っかかる</li>
+<li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
+<li>Scalaの変なバグ(e.g.<a href="/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
+<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
+</ul>
+
+
+<p>ちなみにLinearAlloc問題が起きるのは基本的にAndroid2.3以下だし、DalvikVMに代わるARTがAndroid4.4から試験導入されているので、時間とともに改善するという説もあります。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[[Deprecated]ScalaでAndroidアプリを作るには(IntelliJ IDEA + Sbt)]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij/"/>
+    <updated>2013-06-08T03:25:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/06/08/scala-android-intellij</id>
+    <content type="html"><![CDATA[<p><strong><em>この記事の内容は執筆当時のものです。最新の内容は<a href="/blog/2014/03/13/pfn-android-sdk-plugin">こちら</a>を参照してください。</em></strong></p>
+
+<p>LinkedInのブログで、EclipseベースのScalaによるAndroidアプリ開発環境が紹介されてました。（と、
+<a href="https://twitter.com/okapies">@okapies</a>さんに教えていただきました。ありがとうございます。)</p>
+
+<p><a href="http://engineering.linkedin.com/incubator/technology-behind-eatin-android-apps-scala-ios-apps-and-play-framework-web-services">The technology behind EatIn: Android apps in Scala, iOS apps, and Play Framework web services</a></p>
+
+<p>うちのAndroid Scala開発環境はIntelliJ IDEA + sbtなので、折角なのでこんな風にも出来ますよと紹介してみます。本当はLinkedInブログに対抗して <em>(sorry eclipse users!!)</em> って書きたかったw のですが、IntelliJはエディタとして使ってるだけなので、Eclipseに変えても大して支障ないです。というわけでお好きな方をどぞ。</p>
+
+<p>Androidに馴染みが無い方にも、Scalaに馴染みが無い方にも試してもらえるよう、クドいぐらいに丁寧に書いてますので、慣れ親しんだ部分は読み飛ばしてください。</p>
+
+<p>また、<strong>「もっとこうした方がいいんじゃない？」みたいな突っ込みは大歓迎</strong>です。</p>
+
+<h1>開発環境</h1>
+
+<p>以下コマンド例はMac/Linux用なので、Windowsの方はお好きな方法で適宜書き換えてください。</p>
+
+<h2>各種インストール</h2>
+
+<!-- more -->
+
+
+<h3>IntelliJ IDEA</h3>
+
+<p>強力なリファクタリングと、Android UI Designer機能が便利なIDE。</p>
+
+<p><a href="http://www.jetbrains.com/idea/">IntelliJ IDEA — The Best Java and Polyglot IDE</a></p>
+
+<p>幸いなことに、IntelliJ IDEAのCommunity Edition(無料版)でもScalaとAndroidのサポートを使えます。
+インストールしたら、以下の手順でScalaのPluginを入れましょう。</p>
+
+<pre><code>Configure =&gt; Plugins =&gt; Browse repositories 
+プラグインの一覧からscalaを右クリック =&gt; Download &amp; Install
+</code></pre>
+
+<p>ちなみにsbtコンソールをIntelliJに追加するプラグインもありますが、このコンソールは<em>Tab補完が効かない</em>ので、コマンドが長めなandroid-pluginには不向き。Terminal経由でsbtコマンドを叩いた方が無難です。</p>
+
+<h3>Android SDK</h3>
+
+<p>Android APIのjarが含まれているほか、ビルドやデバッグに使用する各種便利ツールが入ってます。アップデートの度にちょこちょこ構成が変わるので、各種サードパーティ製のツールとの互換性がなくなったりします。なので<strong>新しいバージョンが出ても1個前のバージョンは消さずに、シンボリックリンクの切り替えで対応しとくと良い</strong>です。</p>
+
+<p><a href="http://developer.android.com/intl/ja/sdk/index.html#ExistingIDE">Android SDK | Android Developers</a></p>
+
+<p>IntelliJ IDEAを使う場合は、ADT Bundleではなく<em>USE AN EXISITING IDE</em>からSDK単体をDLます。ADT Bundleでも特に問題はないですが、余計な物(Eclipse+ADT)が入ってます。</p>
+
+<p>その後、SDK環境変数ANDROID_HOMEとtools, platform-toolsのディレクトリにPATHを通します。</p>
+
+<pre><code class="bash">ln -s &lt;SDK_ROOT_DIR&gt; &lt;SYMBOLIC_LINK_PATH&gt;
+
+export $ANDROID_HOME=&lt;SYMBOLIC_LINK_PATH&gt;
+export PATH=$PATH:$ANDROID_HOME/tools
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+</code></pre>
+
+<p>ちなみに上記SDKには最新版のAndroid versionのlibraryしか含まれていないので、回線に余裕があるときに、以下のコマンドでAndroid SDK Manager(GUI)を起動し、各versionのlibraryを落としておくと良いです。</p>
+
+<pre><code class="bash">android
+</code></pre>
+
+<p>なおSDKにAndroidエミュレーター作成用ツールも含まれていますが、起動と各種動作が重い上に、エミュレーターで試せない機能が多い(カメラなど各種ハードウェア、GCMを使用したpush通知、アプリ内課金)など、不便極まりないので実機でデバッグする方が無難です。
+どうしても作りたい(特定のマイナーな解像度での見え方をチェックしたい、など)場合は、以下を参考にどうぞ。</p>
+
+<p><a href="https://sites.google.com/a/techdoctranslator.com/jp/android/developing/tools/emulator">Emulator - Android エミュレータ - ソフトウェア技術ドキュメントを勝手に翻訳</a></p>
+
+<h3>giter8</h3>
+
+<p>Githubのリポジトリに登録しておいたテンプレートからプロジェクトを生成するツール。Androidアプリのプロジェクトは色々構成がややこしいので、giter8経由で作成するのがオヌヌメです。</p>
+
+<pre><code class="bash">brew install giter8
+</code></pre>
+
+<p><a href="https://github.com/n8han/giter8">giter8</a></p>
+
+<h3>scala</h3>
+
+<p>Scala本体。まだ入れていなければ。</p>
+
+<pre><code class="bash">brew install　scala
+</code></pre>
+
+<p><a href="http://docs.scala-lang.org/index.html#">Scala Documentation</a></p>
+
+<h3>sbt</h3>
+
+<p>Scalaプロジェクトのビルドによく使われるビルドツール。まだ入れていなければ。</p>
+
+<pre><code class="bash">brew install　sbt
+</code></pre>
+
+<p><a href="http://scalajp.github.io/sbt-getting-started-guide-ja/">始める sbt - ようこそ</a></p>
+
+<h2>使用する各種コマンド</h2>
+
+<h3>プロジェクトの作成</h3>
+
+<p>giter8を使って作成します。</p>
+
+<pre><code class="bash">g8 taisukeoe/android-app
+
+            Template for Android apps in Scala 
+
+            package [my.android.project]: &lt;YOUR_PACKAGE_NAME&gt;
+            name [My Android Project]: &lt;YOUR_PROJECT_NAME&gt;
+            main_activity [MainActivity]: 
+            scala_version [2.10.2]: 
+            min_api_level [8]: 
+            useProguard [true]: 
+            min_api_level [17]: 
+
+cd &lt;YOUR_PROJECT_NAME&gt;
+
+git init
+
+sbt
+gen-idea
+</code></pre>
+
+<p>各変数の解説</p>
+
+<ul>
+<li>package … Androidアプリのユニーク性の担保に使われているので、絶対にかぶらないように設定する必要があります。同じ端末に同じpackageのアプリは同時に1つしか入れられませんし、GooglePlayには同じパッケージのアプリは常に1つしか存在しません。</li>
+<li>name … プロジェクト名及びディレクトリ名に使われます。お好きに。</li>
+<li>main_activity … アプリ起動時に実行するActivity(画面に相当)の名前。お好きに。</li>
+<li>scala_version … 2.10.2以上推奨です。理由は<a href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">こちらのバグ</a>。2.9系でも別に構いませんが。</li>
+<li>min_api_level … 1がAndroid1.5相当、デフォルトの8はAndroid2.2相当、17が最新のAndroid4.2相当です。このプロジェクトがサポートする最低のAndroid versionの数字を入力します。今使われているAndroid端末の99%程度は2.2以上なので、デフォルトで特に問題ないと思います。</li>
+<li>useProguard … 基本的にtrue一択。あらかじめscala-library.jarをAndroid端末に仕込んだりする場合はfalseでも良いですが。</li>
+<li>target_api_level … 使用したいAndroid APIが含まれている、Android versionを入力します。デフォルトの17(最新4.2)にしておけば全てのAPIを使用できますが、Android4.1以前の端末では該当箇所が実行されないように条件分岐しないと、NoClassDefErrorないしはNoSuchMethodExceptionがthrowされます。もちろんmin_api_levelに揃えておくのも手です。</li>
+</ul>
+
+
+<p>作成したプロジェクトをIntelliJ IDEAで開くとこんな感じ。なおsbt pluginは<a href="https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>及び<a href="https://github.com/mpeltonen/sbt-idea">mpeltonen/sbt-idea</a>を使用しています。</p>
+
+<p><img src="/images/20130608/template.jpg" width="600" height="450"></p>
+
+<h3>ビルド定義の更新</h3>
+
+<p>sbtのビルド定義ファイル(<em>project/build.scala</em>)でAndroid versionを変えたりライブラリ依存性を変更した場合は、忘れずにリロードして再度idea設定ファイルを生成します。でないとIntelliJの補完が効かなくなります。</p>
+
+<pre><code class="bash">sbt
+reload
+gen-idea
+</code></pre>
+
+<h3>ビルド&amp;デプロイ</h3>
+
+<p>USBデバッグモードをONにしたAndroid端末を接続しておくと、以下のコマンドでビルド及びデプロイが実行できます。</p>
+
+<pre><code class="bash">sbt
+android:start-device
+</code></pre>
+
+<p>ビルドした実行ファイルは<em>target/<YOUR_PROJECT_NAME>-<VERSION>.apk</em>に生成されます。
+ちなみに、自分以外の誰かにインストールさせたいときに一番簡単な方法は、このapkファイルをメールで送りつけることです。AndroidデフォルトのGmailアプリからapkを開くとインストールできます。</p>
+
+<p>なおAndroidプロジェクトのビルドには時間がかかりすぎる(MBP Retinaで30秒以上&hellip;)ので、コード書いてる最中は自動コンパイルだけにしておく方が無難です。</p>
+
+<pre><code class="bash">sbt
+~compile
+</code></pre>
+
+<h3>テスト</h3>
+
+<p>Androidアプリのテストは、Android上で行う必要がないもの<em>(ex. Modelやユーティリティークラスの単体テスト)</em>と、Android上で行う必要があるもの<em>(ex. Activity(画面)やViewに関するテスト)</em>の二通りがあり、実行方法も違います。</p>
+
+<p>Android上では行う必要のないテストは、<strong>src/test/</strong>以下に書いて、以下の通りテストを実行。</p>
+
+<pre><code class="bash">sbt
+test
+</code></pre>
+
+<p>Android上で行う必要のあるテストは、サブプロジェクトとして別途ビルド&amp;デプロイします。ここまで記載した手順通りで作成している場合には、<strong>tests/src/main/</strong>以下にテストコードを書く形になります。実行コマンドはこんな感じです。</p>
+
+<pre><code class="bash">sbt
+project tests
+android:install-device
+android:test-device
+</code></pre>
+
+<p>余談ですが、<a href="(https://github.com/jberkel/android-plugin/">jberkel/android-plugin</a>のTypedResourcesを利用したプロジェクトのテストをAndroid上で実行すると、IllegalAccessErrorで失敗するようです。TypedResourcesはただのユーティリティー的なtraitなので、使わなくても支障は特にありません。</p>
+
+<h3>デバッグ</h3>
+
+<p>主にAndroidSDK同梱のAndroid Device Monitorを使います。</p>
+
+<p>Logの確認の他、Thread, Heapなどの状態をチェックしたり、スクリーンショットを撮ったり、hprofとったり割と便利です。</p>
+
+<pre><code class="bash">monitor
+</code></pre>
+
+<p>その他、よく使うandroid-pluginのsbtコマンド一覧</p>
+
+<pre><code>android:package-debug   … プロジェクトをビルド。
+android:prepare-market   … プロジェクトをビルドし、指定した署名ファイル(&lt;HOGE&gt;.keystore)で署名。GooglePlayへのアップロード時に使用する。
+
+android:install-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール
+android:start-device   … プロジェクトをビルド、USB経由でAndroid端末にインストール、アプリ実行
+android:uninstall-device   … USB経由でAndroid端末からアンインストール
+android:test-device … USB経由でAndroid端末上でテストを実施。前もってテスト用apkをインストールする必要あり。
+android:screenshot-device   …USB経由でAndroid端末のスクリーンショットを撮影
+
+# emulatorの場合は、上記コマンドのdeviceをemulatorに変えてください。      
+</code></pre>
+
+<p>Wikiにも色々書かれていますので、一読しておくと良いかもです。</p>
+
+<p><a href="https://github.com/jberkel/android-plugin/wiki">jberkel/android-plugin Wiki</a></p>
+
+<h3>補足 Android UI Designer</h3>
+
+<p>上記手順だけでも使えないことは無いですが、IntelliJ IDEAのAndroid UI Designer機能を使うためにはもう少し設定が必要です。ちなみに先日のGoogle I/Oで発表された<a href="http://taisukeoe.github.io/blog/2013/05/16/android-studio/">Android Studio</a>のメイン機能も、このAndroid UI Designerを下敷きにしているぐらい強力だったりするので、折角IntelliJを使うのであれば、ぜひここまで設定しましょう！</p>
+
+<p>以下、IntelliJ IDEAでプロジェクトを開いた後に行います。</p>
+
+<pre><code>File  =&gt; Project Structure =&gt; Modules =&gt; 
+メインプロジェクトを選択して Add =&gt; Android
+</code></pre>
+
+<p><img src="/images/20130608/project_structure_add_sdk.jpg" width="600" height="450"></p>
+
+<p>追加した&#8221;Android&#8221;を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の&#8221;.idea_modules&#8221;を全て&#8221;src/main&#8221;に変更します。Native libs directoryは&#8221;.idea_modules&#8221;を削除しましょう。下記スクリーンショットのような感じです。</p>
+
+<p><img src="/images/20130608/project_structure_path.jpg" width="600" height="450"></p>
+
+<p>続いてAndroid SDKのパスを追加します。</p>
+
+<pre><code>File =&gt; Project Structure =&gt; Platform Settings =&gt; SDKs =&gt;
+ 上の"+"ボタン =&gt; Android SDK =&gt; $ANDROID_HOME/platforms/android-17　を選択
+
+File =&gt; Project Structure =&gt; Modules =&gt; メインプロジェクトのModule SDK =&gt; 今追加したAndroid SDKを選択。
+</code></pre>
+
+<p><img src="/images/20130608/project_structure_project_sdk.jpg" width="600" height="450"></p>
+
+<p>以上を終えた後、src/main/res/layout/main.xmlを開くと、自動でAndroid UI Designer機能が立ち上がります。もちろん画面下タブのTextを選択すれば、xmlを直接編集できます。Previewを見ながらxmlを編集するだけでも便利です。</p>
+
+<p><img src="/images/20130608/ui_designer.jpg" width="600" height="450"></p>
+
+<h2>最後に</h2>
+
+<p>かなり丁寧に書いたので長くなってしまいましたが、突っ込みor質問orコメントなどあれば下記コメント欄か<a href="https://twitter.com/oe_uia">@OE_uia</a>までお願いします。</p>
+]]></content>
+  </entry>
+  
+</feed>

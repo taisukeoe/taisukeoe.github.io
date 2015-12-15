@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: 
+
+Sitemap: http://taisukeoe.github.io/sitemap.xml 

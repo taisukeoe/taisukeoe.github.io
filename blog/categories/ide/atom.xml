@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Ide | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/ide/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Android Studioを触ってみた]]></title>
+    <link href="http://taisukeoe.github.io/blog/2013/05/16/android-studio/"/>
+    <updated>2013-05-16T15:09:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2013/05/16/android-studio</id>
+    <content type="html"><![CDATA[<h1>概要</h1>
+
+<p><a href="https://developers.google.com/events/io/">Google I/O 2013</a> 初日(日本時間5/16 1:00)にて発表されました。<a href="http://www.jetbrains.com/idea/">IntelliJ IDEA</a>ベースのAndroidに特化したオープンソースのIDEだそうです。</p>
+
+<p>そのほかの、Google I/O関連のまとめはこちら。Galaxy S4のNexus化モデルの販売やら、Google Mapの強化、PlatformとしてのChrome、GmailとGoogle Walletの統合など、他にも盛りだくさんな発表がありました。</p>
+
+<p>これら発表を受けて、Googleの株価は過去1年間で最高の915ドルまで急騰した模様。</p>
+
+<p><a href="http://www.itmedia.co.jp/mobile/articles/1305/16/news051.html">Google、Android向け統合開発環境「Android Studio」を発表 - ITmedia Mobile</a></p>
+
+<p><a href="http://japanese.engadget.com/2013/05/15/google-i-o-2013/">Google I/O 2013 開幕、初日キーノート速報 - Engadget Japanese</a></p>
+
+<p><a href="http://u-note.me/note/47484899">【速報】 Google I/O 2013キーノート講演まとめ #io13-ノート｜U-NOTE【ユーノート】-イベントまとめプラットフォーム</a></p>
+
+<p><a href="http://jp.techcrunch.com/2013/05/16/20130515google-stock-price-closes-at-52-week-high-of-915-on-first-day-of-google-io-as-apple-takes-another-drop/">Google株、Google I/O初日に52週最高の915ドルで引ける。Apple再び下げる | TechCrunch Japan</a></p>
+
+<h1>1.Android Studioインストール</h1>
+
+<p>もうWindows/Mac/Linux版が公開されています。ただしv0.1の<em>early access preview</em>なので、productionには使わない方が良いとのこと。</p>
+
+<!-- more -->
+
+
+<p><a href="http://developer.android.com/intl/ja/sdk/installing/studio.html">Getting Started with Android Studio | Android Developers</a></p>
+
+<p>(5/16追記) Macの場合、<em>/Applications ディレクトリにコピーしないとエラーが出る模様</em>。情報ありがとうございます！</p>
+
+<p>インストールが完了して起動すると、IntelliJ IDEAっぽいスプラッシュ画面。</p>
+
+<p><img src="/images/20130516/android_studio_splash.jpg" width="200" height="150"></p>
+
+<p>生成されるプロジェクトはこんな感じ。</p>
+
+<p><img src="/images/20130516/android_studio_project.jpg" width="400" height="300"></p>
+
+<p>ビルドは<a href="http://www.gradle.org/">Gradle</a>なんですねー。<a href="http://d.hatena.ne.jp/bluepapa32/20110308/1299602195">Gradle Wrapper</a>つき。</p>
+
+<pre><code>build.gradle
+settings.gradle
+gradlew
+gradlew.bat 
+</code></pre>
+
+<p>そしてIDEの設定ファイルは、IntelliJ IDEAと似たような構成みたい。</p>
+
+<pre><code>.idea/
+&lt;HOGEHOGE&gt;.iml
+</code></pre>
+
+<h1>2.便利なPalette機能</h1>
+
+<pre><code>Androidアプリ開発者のために、複数のディスプレイサイズでのレイアウトをプレビューできるレイアウトエディタ&lt;中略&gt;が用意されている
+</code></pre>
+
+<p>とのことなので、早速チェックしてみることに。どうやらIntelliJ IDEAのAndroid UI Designerをベースにしつつ、機能追加/画面の修正をして<em>Palette</em>という名前に変更したようです。</p>
+
+<p><img src="/images/20130516/android_studio_screens.jpg" width="400" height="300"></p>
+
+<p>なんと、レイアウトファイルの<strong>各解像度での見え方のプレビューを一覧表示できる！！</strong></p>
+
+<p><strong>これは便利すぎる…</strong></p>
+
+<h1>3.IntelliJ IDEAとの互換性</h1>
+
+<ul>
+<li>PluginはIntelliJ IDEAのものを一部(VCS系、Inspector系など)利用可能。<strong>Scala pluginは使用不可</strong>。</li>
+<li>IDE設定ファイルは<strong>IntelliJ IDEAとの互換性無し</strong>。一応開けるけど、PaletteないしはAndroid UI Designer画面で、こんなエラーが発生する。IntelliJ IDEAベースで開発しつつ、Android Studioをレイアウトファイルのエディタとして使用するのは無理ぽ。</li>
+<li><strong>(5/18追記)</strong>どうやらAndroidStudioは<a href="http://blogs.jetbrains.com/idea/2013/05/intellij-idea-13-early-preview-is-out/">IntelliJ IDEA 13 EarlyPreview版</a>をベースにしている模様。IntelliJ v13のプロジェクトをAndroidStudioで開けるそうなので、AndroidStudioをレイアウトファイルエディタとして使うというのが現実味を帯びてきました(ぇ。    参考:<a href="http://d.hatena.ne.jp/masanobuimai/20130516/1368708416">Android Studio試してみたよ - marsのメモ</a></li>
+</ul>
+
+
+<p><img src="/images/20130516/android_studio_error.jpg" width="400" height="300"></p>
+
+<p>…Android Studioの<em>エラーの報告先がJetBrains(IntellIJ開発元)になってる</em>のは、すごく迷惑だと思うけどw</p>
+
+<h1>4.その他雑感</h1>
+
+<ul>
+<li>Android Studio単体で使っててもちょこちょこエラーが発生するので、メインで使うのはまだ厳しいかもしれない。</li>
+<li>というか、IntelliJ IDEA本体にAndroidの各解像度プレビュー機能を追加してくれるのが僕にとってはBEST (w</li>
+<li>今後のアップデートに期待！</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Scala | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/scala/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2015-12-15T23:06:13+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Implicitには型注釈をつけましょう]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/07/11/scala-implicits/"/>
+    <updated>2015-07-11T22:52:58+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/07/11/scala-implicits</id>
+    <content type="html"><![CDATA[<p>Scalaには(とても今更ですが) Implicit/暗黙 というキーワードがあります。Implicitキーワードを宣言する場所をざっくり分けると、以下の4つ。</p>
+
+<p>1) implicit class &hellip;</p>
+
+<p>2) implicit parameter (e.g. (implicit a:A) )</p>
+
+<p>3) implicit def &hellip;</p>
+
+<p>4) implicit (var | val) &hellip;</p>
+
+<p>この中で1,2は(明示的に)型を書かざるを得ませんが、3のdefの戻り値、及び4については、型注釈を明示的に書かずに型推論を働かせることが(少なくとも最新の2.11.7でも)可能です。</p>
+
+<p>しかし型注釈を書かなかった場合、<strong>以下のような（一見理由の分かりにくい）コンパイルエラーに遭遇する可能性が有る</strong>ことはご存知でしょうか？</p>
+
+<!--more-->
+
+
+<pre><code class="scala">//compile success in declaring A, then B
+scala&gt; :paste
+object A {implicit val a = 1}
+object B {import A._;implicitly[Int]}
+
+//compile success in annotating type of A.a
+scala&gt; :paste
+object B {import A._ ; implicitly[Int]}
+object A {implicit val a:Int = 1}
+
+//COMPILE ERROR in declaring B, then A without type annotation
+scala&gt; :paste
+object B {import A._ ; implicitly[Int]}
+object A {implicit val a = 1}
+</code></pre>
+
+<p>JIRAにも同種のissueが多数報告されています。</p>
+
+<ul>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-9130">[SI-9130] destructuring binds, implicit resolution, and declaration order - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5265">[SI-5265] warn on implicit def without explicit result type - Scala</a></p></li>
+<li><p><a href="https://issues.scala-lang.org/browse/SI-5348">[SI-5348] Type errors overriding implicit vals - Scala</a></p></li>
+</ul>
+
+
+<p>この問題を防ぐために、コンパイラチームは<strong>暗黙の値やメソッドに型注釈をつけることを強く推奨</strong>しています。</p>
+
+<blockquote><p>Implicits must be explicitly type annotated, otherwise the typechecker may ignore them from preceding parts of the same source file. This is done to avoid triggering spurious cycles in type inference.</p>
+
+<p>暗黙(の値及びメソッド)には明示的に型注釈がつける必要があります。もし型注釈がないと、同じソースファイル上の前方から後方に向かって暗黙を参照している際に、型チェッカーが見落としてしまう恐れがあります。これは型推論をする際に、間違ったサイク
+ルを引き起こさないために行っています。</p>
+
+<ul>
+<li>Comment by Jason Zaugg on <a href="https://issues.scala-lang.org/browse/SI-9130?focusedCommentId=71712&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-71712">SI-9130</a></li>
+</ul>
+</blockquote>
+
+<p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
+
+<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalikeJDBC on Android SQLite]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite/"/>
+    <updated>2015-05-06T21:40:25+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/05/06/scalikejdbc-on-android-sqlite</id>
+    <content type="html"><![CDATA[<p>意外にもまだ試している人がいなさそうなので、<a href="https://rpscala.doorkeeper.jp/events/23383">rpscala合宿</a>でDEMOを作成した。</p>
+
+<p><a href="https://github.com/taisukeoe/scalikejdbc-on-android">scalikejdbc-on-android</a></p>
+
+<p><img src="/images/20150506/scalikejdbc_demo.png"></p>
+
+<!--more-->
+
+
+<h3>使用versionなど:</h3>
+
+<ul>
+<li>Scala 2.11.6</li>
+<li>sbt 0.13.8</li>
+<li>Target: Android 5.1</li>
+<li>MinSDK: Android 4.0.3</li>
+<li>pfn/android-sdk-plugin 1.3.22</li>
+<li>ScalikeJDBC 2.2.6</li>
+<li>SQLDroid 1.0.3</li>
+</ul>
+
+
+<h2>Android in ScalaのDBアクセス事情</h2>
+
+<ul>
+<li>自分は普段Android Database API + <a href="https://github.com/pocorall/scaloid/blob/060fd9b5d330d735be96ac0b9489b4600a6dec09/scaloid-common/src/main/st/org/scaloid/common/implicits.scala#L110-L120">RichCursor</a>を使う</li>
+<li><a href="https://www.typesafe.com/activator/template/agile-scala-android-example">Slickを使用したTypesafe activatorテンプレート</a>などもある</li>
+<li>そもそもDBをローカルに持つ必要のない（DBサーバー+クライアントキャッシュな)Androidアプリも多い</li>
+</ul>
+
+
+<h2><a href="http://scalikejdbc.org/">ScalikeJDBC</a>とは？</h2>
+
+<p><code>a tidy SQL-based access library for Scala Developers</code>(公式ドキュメントより抜粋)</p>
+
+<p>SQL文をそのまま(より型安全な方法で）扱えるのが特長。Androidでいえば<a href="http://developer.android.com/intl/ja/reference/android/database/sqlite/SQLiteDatabase.html">SQLiteDatabase.rawQuery</a>を好んで使う人向け。</p>
+
+<h2>SQLite JDBC Driver</h2>
+
+<p>今回はAndroidのSQLiteを使用するので、SQLite3に対応していることが必須。あとはPure Java実装か、Android NDKでAndroid用のNative Libraryを生成できる必要がある。</p>
+
+<h3><a href="https://github.com/SQLDroid/SQLDroid">SQLDroid</a></h3>
+
+<p>今回使用した、Android Database APIをラップしたJDBC Driver。ただあまり活発にメンテされていないようなので、プロダクションで使用するのは躊躇する。</p>
+
+<h3><a href="http://docs.oracle.com/cd/E17076_02/html/installation/build_android_jdbc.html">Android JDBC Driver (Oracle)</a></h3>
+
+<p>Android NDKを使用しビルドすることで、Android用のNative Library(.so)を生成できる…が、unmanagedDependenciesとして追加する必要があるので、ちょっと扱いずらい。（なお、<a href="http://d.hatena.ne.jp/esmasui/20120918/1347985333">この記事</a>を読む限り、Natvie Libraryを含めなくても動作する（＝Pure Java実装に自動的に切り替わっている？）模様。)</p>
+
+<h3><a href="https://bitbucket.org/xerial/sqlite-jdbc">xerial/sqlite-jdbc</a></h3>
+
+<p>現在Androidはサポートされておらず、実行すると</p>
+
+<blockquote><p>java.lang.UnsatisfiedLinkError: dalvik.system.PathClassLoader[DexPathList[[zip file &ldquo;/system/framework/android.test.runner.jar&rdquo;, zip file &ldquo;/data/app/taisukeoe.scalikeroid-1/base.apk&rdquo;],nativeLibraryDirectories=[/vendor/lib, /system/lib]]] couldn&rsquo;t find &ldquo;libsqlitejdbc.so&rdquo;</p></blockquote>
+
+<p>というRuntimeエラーとともに落ちる。</p>
+
+<p><a href="https://bitbucket.org/xerial/sqlite-jdbc/issue/159/javafx-android-port-crashes-and-fails-to">Pure Java実装に切り替えるAPI</a>のfeatureリクエストは上がっているようなので、これが実装されれば使えるはず。</p>
+
+<h2>落とし穴|Pitfalls</h2>
+
+<h3><a href="https://www.sqlite.org/datatype3.html">SQLite</a>起因のもの</h3>
+
+<ul>
+<li><code>serial</code>データ型が存在しないので、<code>integer autoincrement</code>にする。</li>
+<li><code>timestmap</code>および<code>datetime</code>データ型が存在せず、<code>timestamp</code>指定すると<code>yyyy-MM-dd hh:mm:ss</code>というISO8601フォーマットのTEXT型で保存されるため、WrappedResultSet.jodaDateTimeでDateTime型の値を抽出できない。<code>integer</code>型にしておいてWrappedResultSet.timestampを使う。</li>
+</ul>
+
+
+<h3>Android起因のもの</h3>
+
+<ul>
+<li><code>DatabseUtils.createDbFromSqlStatements</code>から手動でDatabaseを作成する必要がある</li>
+</ul>
+
+
+<h3>Android in Scala起因のもの</h3>
+
+<ul>
+<li><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>のProguard後のclassファイルのキャッシュが重複してしまうことにより、ビルド時に以下のExceptionが投げられる</li>
+</ul>
+
+
+<blockquote><p>java.lang.IllegalArgumentException: already added: Lscala/util/parsing/combinator/JavaTokenParsers$class;</p></blockquote>
+
+<p>これを防ぐために、sbtビルド定義に以下を追加する。</p>
+
+<p><code>proguardCache in Android += ProguardCache("parser-combinators") % "org.scala-lang.modules" %% "scala-parser-combinators"</code></p>
+
+<h2>雑感</h2>
+
+<p>ハッカソンではDEMOまでしか作成できなかったが</p>
+
+<ul>
+<li>ScalikeJDBCの主だった機能は一通り試したい</li>
+<li><a href="http://www.h2database.com/html/tutorial.html#android">h2 database</a>は公式でAndroid対応のJDBC driverを配布しているようなので、h2でも試したい</li>
+<li>Typesafe activator templateにしたい</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaのREPLを拡張するには]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension/"/>
+    <updated>2014-12-06T18:04:35+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/12/06/scala-repl-extension</id>
+    <content type="html"><![CDATA[<p>こちらは<a href="http://qiita.com/advent-calendar/2014/scala">Scala AdventCalendar 2014</a>の7日目の記事です。
+今日はScalaのカスタムREPLの作り方についての話。なお今回は(Scala REPL同様)StandaloneなREPLアプリの作成を目的としているので、<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>は主眼ではありません。</p>
+
+<h1>モチベーション</h1>
+
+<p>ScalaのREPLは手元のローカルマシンでAPIを試してみたいときや、ちょっとした計算をしたいときにはとても便利なのですが、やや凝ったことをしたいときなど、そのまま使うには不便さを感じることがあります。</p>
+
+<p>具体的にはAndroidのAPIをScalaのREPLから叩けるようにしたかったのですが、Android環境をJVMでエミュレートするためにはカスタムClassLoaderを使ってAndroid APIのClassを書き換える必要があって。。。という感じ。</p>
+
+<p>これはちょっと特殊なモチベーションかもしれませんが、クラスター上などの特定の環境で実行させたいとき(e.g.<a href="http://spark.apache.org/docs/latest/quick-start.html#interactive-analysis-with-the-spark-shell"><code>spark-shell</code></a>)、自作ライブラリのsandbox環境を提供するにあたって特定の場面でよく使うコマンドを追加したい、など思われる方はいるかもしれません。</p>
+
+<p>そんなとき、意外とScala REPLを拡張する記事を書いている人が少なかったので、今回はScalaのソースコードを読みながらカスタムClassLoaderを使用する方法、コマンドを追加する方法について書くことにしました。</p>
+
+<p>参考:<a href="http://www.michaelpollmeier.com/create-your-custom-scala-repl/">Create your custom Scala REPL</a> &hellip;  数少ないREPL拡張方法に関する記事。</p>
+
+<h1>成果物</h1>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl"><code>taisukeoe/MyCLRepl</code></a></p>
+
+<pre><code class="scala MyCLRepl DEMO">scala&gt; val hello = "hello"
+
+MyClassLoader loads classOf &lt;root&gt;.$line3
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.collection.mutable.StringBuilder
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+hello: String = hello
+
+scala&gt; :myCommand hello
+
+This is a custom command example. You can do something from value:"hello" with custom Scala interpreter.
+</code></pre>
+
+<p>ClassLoaderの差し替え(Classのロード時にクラス名をprint)と、myCommandというコマンドの追加をしています。</p>
+
+<!--more-->
+
+
+<h1>REPLとは</h1>
+
+<p><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">Read–Eval–Print Loop</a>の略で、対話型の開発環境。ユーザーの入力したコードを一行から評価する。
+ScalaのREPLは<code>scala</code>コマンドから開始できる。</p>
+
+<h1>ScalaのREPLの構成</h1>
+
+<p><a href="https://github.com/scala/scala/tree/v2.11.4/src/repl/scala/tools/nsc"><code>scala.tools.nsc.interpreter</code></a>パッケージがREPLに相当。インタプリタのソースコードがそれなりの量あるので一見大変そうだが、構成自体はシンプル。REPLをカスタマイズする上で最低限見る必要がある場所に絞って、以下では解説します。</p>
+
+<h2>エントリポイント</h2>
+
+<p>scalaのスクリプトの中身を見ると、以下の通り<code>scala.tools.nsc.MainGenericRunner</code>の<code>main</code>関数をエントリポイントとしてREPLを起動していることがわかる。</p>
+
+<pre><code class="bash /usr/local/bin/scala#L202-212">execCommand \
+  "${JAVACMD:=java}" \
+  $JAVA_OPTS \
+  "${java_args[@]}" \
+  $(classpathArgs) \
+  -Dscala.home="$SCALA_HOME" \
+  $OVERRIDE_USEJAVACP \
+  "$EMACS_OPT" \
+  $WINDOWS_OPT \
+  scala.tools.nsc.MainGenericRunner  "$@"
+</code></pre>
+
+<h2>Main関数の中でLoopを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74"><code>scala.tools.nsc.MainGenericRunner</code></a>の<code>main</code>関数の処理は、同コンパニオンクラスの<code>process</code>関数に移譲している。この関数の中で、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>process</code>関数を呼んでおり、このクラスがREPLのLoopに相当。</p>
+
+<pre><code class="scala scala.tools.nsc.MainGenericRunner https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">class MainGenericRunner {
+...
+  def process(args: Array[String]): Boolean = {
+    ...
+    def run(): Boolean = {
+      ....
+
+      def runTarget(): Either[Throwable, Boolean] = howToRun match {
+        ...
+        case _  =&gt;
+          // We start the repl when no arguments are given.
+          Right(new interpreter.ILoop process settings)
+      }
+     ...
+    }
+    ...
+      run()
+  }
+}
+
+object MainGenericRunner extends MainGenericRunner {
+  def main(args: Array[String]): Unit = if (!process(args)) sys.exit(1)
+}
+</code></pre>
+
+<p>参考:<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/MainGenericRunner.scala#L74">scala.tools.nsc.MainGenericRunner.run</a></p>
+
+<h2>Loopの中でインタプリタを呼び出し</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a>はREPLのLoopに相当するクラス。コマンドの判定や、入力したコードのインタプリタへの移譲などを行っている。</p>
+
+<p>REPLのコマンド(e.g.<code>:help</code>)の定義は<code>standardCommands</code>変数。overrideした<code>commands</code>関数において追加することでカスタムCommandを実装できる。</p>
+
+<p>また、<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>ILoop</code></a>の<code>createInterpreter</code>関数内で、インタプリタのメンバ変数<code>var intp:IMain</code>を初期化している。</p>
+
+<p>なおインタプリタ <code>intp</code>の実装クラスは<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>ILoopInterpreter</code></a>。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.ILoop https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala">class ILoop(in0: Option[BufferedReader], protected val out: JPrintWriter)
+                extends AnyRef
+                   with LoopCommands
+{
+...
+var intp: IMain = _
+...
+
+　  lazy val standardCommands = List(
+    cmd("edit", "&lt;id&gt;|&lt;line&gt;", "edit history", editCommand),
+    cmd("help", "[command]", "print this summary or command-specific help", helpCommand),
+    historyCommand,
+    cmd("h?", "&lt;string&gt;", "search the history", searchHistory),
+    cmd("imports", "[name name ...]", "show import history, identifying sources of names", importsCommand),
+    cmd("implicits", "[-v]", "show the implicits in scope", intp.implicitsCommand),
+    cmd("javap", "&lt;path|class&gt;", "disassemble a file or class name", javapCommand),
+    cmd("line", "&lt;id&gt;|&lt;line&gt;", "place line(s) at the end of history", lineCommand),
+    cmd("load", "&lt;path&gt;", "interpret lines in a file", loadCommand),
+    cmd("paste", "[-raw] [path]", "enter paste mode or paste a file", pasteCommand),
+    nullary("power", "enable power user mode", powerCmd),
+    nullary("quit", "exit the interpreter", () =&gt; Result(keepRunning = false, None)),
+    cmd("replay", "[options]", "reset the repl and replay all previous commands", replayCommand),
+    cmd("require", "&lt;path&gt;", "add a jar to the classpath", require),
+    cmd("reset", "[options]", "reset the repl to its initial state, forgetting all session entries", resetCommand),
+    cmd("save", "&lt;path&gt;", "save replayable session to a file", saveCommand),
+    shCommand,
+    cmd("settings", "&lt;options&gt;", "update compiler options, if possible; see reset", changeSettings),
+    nullary("silent", "disable/enable automatic printing of results", verbosity),
+    cmd("type", "[-v] &lt;expr&gt;", "display the type of an expression without evaluating it", typeCommand),
+    cmd("kind", "[-v] &lt;expr&gt;", "display the kind of expression's type", kindCommand),
+    nullary("warnings", "show the suppressed warnings from the most recent line which had any", warningsCommand)
+  )
+
+  ...
+
+    /** Available commands */
+  def commands: List[LoopCommand] = standardCommands ++ (
+    if (isReplPower) powerCommands else Nil
+  )
+
+  ...
+
+  class ILoopInterpreter extends IMain(settings, out) {
+    outer =&gt;
+
+    override lazy val formatting = new Formatting {
+      def prompt = ILoop.this.prompt
+    }
+    override protected def parentClassLoader =
+      settings.explicitParentLoader.getOrElse( classOf[ILoop].getClassLoader )
+  }     
+  /** Create a new interpreter. */
+  def createInterpreter() {
+    if (addedClasspath != "")
+      settings.classpath append addedClasspath
+
+    intp = new ILoopInterpreter
+  }
+
+  ...
+
+  // start an interpreter with the given settings
+  def process(settings: Settings): Boolean = savingContextLoader {
+    this.settings = settings
+    createInterpreter()
+     ...
+    printWelcome()
+     ...
+    try loop() match {
+      case LineResults.EOF =&gt; out print Properties.shellInterruptedString
+      case _               =&gt;
+    }
+    catch AbstractOrMissingHandler()
+    finally closeInterpreter()
+
+    true
+  }
+  ...
+</code></pre>
+
+<h2>インタプリタの中でClassLoaderを生成</h2>
+
+<p><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>がインタプリタの主たるコード。</p>
+
+<p><code>private var _classLoader:ClassLoader</code>がClassLoaderのメンバ変数だが、privateなのでclassLoader関数をoverrideしてカスタムClassLoaderを生成する。</p>
+
+<p>ただし、<code>IMain</code>の<code>classLoader</code>関数の戻り値の型は<a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>になので、カスタムClassLoaderもこれを継承させる必要がある点に注意。</p>
+
+<pre><code class="scala scala.tools.nsc.interpreter.IMain https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala">class IMain(@BeanProperty val factory: ScriptEngineFactory, initialSettings: Settings, protected val out: JPrintWriter) extends AbstractScriptEngine with Compilable with Imports {
+  imain =&gt;
+
+  ...
+
+  private var _classLoader: util.AbstractFileClassLoader = null                              // active classloader
+  ....
+
+  /** Parent classloader.  Overridable. */
+  protected def parentClassLoader: ClassLoader =
+    settings.explicitParentLoader.getOrElse( this.getClass.getClassLoader() )
+
+  def resetClassLoader() = {
+    repldbg("Setting new classloader: was " + _classLoader)
+    _classLoader = null
+    ensureClassLoader()
+  }
+    final def ensureClassLoader() {
+    if (_classLoader == null)
+      _classLoader = makeClassLoader()
+  }
+  def classLoader: util.AbstractFileClassLoader = {
+    ensureClassLoader()
+    _classLoader
+  }
+</code></pre>
+
+<h1>カスタムREPLを作る</h1>
+
+<p>基本的には解説した以下のクラスに相当するものを継承なり自前で作るなりすれば、カスタムREPLが作れます。</p>
+
+<ul>
+<li><a href=""><code>scala.tools.nsc.MainGenericRunner</code></a> &hellip; REPLを起動するmain関数、Loopの呼び出し</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala"><code>scala.tools.nsc.interpreter.ILoop</code></a> &hellip; Loopの実装。Commandの判定。インタプリタへ処理の移譲。</li>
+<li><a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/IMain.scala"><code>scala.tools.nsc.interpreter.IMain</code></a>を継承した<a href="https://github.com/scala/scala/blob/v2.11.4/src/repl/scala/tools/nsc/interpreter/ILoop.scala#109"><code>scala.tools.nsc.interpreter.ILoop.ILoopInterpreter</code></a> &hellip; インタプリタの実装。ClassLoaderの生成。</li>
+<li><a href="https://github.com/scala/scala/blob/2.11.x/src/repl/scala/tools/nsc/interpreter/AbstractFileClassLoader.scala"><code>scala.reflect.internal.util.AbstractFileClassLoader</code></a>を継承したカスタムClassLoader &hellip; インタプリタに使用させる。</li>
+</ul>
+
+
+<p>先ほども記載しましたが、完成物は以下の通り。試し方はREADME参照のこと。</p>
+
+<p><a href="https://github.com/taisukeoe/MyCLRepl">taisukeoe/MyCLRepl</a></p>
+
+<h1>REPLを拡張している実例</h1>
+
+<p><a href="https://spark.apache.org/">Apache Spark</a>のspark-shellは、REPL上で入力したコマンドをcluster上で実行させるために、REPLを拡張している。以下のファイル群がカスタムREPLに相当する。</p>
+
+<ul>
+<li><a href="https://github.com/apache/spark/blob/master/bin/spark-shell#L61">spark-shell</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/Main.scala">org.apache.spark.repl.Main</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkILoop.scala#L902">org.apache.spark.repl.SparkILoop</a></li>
+<li><a href="https://github.com/apache/spark/blob/e895e0cbecbbec1b412ff21321e57826d2d0a982/repl/scala-2.11/src/main/scala/org/apache/spark/repl/SparkIMain.scala">org.apache.spark.repl.SparkIMain</a></li>
+</ul>
+
+
+<p><a href="http://scalamatsuri.org/">ScalaMatsuri</a>で発表された<a href="https://github.com/xitrum-framework/scalive">Scalive</a>もREPLを拡張してJVM環境を触れるようにしている。</p>
+
+<h2>余談:Scalaの:power モード</h2>
+
+<p>Scala REPLに備わっている<a href="http://www.ne.jp/asahi/hishidama/home/tech/scala/repl/power.html"><code>:power</code>モード</a>を使用すると、Scala REPLコードのpublicな変数・関数へのアクセスが可能で、varなら置き換えも可能。</p>
+
+<p>例えば上記のカスタムClassLoader挿入は、<code>:power</code>モードを利用してこんな風にも書けます。（ClassLoaderのサイズが膨らんでくるとつらさはありますが）</p>
+
+<pre><code class="scala">scala&gt; :power
+
+** Power User mode enabled - BEEP WHIR GYVE **
+** :phase has been set to 'typer'.          **
+** scala.tools.nsc._ has been imported      **
+** global._, definitions._ also imported    **
+** Try  :help, :vals, power.&lt;tab&gt;           **
+
+scala&gt; :paste
+// Entering paste mode (ctrl-D to finish)
+
+import scala.reflect.internal.util.ScalaClassLoader
+import scala.tools.nsc.interpreter.JPrintWriter
+import scala.tools.nsc.io.AbstractFile
+import scala.tools.nsc.util
+repl.intp = new repl.ILoopInterpreter {
+   override def classLoader = new util.AbstractFileClassLoader(root:AbstractFile,parent:ClassLoader)  with ScalaClassLoader{
+  override def loadClass(name: String) = {
+    println(s"MyClassLoader loads classOf ${name}")
+    super.loadClass(name)
+  }
+ }
+}
+
+scala&gt; val hoge = "hoge"
+
+MyClassLoader loads classOf &lt;root&gt;.$line2
+MyClassLoader loads classOf $line2
+&lt;&lt;中略&gt;&gt;
+MyClassLoader loads classOf scala.runtime.ScalaRunTime$
+MyClassLoader loads classOf scala.runtime.BoxedUnit
+
+hoge: String = hoge
+</code></pre>
+
+<p>ただその一方でREPLのコマンドの判別はILoopクラスで行わており、MainGenericRunnerの内部関数中で直接呼び出されているのでPowerModeからのカスタムCommandの追加は不可能なはず（とはいいつつ、何がしかのhackもありそうな気がするのでもしあればコメント欄で教えてください。）</p>
+
+<h2>余談</h2>
+
+<p>肝心の、オレオレClassLoaderを使ってAndroid APIを叩けるScala REPLアプリは間に合わず。現状でも、未解決のwarningが出る問題とか、タブ補完が効かない問題など、色々と雑な感じにはなっています。。。</p>
+
+<p>そのあたりのフォローはまた後日に(&lsquo;・ω・`)</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Akka Transactorsはオワコン]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated/"/>
+    <updated>2014-09-30T01:21:47+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/30/akka-transactor-deprecated</id>
+    <content type="html"><![CDATA[<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> STM is a failure, since removed from Akka.</p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/516271313258676226">September 28, 2014</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>9/28のAkka Meetupで、AkkaでTransaction処理する話題が出たときに、こんなことをつぶやいたら、<a href="http://shop.oreilly.com/product/0636920028789.do">Effective Akka</a>著者の<a href="https://twitter.com/jamie_allen">@jamie_allen</a>さんに「それはもうオワコンだよ」と教えていただいた(確かに調べてみると、<a href="http://doc.akka.io/docs/akka/snapshot/project/migration-guide-2.2.x-2.3.x.html">Akka 2.3でdeprecated</a>)ので記事化してみる。</p>
+
+<!--more-->
+
+
+<h2>Akka Transactorsとは</h2>
+
+<p><a href="http://doc.akka.io/docs/akka/2.0/scala/transactors.html">Akka Transactors 公式ドキュメント</a>より抜粋,翻訳。</p>
+
+<blockquote><p>Generally, the STM is not needed very often when working with Akka. Some use-cases (that we can think of) are:</p>
+
+<ul>
+<li>When you really need composable message flows across many actors updating their internal local state but need them to do that atomically in one big transaction. Might not be often but when you do need this then you are screwed without it.</li>
+<li>When you want to share a datastructure across actors.</li>
+</ul>
+
+
+<p>一般的に、Akkaを使用しているときにSTMは殆どの場合必要ないけれども、(我々の考えている)ユースケースが幾つかある:</p>
+
+<ul>
+<li>多数のアクター間の内部のローカルな状態を一つの大きなトランザクション内でアトミックに変更する為に合成可能なメッセージフローが必要なとき。こういうケースは余り頻繁にはないが、<strong>必要になったときTransactorsがないととても困るはずだ</strong>。</li>
+<li>データ構造をアクター間で共有したいとき</li>
+</ul>
+</blockquote>
+
+<p>「Transactorsが無いととても困るはずだ」と書いておきながら、なんで削除されたのか気になったので聞いてみた。</p>
+
+<h2>Akka Transactorsが削除された理由</h2>
+
+<ul>
+<li>Jamieさん曰く、非決定点?(some indeterminate point)においてSTMはライブロックに陥る可能性があるから。<em>(STMのライブロックについては<a href="http://ja.wikipedia.org/wiki/%E3%82%BD%E3%83%95%E3%83%88%E3%82%A6%E3%82%A7%E3%82%A2%E3%83%88%E3%83%A9%E3%83%B3%E3%82%B6%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%83%A1%E3%83%A2%E3%83%AA#.E4.B8.8D.E9.80.8F.E6.98.8E.E6.80.A7">このあたり</a>を参照。)</em></li>
+<li>Akka Teamの<a href="https://twitter.com/patriknw">@patriknw</a>さん曰く、Akka Transactorsは<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">ScalableでもDistributableでもない</a>から。</li>
+<li>上記二つは一応分けたけど、これはクラスター環境だとSTMがライブロックに陥りやすい<strong>ので</strong>、ScalabilityやDistributabilityを損なう、ということな気がする(が間違っていたら教えてください)。</li>
+</ul>
+
+
+<h2>Akka Transactorsの代替手段</h2>
+
+<ul>
+<li>複数のActorの内部のローカルな状態をatomicに変更したいときは、short-lived actor(短命のアクター)を実装してその中でトランザクションを書く。</li>
+<li>トランザクションの書き方は、そのshort-lived actorのfailure内にロールバック処理を自前で実装するのが、Jamieさんが<a href="http://www.slideshare.net/shinolajla/effective-akka-scalaio/8">Effective Akka内でも</a>お勧めしている方法。</li>
+<li>でもshort-lived actor内のlocalな環境に限定すれば<a href="https://groups.google.com/d/msg/akka-user/P1VCkauJXN4/DvQ8J4eNnqUJ">STMも使える</a>はず…なのだけど、そのことを聞いたら<a href="https://twitter.com/jamie_allen/status/516359268723740672">&ldquo;No, no STM at all&rdquo;</a>と強く否定された。localな環境ならSTMはオーバースペックで、ロールバック処理さえあれば十分というだけのことかしら。</li>
+</ul>
+
+
+<h2>最後に</h2>
+
+<p>Effective AkkaのCameo Patternという項で、short-lived actorで複数のActorのをコーディネートする例が書かれているのでご参考までに(でもコーディネートするところだけで、トランザクションに相当するコードはない）。</p>
+
+<p><iframe src="https://www.slideshare.net/slideshow/embed_code/key/J1JLMjGoC0zu5v" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/shinolajla/effective-akka-scalaio" title="Effective akka scalaio" target="_blank">Effective akka scalaio</a> </strong> from <strong><a href="http://www.slideshare.net/shinolajla" target="_blank">shinolajla</a></strong> </div>
+
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ScalaMatsuri 行動規範を掲げた経緯]]></title>
+    <link href="http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct/"/>
+    <updated>2014-09-25T10:38:17+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2014/09/25/scalamatsuri-code-of-conduct</id>
+    <content type="html"><![CDATA[<p>今年から、<a href="http://scalamatsuri.org/ja/code-of-conduct/">行動規範</a>をScalaMatsuriとして掲げ始めた。
+その目的は<strong>「みんな仲良く」</strong>。噛み砕いて言えば、性別、国籍などに起因するような少数派が居心地の悪い思い、不快な思いをしないことを目指している。</p>
+
+<p>この行動規範について、突然Webサイトに追加されたので驚かれた方も多いかもしれない。この行動規範は、現実に発生しそうになった問題から、必要要件を考え、準備委員内で長期間に渡り議論を重ねた上で公開したものだ。</p>
+
+<p>既にその目的については<a href="http://twitter.com/">@eed3si9n_ja</a>さんが<a href="http://eed3si9n.com/ja/towards-universal-access-at-a-conference">カンファレンスでのユニバーサル・アクセスへ向けて</a>という記事でまとめてくださっているが、来年から本格的に運用するにあたり、この行動規範を掲げた経緯も含めて紹介することが、ご理解とご協力をいただく上では重要ではないかと考えているため、この記事を書くに至った。</p>
+
+<!--more-->
+
+
+<p>この記事では、行動規範が生まれた経緯を3つの側面から説明していきたい。</p>
+
+<ul>
+<li>行動規範が必要となった背景</li>
+<li>どのような必要要件から行動規範が決まったか</li>
+<li>来年以降の行動規範の運用に向けて</li>
+</ul>
+
+
+<h1>行動規範が必要となった背景</h1>
+
+<p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
+
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+
+<p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
+
+<h1>どのような必要要件から行動規範が決まったか</h1>
+
+<p>実運用、公平性、リソース確保などの現実的制約について議論を重ねた結果、以下のような必要要件に至った。</p>
+
+<ul>
+<li>時代を反映するための柔軟性</li>
+<li>事務コスト削減のための、微細なルール(e.g. スカート丈何cm)規定の排除</li>
+<li>退場のような強行手段に出た場合の、公平性の担保</li>
+<li>準備委員全体での都度議論を避けることによる、コミュニケーションコストの低減</li>
+</ul>
+
+
+<p>これらを満たすものとして、実績のあるPNWScala, NE ScalaやScalaDaysといったScalaの国際カンファレンスの行動規範を思想方針として全面的に採用することに決めた。</p>
+
+<p>ScalaMatsuri発起の理由として海外コミュニティとの交流をうたっていること、直近では招待講演者やスポンサーとして、将来的には一般参加者として、先に挙げたカンファレンスに参加している層がScalaMatsuriに来ても居心地の悪い思いをしなくて済むような準備を整えるために、国際カンファレンスに追随した形だ。</p>
+
+<p>これらのカンファレンスに限らず、日本国内でいえばRubyKaigiでも<a href="http://rubykaigi.org/2014/anti-harassment-policy">Anti-harassment-policy</a>について明示している通り、国際的なカンファレンスを視野に入れるためには、同様のガイドラインを掲げることは避けては通れないものだと考えている。但し、細部については実運用や時代の移り変わりに伴い、加筆修正される可能性はある。</p>
+
+<h1>来年以降の行動規範の運用に向けて</h1>
+
+<p>今年のScalaMatsuri 2014では、行動規範の議論に時間を費やした結果、公開が直前となってしまった為、実運用は見送った形となった。ただ来年から運用を開始するにあたり、まだ幾つかの課題は残っている。例えば:</p>
+
+<ul>
+<li>個々の事例について、どのように判断するのか？</li>
+<li>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</li>
+</ul>
+
+
+<p>それぞれについて、まだ議論は続いているものの、どのようにクリアできる可能性があるかについて紹介していきたい。</p>
+
+<h4>個々の事例について、どのように判断するのか？</h4>
+
+<p>審判制度での運用を検討している。具体的には、3人〜5人程度の審判の間で議論して最終的な判断を下すが、その際に、過去の代表事例との間に大きな矛盾が生じないかチェックをするというものだ。</p>
+
+<h5>自主規制を重ねた結果、ScalaMatsuri自体が面白くなくなってしまうのではないか？</h5>
+
+<p>確かに、幾ばくかのトレードオフがあることは事実だと思う。</p>
+
+<p>しかしながら、ScalaMatsuri 2014のアンカンファレンスの異様な盛り上がりを経験した今振り返ってみると、行動規範を遵守したままでもイベントを盛り上げることは不可能ではないと思える。また代表的な事例をオープンにすることで、自主規制の参考にしていただけることを期待している。</p>
+
+<h1>まとめ</h1>
+
+<p>行動規範は、ScalaMatsuriのコアである海外コミュニティとの交流を実現する上でも、ScalaMatsuriに関わる全ての人をトラブルから守る上でも無くてはならないものだと考えている。ScalaMatsuriを一緒にハラスメント・フリーなイベントするべく、ご理解とご協力を賜われれば幸いである。</p>
+
+<p>最後に、この記事をレビューしてくださった<a href="http://twitter.com/eed3si9n_ja">@eed3si9n_ja</a>さん、<a href="http://twitter.com/gakuzzzz">@gakuzzzz</a>さん、<a href="http://twitter.com/kmizu">@kmizu</a>さん、<a href="http://twitter.com/seratch_ja">@seratch_ja</a>さん、<a href="http://twitter.com/xuwei_k">@xuwei-k</a>さんに感謝します。</p>
+]]></content>
+  </entry>
+  
+</feed>
