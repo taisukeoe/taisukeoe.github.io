@@ -129,6 +129,24 @@
 
 <p>この<code>Intent</code>は大変便利な仕組みですが、その一方で<strong><em>一連のパイプラインの記述が<code>startActivityForResult</code>と<code>onActivityResult</code>の間で分断されてしまい、データの流れが追いにくい</em></strong>コードになっています。</p>
 
+<p>例えば以下のような、ボタンをクリックすると外部アプリで写真を選択させて、自アプリに表示するだけのアプリについて考えてみましょう。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> ~<code>startActivityForResult</code> </th>
+<th style="text-align:center;"> <code>onActivityResult</code> ~ </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <img src="/images/20151215/app-1-small.png" width="300" height="300"> </td>
+<td style="text-align:center;"> <img src="/images/20151215/app-2-small.png" width="300" height="300"> </td>
+</tr>
+</tbody>
+</table>
+
+
 <figure class='code'><figcaption><span>Promise無しの例(パイプラインが分断される)</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>

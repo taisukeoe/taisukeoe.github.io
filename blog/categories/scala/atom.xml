@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scala | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/scala/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2015-12-16T00:47:26+09:00</updated>
+  <updated>2015-12-16T01:22:51+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -46,6 +46,24 @@
 <p>取得したい情報や実行したい処理(Action)を<code>Intent</code>にセットし、<code>startActivityForResult</code>メソッドに渡すことで、外部アプリなどを起動し必要なデータを取得させたうえで、自分のアプリに返ってくる（<code>onActivityResult</code>メソッドが呼ばれ、引数にデータが渡される)ことが出来ます。</p>
 
 <p>この<code>Intent</code>は大変便利な仕組みですが、その一方で<strong><em>一連のパイプラインの記述が<code>startActivityForResult</code>と<code>onActivityResult</code>の間で分断されてしまい、データの流れが追いにくい</em></strong>コードになっています。</p>
+
+<p>例えば以下のような、ボタンをクリックすると外部アプリで写真を選択させて、自アプリに表示するだけのアプリについて考えてみましょう。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> ~<code>startActivityForResult</code> </th>
+<th style="text-align:center;"> <code>onActivityResult</code> ~ </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <img src="/images/20151215/app-1-small.png" width="300" height="300"> </td>
+<td style="text-align:center;"> <img src="/images/20151215/app-2-small.png" width="300" height="300"> </td>
+</tr>
+</tbody>
+</table>
+
 
 <pre><code class="scala Promise無しの例(パイプラインが分断される)">class MyActivity extends Activity with TypedFindView{
 lazy val IMAGE_FETCH_ID = 12345
