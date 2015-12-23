@@ -17,7 +17,7 @@ AndroidのBluetooth Low Energy(BLE)について、どんなイメージをお持
 <!--more-->
 
 #BLEの基礎
-BLEは、接続する２デバイス間の関係を明確に分かれています。CentralとPeripheralです。
+BLEは、接続する２デバイス間の関係が明確に分かれています。CentralとPeripheralです。
 
 | -役割- | -Central- | -Peripheral- |
 | :-: | :-: | :-: |
@@ -25,7 +25,9 @@ BLEは、接続する２デバイス間の関係を明確に分かれていま�
 | GATT | Client | Server |
 | version | 4.3~ | 5.0~ |
 
+
 #BLE機能の使用方法
+
 まず、以下のpermissionとfeatureが必要になります。
 
 ```xml
