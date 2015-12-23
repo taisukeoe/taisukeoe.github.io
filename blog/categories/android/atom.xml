@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2015-12-16T01:22:51+09:00</updated>
+  <updated>2015-12-24T02:10:36+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,198 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[そこまで怖くないAndroid BLE]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/12/24/android-ble/"/>
+    <updated>2015-12-24T00:08:16+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/12/24/android-ble</id>
+    <content type="html"><![CDATA[<p>これは<a href="http://qiita.com/advent-calendar/2015/ble">BLE Advent Calendar 2015</a> 7日目の記事です。</p>
+
+<p>AndroidのBluetooth Low Energy(BLE)について、どんなイメージをお持ちでしょうか？</p>
+
+<p>安定してない？わかりにくい？</p>
+
+<p>色々と怖いイメージをもたれがちと思います。確かに怖いところも色々とありますが、今ちょうどAndroid BLEをフルに使ったプロダクト<a href="http://bonx.co/ja/">BONX -Wearable Walkie-Talkie-</a>を開発しているので、そこで溜まった知見を共有できればと思います。</p>
+
+<!--more-->
+
+
+<h1>BLEの基礎</h1>
+
+<p>BLEは、接続する２デバイス間の関係を明確に分かれています。CentralとPeripheralです。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> -役割- </th>
+<th style="text-align:center;"> -Central- </th>
+<th style="text-align:center;"> -Peripheral- </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> 動作 </td>
+<td style="text-align:center;"> Scan </td>
+<td style="text-align:center;"> Advertise </td>
+</tr>
+<tr>
+<td style="text-align:center;"> GATT </td>
+<td style="text-align:center;"> Client </td>
+<td style="text-align:center;"> Server </td>
+</tr>
+<tr>
+<td style="text-align:center;"> version </td>
+<td style="text-align:center;"> 4.3~ </td>
+<td style="text-align:center;"> 5.0~ </td>
+</tr>
+</tbody>
+</table>
+
+
+<h1>BLE機能の使用方法</h1>
+
+<p>まず、以下のpermissionとfeatureが必要になります。</p>
+
+<pre><code class="xml">&lt;uses-permission android:name="android.permission.BLUETOOTH" /&gt;
+&lt;uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /&gt;
+&lt;uses-feature android:name="android.hardware.bluetooth_le" android:required="true"/&gt;
+</code></pre>
+
+<p>Android 6.0から、以下のpermission(ACCESS_FINE_LOCATIONでも可)が必要になる上に、<strong><em>更にユーザーに明示的に位置情報使用許可</em></strong> をもらう必要が有ります(iOSっぽいですね)。</p>
+
+<pre><code class="xml">&lt;uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /&gt;
+</code></pre>
+
+<p>使用許可は、以下のように求めましょう。許可を求めるDialogが表示され、一度許可をもらえば、その後はずっと（端末の設定で明示的にOFFにされない限り）有効です。</p>
+
+<pre><code class="java">public class MyActivity extends Activity{
+   ....
+   requestPermissions(new String[]{Manifest.permission.ACCESS_COURSE_LOCATION}, REQUEST_CODE)
+   ...
+   @Override
+   public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults){
+       if(requestCode == REQUEST_CODE)
+       {
+           ...
+       }
+   }
+}
+</code></pre>
+
+<p><a href="http://stackoverflow.com/questions/33043582/bluetooth-low-energy-startscan-on-android-6-0-does-not-find-devices">Bluetooth Low Energy startScan on Android 6.0 does not find devices - Stack Overflow</a></p>
+
+<h1>BLE Central機能</h1>
+
+<p>Android 4.3から、BLE Central機能のサポートを開始しました。</p>
+
+<h2>BLE Central機能で使うクラス,メソッド</h2>
+
+<p>Android 4.4以下(API Level 20以下)では<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#startLeScan</code></a>を使います。</p>
+
+<p>Android 5.0以上(API Level 21以上)では先の旧APIはdeprecatedになっていますので、<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeScanner</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeScanner.html"><code>BluetoothLeScanner#startScan</code></a>を使います。</p>
+
+<p>5.0以上のほうが、<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanSettings.html"><code>ScanSettings</code></a>や、より細かな<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanFilter.html"><code>ScanFilter</code></a>を指定できたり、AdvertisePacketの中身を生byte列ではなく<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanResult.html"><code>ScanResult</code></a>で取得できたりと、柔軟性高く利用できます。</p>
+
+<p>APIの使いやすさもそうですが、Android 4.3, Android 4.4ではBLE Central機能があまり安定していない（よく接続やRead/Writeに失敗するし、遅い）ので、注意してください。</p>
+
+<h2>BLE Central実験用アプリ</h2>
+
+<p>iOS BLEテスト用アプリといえば、<a href="https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8">Light Blue</a>がデファクトだと思いますが、AndroidでCentral機能を<a href="https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&amp;hl=ja">BLE Scanner: Read,Write,Notify</a>です。</p>
+
+<p>BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、かつ安定しているのでテストによく使います。</p>
+
+<h2>その他注意というかBad Know-How</h2>
+
+<ul>
+<li>BLE接続機能の安定性は端末差が大きい</li>
+</ul>
+
+
+<p>おおよその端末でBLE Scan自体は比較的安定しているのですが、BLE接続、具体的には接続にかかる時間及びRead/Writeの成功率には個体差が大きいです。</p>
+
+<p>接続・切断処理を短時間の間に繰り返すアプリを作る場合は注意してください。</p>
+
+<ul>
+<li>BLEのOSキャッシュにより、長時間使用していると謎の挙動を示すことがある</li>
+</ul>
+
+
+<p>具体的には、BLE接続に失敗する、ないしはRead /Writeに失敗する確率が上がる、などです。</p>
+
+<p>そうなった場合は、まずBluetooth ON/OFFを試して、もしダメなら端末再起動すると直ります。</p>
+
+<ul>
+<li>BLE characteristicに書き込む値のENDIANに注意する。</li>
+</ul>
+
+
+<p>BLEアプリを作る場合、大抵はクロスプラットフォーム（というかiOSで作っていて、そのAndroid版を作りたい場合）が多いと思います。</p>
+
+<p>その場合は、ENDIANには注意してください。iOSはcharacteristicにはLITTLE ENDIANで読み書きする一方、AndroidはBIG ENDIANです。</p>
+
+<ul>
+<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothDevice.html"><code>BluetoothDevice#getType</code></a>が<code>DEVICE_TYPE_DUAL</code>のデバイスへの接続が頻繁に失敗する</li>
+</ul>
+
+
+<p>startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様。</p>
+
+<p><a href="https://code.google.com/p/android/issues/detail?id=58942">Issue 58942 - android - BluetoothDevice.connectGATT Will Not Connect to BluetoothDevice.DEVICE_TYPE_DUAL - Android Open Source Project - Issue Tracker - Google Project Hosting</a></p>
+
+<p><a href="https://groups.google.com/forum/#!topic/btstack-dev/9zWiU5_V9MI">Dual-mode issue when connecting Android BLE - Google グループ</a></p>
+
+<h1>BLE Peripheral機能</h1>
+
+<p>Android 5.0から、OS上はBLE Peripheralのサポートを開始しました。</p>
+
+<p>しかしながら、何故か現在使われている<a href="https://source.android.com/devices/bluetooth.html">Bluedroid</a>というBluetoothプロトコル・スタックでは、Broadcom製のチップセットのHCIコマンド<code>multiple advertisement</code>に依存しており、端末が搭載しているチップセットによってはBLE Peripheral機能が使えません。</p>
+
+<p><a href="http://qiita.com/eggman/items/6a13f5be7deb363c800d">bluetooth - Android 5.0でBLE advertising するための要件 - Qiita</a></p>
+
+<p>BLE Peripheral機能を使えるかどうかは、以下のように判定できますので、チェックしましょう。但し端末がAdvertiseをサポートしていても、BluetoothがOFFになっているとき(<code>BluetoothAdapter#isEnabled</code>がfalseのとき)は以下も<code>false</code>を返すことに注意してください。</p>
+
+<pre><code class="java">public boolean isCapableToAdvertise(BluetoothAdapter bAdapter){
+return Build.VERSION.SDK_INT &gt; 20 &amp;&amp;
+     null != bAdapter.getBluetoothLeAdvertiser() &amp;&amp;
+     bAdapter.isMultipleAdvertisementSupported() &amp;&amp;
+     bAdapter.isOffloadedFilteringSupported() &amp;&amp;
+     bAdapter.isOffloadedScanBatchingSupported();
+}
+</code></pre>
+
+<p><a href="http://qiita.com/qjuliar/items/0dd825f25d9de40d041f#_reference-4eb57a712932c923b08b">AndroidでBLEのAdvertise modeを使えるかどうかのメモ - Qiita</a></p>
+
+<p>BLE Peripheral機能が使える端末のリストは、以下が一番まとまっていると思います。</p>
+
+<p><a href="http://altbeacon.github.io/android-beacon-library/beacon-transmitter-devices.html">Android Beacon Library</a></p>
+
+<p>ここにない端末で言えば、Galaxy S6, Zenfone 2 Laser, Galazy S5 Active, Nexus 6PなどはAdvertiseに対応しています。</p>
+
+<h2>BLE Peripheral機能で使うクラス、メソッド</h2>
+
+<p>GattServerの初期化は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothManager.html"><code>BluetoothManager#openGattServer</code></a>から行います。</p>
+
+<p>Advertiseの開始は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeAdvertiser</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html"><code>BluetoothLeAdvertiser#startScan</code></a>を使います。</p>
+
+<h2>BLE Peripheral機能の諸注意</h2>
+
+<ul>
+<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html"><code>AdvertiseData.Builder#setIncludeDevicename</code></a>を<code>true</code>にすると、Advertiseが不安定になることがある。</li>
+</ul>
+
+
+<p>不要な場合は、inludeするのをやめましょう。</p>
+
+<h1>最後に</h1>
+
+<p>Android BLE機能についてざくっと紹介しましたが、いかがでしょうか。</p>
+
+<p>色々バグがあったりクセがあったりして確かに扱いにくいとは思いますが、頑張れば対応できるレベルだと思います。</p>
+
+<p>まだまだ開発しながらノウハウを貯めている段階ですので、もし間違いなどあればぜひ<a href="https://twitter.com/OE_uia">@OE_uia</a>に教えてください。よろしくお願いします。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Scala標準のPromiseがAndroidで便利だという話]]></title>
@@ -649,62 +841,6 @@ giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
 <p>ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。</p>
 
 <p>まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ScalaでAndroidアプリを作るには（pfn/android-sdk-plugin）]]></title>
-    <link href="http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin/"/>
-    <updated>2014-03-13T06:06:00+09:00</updated>
-    <id>http://taisukeoe.github.io/blog/2014/03/13/pfn-android-sdk-plugin</id>
-    <content type="html"><![CDATA[<p>表題の件ですが、今は<strong><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>を使うのがオススメです</strong>。</p>
-
-<p>なぜか。</p>
-
-<!-- more -->
-
-
-<p>2013年6月に<a href="/blog/2013/06/08/scala-android-intellij/">ScalaでAndroidアプリを作るには</a>という記事を書いたのですが、その後Android SDKのディレクトリ構造が(r22〜？)変わったものの、記事中で使用していた<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>がその変更に追従しておらず、<em>Could not find tool &ldquo;aapt&rdquo;</em>エラーが出てビルドできない問題が発生しています。</p>
-
-<p>参考のSO記事はこちら。mavenのpluginの話ですが同じ問題。</p>
-
-<p><a href="http://stackoverflow.com/questions/16927306/could-not-find-tool-aapt-please-provide-proper-android-sdk-directory-path-as-co">maven - Could not find tool aapt. Please provide proper Android SDK directory path as configuration parameter - Stack Overflow</a></p>
-
-<h1>pfn/android-sdk-pluginの、<a href="https://github.com/jberkel/android-plugin">jberkel/android-plugin</a>との主な違い</h1>
-
-<ul>
-<li>Proguardしたclassファイルをキャッシュしてくれるので、<strong>デバッグ時のビルド時間が半分くらい</strong>になる。</li>
-<li>ディレクトリ構造がsbtではなく、Android SDKデフォルト(android create project &hellip;)。</li>
-<li>local.propeties,project.properties,proguard-project.txtなどAndroidSDKの各種configファイルも使用可能(なのでbuild.sbtが膨れ上がらずに済む)。</li>
-<li>Android NDKサポートがない</li>
-<li>proguardのデフォルトの設定が違うので、書き直しが必要（これが面倒…）</li>
-</ul>
-
-
-<p>また思い出したら上に書き足します。</p>
-
-<h1>pfn/android-sdk-pluginの問題</h1>
-
-<ul>
-<li>sampleコードが古い</li>
-<li>configファイルなどを更新した場合も、reloadが必要</li>
-<li>ScalaTestなどScalaのテストフレームワークと相性悪い？（回避方法模索中）</li>
-</ul>
-
-
-<h1>AndroidアプリをScalaで書くときの問題</h1>
-
-<p>あと、AndroidアプリをScalaで書くと、以下の問題にぶつかりやすくなります（DalvikVM自身の問題も多分に含まれるのですが）。</p>
-
-<ul>
-<li>DalvikVMのmethod数上限65,535個に引っかかる</li>
-<li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
-<li>Scalaの変なバグ(e.g.<a href="/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
-<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
-</ul>
-
-
-<p>ちなみにLinearAlloc問題が起きるのは基本的にAndroid2.3以下だし、DalvikVMに代わるARTがAndroid4.4から試験導入されているので、時間とともに改善するという説もあります。</p>
 ]]></content>
   </entry>
   

@@ -1,0 +1,497 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>そこまで怖くないAndroid BLE - OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="これはBLE Advent Calendar 2015 7日目の記事です。 AndroidのBluetooth Low Energy(BLE)について、どんなイメージをお持ちでしょうか？ 安定してない？わかりにくい？ 色々と怖いイメージをもたれがちと思います。確かに怖いところも色々とありますが、 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2015/12/24/android-ble">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taisukeoe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">そこまで怖くないAndroid BLE</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-12-24T00:08:16+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:08 am</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>これは<a href="http://qiita.com/advent-calendar/2015/ble">BLE Advent Calendar 2015</a> 7日目の記事です。</p>
+
+<p>AndroidのBluetooth Low Energy(BLE)について、どんなイメージをお持ちでしょうか？</p>
+
+<p>安定してない？わかりにくい？</p>
+
+<p>色々と怖いイメージをもたれがちと思います。確かに怖いところも色々とありますが、今ちょうどAndroid BLEをフルに使ったプロダクト<a href="http://bonx.co/ja/">BONX -Wearable Walkie-Talkie-</a>を開発しているので、そこで溜まった知見を共有できればと思います。</p>
+
+<!--more-->
+
+
+<h1>BLEの基礎</h1>
+
+<p>BLEは、接続する２デバイス間の関係を明確に分かれています。CentralとPeripheralです。</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;"> -役割- </th>
+<th style="text-align:center;"> -Central- </th>
+<th style="text-align:center;"> -Peripheral- </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> 動作 </td>
+<td style="text-align:center;"> Scan </td>
+<td style="text-align:center;"> Advertise </td>
+</tr>
+<tr>
+<td style="text-align:center;"> GATT </td>
+<td style="text-align:center;"> Client </td>
+<td style="text-align:center;"> Server </td>
+</tr>
+<tr>
+<td style="text-align:center;"> version </td>
+<td style="text-align:center;"> 4.3~ </td>
+<td style="text-align:center;"> 5.0~ </td>
+</tr>
+</tbody>
+</table>
+
+
+<h1>BLE機能の使用方法</h1>
+
+<p>まず、以下のpermissionとfeatureが必要になります。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.BLUETOOTH&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.BLUETOOTH_ADMIN&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;uses-feature</span> <span class="na">android:name=</span><span class="s">&quot;android.hardware.bluetooth_le&quot;</span> <span class="na">android:required=</span><span class="s">&quot;true&quot;</span><span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Android 6.0から、以下のpermission(ACCESS_FINE_LOCATIONでも可)が必要になる上に、<strong><em>更にユーザーに明示的に位置情報使用許可</em></strong> をもらう必要が有ります(iOSっぽいですね)。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;uses-permission</span> <span class="na">android:name=</span><span class="s">&quot;android.permission.ACCESS_COARSE_LOCATION&quot;</span> <span class="nt">/&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>使用許可は、以下のように求めましょう。許可を求めるDialogが表示され、一度許可をもらえば、その後はずっと（端末の設定で明示的にOFFにされない限り）有効です。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyActivity</span> <span class="kd">extends</span> <span class="n">Activity</span><span class="o">{</span>
+</span><span class='line'>   <span class="o">....</span>
+</span><span class='line'>   <span class="n">requestPermissions</span><span class="o">(</span><span class="k">new</span> <span class="n">String</span><span class="o">[]{</span><span class="n">Manifest</span><span class="o">.</span><span class="na">permission</span><span class="o">.</span><span class="na">ACCESS_COURSE_LOCATION</span><span class="o">},</span> <span class="n">REQUEST_CODE</span><span class="o">)</span>
+</span><span class='line'>   <span class="o">...</span>
+</span><span class='line'>   <span class="nd">@Override</span>
+</span><span class='line'>   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onRequestPermissionsResult</span><span class="o">(</span><span class="kt">int</span> <span class="n">requestCode</span><span class="o">,</span> <span class="n">String</span> <span class="n">permissions</span><span class="o">[],</span> <span class="kt">int</span><span class="o">[]</span> <span class="n">grantResults</span><span class="o">){</span>
+</span><span class='line'>       <span class="k">if</span><span class="o">(</span><span class="n">requestCode</span> <span class="o">==</span> <span class="n">REQUEST_CODE</span><span class="o">)</span>
+</span><span class='line'>       <span class="o">{</span>
+</span><span class='line'>           <span class="o">...</span>
+</span><span class='line'>       <span class="o">}</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://stackoverflow.com/questions/33043582/bluetooth-low-energy-startscan-on-android-6-0-does-not-find-devices">Bluetooth Low Energy startScan on Android 6.0 does not find devices - Stack Overflow</a></p>
+
+<h1>BLE Central機能</h1>
+
+<p>Android 4.3から、BLE Central機能のサポートを開始しました。</p>
+
+<h2>BLE Central機能で使うクラス,メソッド</h2>
+
+<p>Android 4.4以下(API Level 20以下)では<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#startLeScan</code></a>を使います。</p>
+
+<p>Android 5.0以上(API Level 21以上)では先の旧APIはdeprecatedになっていますので、<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeScanner</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeScanner.html"><code>BluetoothLeScanner#startScan</code></a>を使います。</p>
+
+<p>5.0以上のほうが、<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanSettings.html"><code>ScanSettings</code></a>や、より細かな<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanFilter.html"><code>ScanFilter</code></a>を指定できたり、AdvertisePacketの中身を生byte列ではなく<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/ScanResult.html"><code>ScanResult</code></a>で取得できたりと、柔軟性高く利用できます。</p>
+
+<p>APIの使いやすさもそうですが、Android 4.3, Android 4.4ではBLE Central機能があまり安定していない（よく接続やRead/Writeに失敗するし、遅い）ので、注意してください。</p>
+
+<h2>BLE Central実験用アプリ</h2>
+
+<p>iOS BLEテスト用アプリといえば、<a href="https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8">Light Blue</a>がデファクトだと思いますが、AndroidでCentral機能を<a href="https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&amp;hl=ja">BLE Scanner: Read,Write,Notify</a>です。</p>
+
+<p>BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、かつ安定しているのでテストによく使います。</p>
+
+<h2>その他注意というかBad Know-How</h2>
+
+<ul>
+<li>BLE接続機能の安定性は端末差が大きい</li>
+</ul>
+
+
+<p>おおよその端末でBLE Scan自体は比較的安定しているのですが、BLE接続、具体的には接続にかかる時間及びRead/Writeの成功率には個体差が大きいです。</p>
+
+<p>接続・切断処理を短時間の間に繰り返すアプリを作る場合は注意してください。</p>
+
+<ul>
+<li>BLEのOSキャッシュにより、長時間使用していると謎の挙動を示すことがある</li>
+</ul>
+
+
+<p>具体的には、BLE接続に失敗する、ないしはRead /Writeに失敗する確率が上がる、などです。</p>
+
+<p>そうなった場合は、まずBluetooth ON/OFFを試して、もしダメなら端末再起動すると直ります。</p>
+
+<ul>
+<li>BLE characteristicに書き込む値のENDIANに注意する。</li>
+</ul>
+
+
+<p>BLEアプリを作る場合、大抵はクロスプラットフォーム（というかiOSで作っていて、そのAndroid版を作りたい場合）が多いと思います。</p>
+
+<p>その場合は、ENDIANには注意してください。iOSはcharacteristicにはLITTLE ENDIANで読み書きする一方、AndroidはBIG ENDIANです。</p>
+
+<ul>
+<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothDevice.html"><code>BluetoothDevice#getType</code></a>が<code>DEVICE_TYPE_DUAL</code>のデバイスへの接続が頻繁に失敗する</li>
+</ul>
+
+
+<p>startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様。</p>
+
+<p><a href="https://code.google.com/p/android/issues/detail?id=58942">Issue 58942 - android - BluetoothDevice.connectGATT Will Not Connect to BluetoothDevice.DEVICE_TYPE_DUAL - Android Open Source Project - Issue Tracker - Google Project Hosting</a></p>
+
+<p><a href="https://groups.google.com/forum/#!topic/btstack-dev/9zWiU5_V9MI">Dual-mode issue when connecting Android BLE - Google グループ</a></p>
+
+<h1>BLE Peripheral機能</h1>
+
+<p>Android 5.0から、OS上はBLE Peripheralのサポートを開始しました。</p>
+
+<p>しかしながら、何故か現在使われている<a href="https://source.android.com/devices/bluetooth.html">Bluedroid</a>というBluetoothプロトコル・スタックでは、Broadcom製のチップセットのHCIコマンド<code>multiple advertisement</code>に依存しており、端末が搭載しているチップセットによってはBLE Peripheral機能が使えません。</p>
+
+<p><a href="http://qiita.com/eggman/items/6a13f5be7deb363c800d">bluetooth - Android 5.0でBLE advertising するための要件 - Qiita</a></p>
+
+<p>BLE Peripheral機能を使えるかどうかは、以下のように判定できますので、チェックしましょう。但し端末がAdvertiseをサポートしていても、BluetoothがOFFになっているとき(<code>BluetoothAdapter#isEnabled</code>がfalseのとき)は以下も<code>false</code>を返すことに注意してください。</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isCapableToAdvertise</span><span class="o">(</span><span class="n">BluetoothAdapter</span> <span class="n">bAdapter</span><span class="o">){</span>
+</span><span class='line'><span class="k">return</span> <span class="n">Build</span><span class="o">.</span><span class="na">VERSION</span><span class="o">.</span><span class="na">SDK_INT</span> <span class="o">&gt;</span> <span class="mi">20</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>     <span class="kc">null</span> <span class="o">!=</span> <span class="n">bAdapter</span><span class="o">.</span><span class="na">getBluetoothLeAdvertiser</span><span class="o">()</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>     <span class="n">bAdapter</span><span class="o">.</span><span class="na">isMultipleAdvertisementSupported</span><span class="o">()</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>     <span class="n">bAdapter</span><span class="o">.</span><span class="na">isOffloadedFilteringSupported</span><span class="o">()</span> <span class="o">&amp;&amp;</span>
+</span><span class='line'>     <span class="n">bAdapter</span><span class="o">.</span><span class="na">isOffloadedScanBatchingSupported</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://qiita.com/qjuliar/items/0dd825f25d9de40d041f#_reference-4eb57a712932c923b08b">AndroidでBLEのAdvertise modeを使えるかどうかのメモ - Qiita</a></p>
+
+<p>BLE Peripheral機能が使える端末のリストは、以下が一番まとまっていると思います。</p>
+
+<p><a href="http://altbeacon.github.io/android-beacon-library/beacon-transmitter-devices.html">Android Beacon Library</a></p>
+
+<p>ここにない端末で言えば、Galaxy S6, Zenfone 2 Laser, Galazy S5 Active, Nexus 6PなどはAdvertiseに対応しています。</p>
+
+<h2>BLE Peripheral機能で使うクラス、メソッド</h2>
+
+<p>GattServerの初期化は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothManager.html"><code>BluetoothManager#openGattServer</code></a>から行います。</p>
+
+<p>Advertiseの開始は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeAdvertiser</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html"><code>BluetoothLeAdvertiser#startScan</code></a>を使います。</p>
+
+<h2>BLE Peripheral機能の諸注意</h2>
+
+<ul>
+<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html"><code>AdvertiseData.Builder#setIncludeDevicename</code></a>を<code>true</code>にすると、Advertiseが不安定になることがある。</li>
+</ul>
+
+
+<p>不要な場合は、inludeするのをやめましょう。</p>
+
+<h1>最後に</h1>
+
+<p>Android BLE機能についてざくっと紹介しましたが、いかがでしょうか。</p>
+
+<p>色々バグがあったりクセがあったりして確かに扱いにくいとは思いますが、頑張れば対応できるレベルだと思います。</p>
+
+<p>まだまだ開発しながらノウハウを貯めている段階ですので、もし間違いなどあればぜひ<a href="https://twitter.com/OE_uia">@OE_uia</a>に教えてください。よろしくお願いします。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Taisuke Oe</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-12-24T00:08:16+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>24</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:08 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/android/'>android</a>, <a class='category' href='/blog/categories/ble/'>ble</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2015/12/24/android-ble/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2015/12/24/android-ble/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/12/15/scala-promise-sample-for-android/" title="Previous Post: Scala標準のPromiseがAndroidで便利だという話">&laquo; Scala標準のPromiseがAndroidで便利だという話</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/12/24/android-ble/">そこまで怖くないAndroid BLE</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/15/scala-promise-sample-for-android/">Scala標準のPromiseがAndroidで便利だという話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/11/scala-implicits/">Implicitには型注釈をつけましょう</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/05/06/scalikejdbc-on-android-sqlite/">ScalikeJDBC on Android SQLite</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/12/06/scala-repl-extension/">ScalaのREPLを拡張するには</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2015/12/24/android-ble/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2015/12/24/android-ble/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
