@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2015-12-24T02:20:35+09:00</updated>
+  <updated>2016-01-04T00:33:52+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,58 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[AndroidとiOSのBLE仕様で注意すべき点]]></title>
+    <link href="http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble/"/>
+    <updated>2015-12-31T23:50:56+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble</id>
+    <content type="html"><![CDATA[<p>これは<a href="http://qiita.com/advent-calendar/2015/ble">BLE Advent Calendar 2015</a> 7日目の記事です。</p>
+
+<p>先日はAndroidのBLEにつきまして、記事を書きました。</p>
+
+<p><a href="/blog/2015/12/24/android-ble/">そこまで怖くないAndroid BLE - OE_uia Tech Blog</a></p>
+
+<p>今回は、AndroidとiOSがBLE連携する際に気をつけるべき点を挙げたいと思います。</p>
+
+<h2>Advertising Packet内のService UUIDは過信しない</h2>
+
+<!--more-->
+
+
+<p>BLE Advertiseには、Advertising Packetと呼ばれる上限31byteのデータをAdvertiseに含めることができます。</p>
+
+<p>このAdvertising Packetは規格化されており、Service UUIDやlocal name、manufacturer dataなどを含めるようにデザインされています。重要な点として、BLE CentralからBLE PeripheralのAdvertising PacketはBLE接続せずに取得することができるので、BLE Scanのフィルタリングに使えます。</p>
+
+<p>例えば、特定のService UUIDをAdvertising Packetに含んでいるBLE PeripheralのみBLE Scanに引っかかるようにすることが出来ます。このUUID指定のBLE Scanは、高速に意中のBLE Advertiseを発見するために非常に効果的です。</p>
+
+<p>&hellip;しかし、<strong><em>AndroidとiOSが混在する場合で、なおかつiOSアプリがバックグラウンド状態でもAdvertiseする場合は注意</em></strong> が必要です。</p>
+
+<p>なぜなら、iOSデバイスからのBLE Advertiseは、アプリがバックグラウンド状態ではAdvertising Packetからlocal nameとUUIDが抜け落ちるという、独特の癖が有ります。(バグかと思ったら、ドキュメント化もされており公式な仕様のようです。)</p>
+
+<p>しかし、他のiOSデバイスからは、この癖については特に意識することなくBLE Scanで見つけることができたりするのです。どうやら、iOS独自の <code>overflow</code> 領域にAdvertising Packetの情報を保存しており、他のiOSアプリからはその <code>overflow</code> 領域も含めてBLE Scan時に参照することができ、結果として今Service UUIDを保存しているのがAdvertising Packetなのか <code>overflow</code> 領域かを意識せずにUUID指定のスキャンができます。</p>
+
+<p><a href="https://forums.developer.apple.com/thread/11705">Advertising in background, getting UUID | Apple Developer Forums</a></p>
+
+<p>しかし、AndroidはこのiOSの <code>overflow</code> 領域を参照することができません。つまり、iOSがBLE Peripheralで、かつAdvertiseしているアプリがバックグラウンドにいってしまった場合、<strong><em>CentralのAndroidからUUID指定のBLE ScanでiOSを見つけることができなくなります</em></strong> 。</p>
+
+<p>すなわち、アプリがBLE Advertiseしたままバックグラウンドに行くことが前提の場合、<strong>Central側のAndroidはUUID指定せずにBLE Scan</strong> をしなければいけません。その一方で、iOSは気にせずUUID指定してBLE Scanできます。</p>
+
+<h2>BLE characteristicのエンディアンに注意</h2>
+
+<p>iOSがBLE Characteristicにデータを書き込む場合、NSDataをコンテナとして使用してバイト列を書き込むと思うのですが、その場合バイト列のorderはリトル・エンディアンです。これはLightBlueなどを使って確認できます。</p>
+
+<p>その一方、Androidのbyte orderは(少なくとも <a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothGattCharacteristic.html"><code>BluetoothGattCharacteristic#getValue</code></a> から取得できるバイト列は)ビッグ・エンディアンなので、Characteristicを介してバイト列の受け渡しをする場合は、どこかでbyte orderを反転してあげる必要が有ります。</p>
+
+<p>これについては決めごとの問題でしか無いので、BLE Characteristic上でバイト列を保持するのがビッグ・エンディアンなのか、リトル・エンディアンなのか、仕様としてまず最初に決めておくと良いと思います。</p>
+
+<p>エンディアンについてはこちら。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%B3%E3%83%87%E3%82%A3%E3%82%A2%E3%83%B3">エンディアン - Wikipedia</a></p>
+
+<p>この記事について、間違いなどあれば<a href="https://twitter.com/OE_uia">@OE_uia</a>に教えてください。よろしくお願いします。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[そこまで怖くないAndroid BLE]]></title>
@@ -759,88 +811,6 @@ hoge: String = hoge
 <p>肝心の、オレオレClassLoaderを使ってAndroid APIを叩けるScala REPLアプリは間に合わず。現状でも、未解決のwarningが出る問題とか、タブ補完が効かない問題など、色々と雑な感じにはなっています。。。</p>
 
 <p>そのあたりのフォローはまた後日に(&lsquo;・ω・`)</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Androidプロジェクト(pfn)のgiter8テンプレート]]></title>
-    <link href="http://taisukeoe.github.io/blog/2014/03/14/pfn-test/"/>
-    <updated>2014-03-14T12:00:00+09:00</updated>
-    <id>http://taisukeoe.github.io/blog/2014/03/14/pfn-test</id>
-    <content type="html"><![CDATA[<p>ScalaでAndroidアプリを作るためのsbtプラグイン、<a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>の紹介を<a href="/blog/2014/03/13/pfn-android-sdk-plugin/">前回のブログ</a>でしました。</p>
-
-<p>が、このREADMEの通りにプロジェクトを作るのが面倒なので、giter8テンプレートも作ってみました。</p>
-
-<h1>プロジェクト作成</h1>
-
-<pre><code class="bash"> g8 taisukeoe/android-pfn-app.g8
-</code></pre>
-
-<!--more-->
-
-
-<p>からプロジェクトの雛形が作れます。
-giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
-
-<h1>ディレクトリ構造</h1>
-
-<p>こんな感じです。</p>
-
-<pre><code>MyAndroidProject
-├── .gitignore
-├── AndroidManifest.xml
-├── build.sbt
-├── local.properties
-├── proguard-project.txt
-├── project/
-│   ├── build.properties
-│   └── plugins.sbt
-├── project.properties
-├── res/
-│   ├── layout/
-│   └── values/
-├── src/.../MainActivity.scala
-└── tests/
-    └── src/.../MainActivityInstrumentationTest.scala
-</code></pre>
-
-<p>簡単な説明。</p>
-
-<ul>
-<li>AndroidManifest.xml &hellip;ActivityやApplicationのもろもろの設定。</li>
-<li>build.sbt &hellip;sbtのビルド定義</li>
-<li>local.propeties &hellip;AndroidSDKのpathを記入。また、keyStoreの情報を記入すると、<em>android:package-release</em>で簡単にrelease buildできる。</li>
-<li>proguard-project.txt &hellip;proguardオプションを記入。<em>-dontwarn</em>, <em>-keep</em>, <em>-keepclassmembers</em>, <em>-libraryjars</em>あたりのオプションが頻出。詳しくは<a href="http://proguard.sourceforge.net/index.html#manual/usage.html">ProGuard Usage</a>を参照。</li>
-<li>project/ &hellip;sbtのバージョンやpluginなどを記入。</li>
-<li>project.properties&hellip; 利用するAndroid APIのバージョン(target api)や、(unmanagedの)libraryプロジェクトのpathを記入。</li>
-<li>res/ &hellip;レイアウトやテキスト、画像などのリソースファイル置き場。</li>
-<li>src/ &hellip;ソース。</li>
-</ul>
-
-
-<p>local.properties, project.propertiesを修正したときは、ちゃんと<em>sbt reload</em>しましょう。</p>
-
-<p>proguard-project.textを修正したときは、<em>sbt reload clean</em>してclassファイルのキャッシュを消しましょう。</p>
-
-<h1>各種コマンド</h1>
-
-<p><a href="https://github.com/pfn/android-sdk-plugin">pfn/android-sdk-plugin</a>より。</p>
-
-<h2>インストール</h2>
-
-<pre><code class="bash">sbt
-&gt; android:run
-</code></pre>
-
-<h2>テスト</h2>
-
-<pre><code class="bash">sbt
-&gt; android:test
-</code></pre>
-
-<p>ちなみにScalaTestやspec2を入れようとすると、ScalaTestはサイズが大きすぎてmethod数64k問題に引っかかり端末にインストールできず、spec2は実行時にDalvikVMのOutOfMemoryErrorを引きおこしてしまいます。</p>
-
-<p>まあ結局、端末上で行うテストはAndroidInstrumentationTestCase2とかを継承せざるをえませんし、Scalaで書けるだけ良しとしましょう。</p>
 ]]></content>
   </entry>
   

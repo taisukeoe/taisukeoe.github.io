@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた - OE_uia Tech Blog</title>
+  <title>AndroidとiOSのBLE仕様で注意すべき点 - OE_uia Tech Blog</title>
   <meta name="author" content="Taisuke Oe">
 
   
-  <meta name="description" content="Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜 オミックス(omics)とは? 生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。 オーミクス &hellip;">
+  <meta name="description" content="これはBLE Advent Calendar 2015 7日目の記事です。 先日はAndroidのBLEにつきまして、記事を書きました。 そこまで怖くないAndroid BLE - OE_uia Tech Blog 今回は、 &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://taisukeoe.github.io/blog/2013/03/11/omics-r">
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">「Rでつなぐ次世代オミックス情報統合解析研究会」に参加してみた</h1>
+      <h1 class="entry-title">AndroidとiOSのBLE仕様で注意すべき点</h1>
     
     
       <p class="meta">
@@ -90,7 +90,7 @@
 
 
 
-<time class='entry-date' datetime='2013-03-11T13:10:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:10 pm</span></time>
+<time class='entry-date' datetime='2015-12-31T23:50:56+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>11:50 pm</span></time>
         
            | <a href="#disqus_thread"
              data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
@@ -100,41 +100,50 @@
   </header>
 
 
-<div class="entry-content"><p><a href="http://www.jsbi.org/event/hosted-events/20130308r/">Japanese Society for Bioinformatics - JSBi :: 第2回Rでつなぐ次世代オミックス情報統合解析研究会＠理研横浜</a></p>
+<div class="entry-content"><p>これは<a href="http://qiita.com/advent-calendar/2015/ble">BLE Advent Calendar 2015</a> 7日目の記事です。</p>
 
-<h3>オミックス(omics)とは?</h3>
+<p>先日はAndroidのBLEにつきまして、記事を書きました。</p>
 
-<p>生物学の各領域（遺伝子、転写産物、タンパク質…etc）を総体(ome)として理解する学問(ics)。</p>
+<p><a href="/blog/2015/12/24/android-ble/">そこまで怖くないAndroid BLE - OE_uia Tech Blog</a></p>
 
-<p><a href="http://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%BC%E3%83%9F%E3%82%AF%E3%82%B9">オーミクス - Wikipedia</a></p>
+<p>今回は、AndroidとiOSがBLE連携する際に気をつけるべき点を挙げたいと思います。</p>
 
-<h3>なぜ参加したか?</h3>
+<h2>Advertising Packet内のService UUIDは過信しない</h2>
 
-<p>元々大学ではin vitroな実験系分子生物学の研究室に3年間在籍していたものの、今はプログラミングばっかりやっているので、バイオインフォマティクス(情報生物学)はピッタリじゃないかなーとか。半分は完全に趣味ですが。</p>
-
-<h3>面白かったポイント</h3>
-
-<!-- more -->
+<!--more-->
 
 
-<ul>
-<li><p>今はMicroArrayや質量分析機などの発展により、研究のボトルネックがデータ収集速度ではなく解析速度に来ている。これにより実験系の研究者にとっても、バイオインフォマティクスの重要性が上がっている。</p></li>
-<li><p>データ解析には元々Fortranを使っていた研究室が多いものの、今は<a href="http://ja.wikipedia.org/wiki/R%E8%A8%80%E8%AA%9E">R言語</a>が主流。対応解析(CorrespondenceAnalysys)用ライブラリのFactoMineRやネットワーク解析向けにigraphなどのライブラリの紹介もあった。</p>
+<p>BLE Advertiseには、Advertising Packetと呼ばれる上限31byteのデータをAdvertiseに含めることができます。</p>
 
-<p>  参考:
-<a href="https://sites.google.com/site/kztakemoto/r-seminar-on-igraph---supplementary-information">R seminar on igraph - supplementary information - Kazuhiro Takemoto</a></p></li>
-<li><p>ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。</p></li>
-<li><p>気象学でよく使われる「<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96">データ同化</a>」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは<a href="http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF">カルマンフィルタ</a>(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。</p>
+<p>このAdvertising Packetは規格化されており、Service UUIDやlocal name、manufacturer dataなどを含めるようにデザインされています。重要な点として、BLE CentralからBLE PeripheralのAdvertising PacketはBLE接続せずに取得することができるので、BLE Scanのフィルタリングに使えます。</p>
 
-<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー&#8221;Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
-<li><p>現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO(<a href="http://ja.wikipedia.org/wiki/Gene_Ontology">遺伝子オントロジー</a>)と<a href="http://ja.wikipedia.org/wiki/MeSH">MeSH</a>(Medical Subject Headings)。
-MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。</p></li>
-</ul>
+<p>例えば、特定のService UUIDをAdvertising Packetに含んでいるBLE PeripheralのみBLE Scanに引っかかるようにすることが出来ます。このUUID指定のBLE Scanは、高速に意中のBLE Advertiseを発見するために非常に効果的です。</p>
 
+<p>&hellip;しかし、<strong><em>AndroidとiOSが混在する場合で、なおかつiOSアプリがバックグラウンド状態でもAdvertiseする場合は注意</em></strong> が必要です。</p>
 
-<h3>最後に</h3>
+<p>なぜなら、iOSデバイスからのBLE Advertiseは、アプリがバックグラウンド状態ではAdvertising Packetからlocal nameとUUIDが抜け落ちるという、独特の癖が有ります。(バグかと思ったら、ドキュメント化もされており公式な仕様のようです。)</p>
 
-<p>バイオの知識だけじゃなく、統計学(とR)の知識が重要な模様。こういう複合領域の戦場にはどんどん攻め入りたいですね。</p>
+<p>しかし、他のiOSデバイスからは、この癖については特に意識することなくBLE Scanで見つけることができたりするのです。どうやら、iOS独自の <code>overflow</code> 領域にAdvertising Packetの情報を保存しており、他のiOSアプリからはその <code>overflow</code> 領域も含めてBLE Scan時に参照することができ、結果として今Service UUIDを保存しているのがAdvertising Packetなのか <code>overflow</code> 領域かを意識せずにUUID指定のスキャンができます。</p>
+
+<p><a href="https://forums.developer.apple.com/thread/11705">Advertising in background, getting UUID | Apple Developer Forums</a></p>
+
+<p>しかし、AndroidはこのiOSの <code>overflow</code> 領域を参照することができません。つまり、iOSがBLE Peripheralで、かつAdvertiseしているアプリがバックグラウンドにいってしまった場合、<strong><em>CentralのAndroidからUUID指定のBLE ScanでiOSを見つけることができなくなります</em></strong> 。</p>
+
+<p>すなわち、アプリがBLE Advertiseしたままバックグラウンドに行くことが前提の場合、<strong>Central側のAndroidはUUID指定せずにBLE Scan</strong> をしなければいけません。その一方で、iOSは気にせずUUID指定してBLE Scanできます。</p>
+
+<h2>BLE characteristicのエンディアンに注意</h2>
+
+<p>iOSがBLE Characteristicにデータを書き込む場合、NSDataをコンテナとして使用してバイト列を書き込むと思うのですが、その場合バイト列のorderはリトル・エンディアンです。これはLightBlueなどを使って確認できます。</p>
+
+<p>その一方、Androidのbyte orderは(少なくとも <a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothGattCharacteristic.html"><code>BluetoothGattCharacteristic#getValue</code></a> から取得できるバイト列は)ビッグ・エンディアンなので、Characteristicを介してバイト列の受け渡しをする場合は、どこかでbyte orderを反転してあげる必要が有ります。</p>
+
+<p>これについては決めごとの問題でしか無いので、BLE Characteristic上でバイト列を保持するのがビッグ・エンディアンなのか、リトル・エンディアンなのか、仕様としてまず最初に決めておくと良いと思います。</p>
+
+<p>エンディアンについてはこちら。</p>
+
+<p><a href="https://ja.wikipedia.org/wiki/%E3%82%A8%E3%83%B3%E3%83%87%E3%82%A3%E3%82%A2%E3%83%B3">エンディアン - Wikipedia</a></p>
+
+<p>この記事について、間違いなどあれば<a href="https://twitter.com/OE_uia">@OE_uia</a>に教えてください。よろしくお願いします。</p>
 </div>
 
 
@@ -150,12 +159,12 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
 
 
 
-<time class='entry-date' datetime='2013-03-11T13:10:00+09:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2013</span></span> <span class='time'>1:10 pm</span></time>
+<time class='entry-date' datetime='2015-12-31T23:50:56+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>31</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>11:50 pm</span></time>
       
 
 <span class="categories">
   
-    <a class='category' href='/blog/categories/bio/'>bio</a>, <a class='category' href='/blog/categories/conference/'>conference</a>, <a class='category' href='/blog/categories/r/'>r</a>
+    <a class='category' href='/blog/categories/android/'>android</a>, <a class='category' href='/blog/categories/ble/'>ble</a>
   
 </span>
 
@@ -164,7 +173,7 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
     
       <div class="sharing">
   
-  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2013/03/11/omics-r/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2013/03/11/omics-r/" >Tweet</a>
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble/" >Tweet</a>
   
   
   
@@ -175,10 +184,8 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/03/10/scalaconfjp/" title="Previous Post: Scala Conference 2013 in Japanの振り返り">&laquo; Scala Conference 2013 in Japanの振り返り</a>
+        <a class="basic-alignment left" href="/blog/2015/12/24/android-ble/" title="Previous Post: そこまで怖くないAndroid BLE">&laquo; そこまで怖くないAndroid BLE</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/03/22/scala-2-dot-10-bytecode/" title="Next Post: Scala2.10.x bytecode problem">Scala2.10.x bytecode problem &raquo;</a>
       
     </p>
   </footer>
@@ -279,8 +286,8 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://taisukeoe.github.io/blog/2013/03/11/omics-r/';
-        var disqus_url = 'http://taisukeoe.github.io/blog/2013/03/11/omics-r/';
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2015/12/31/android-ios-ble/';
         var disqus_script = 'embed.js';
       
     (function () {
