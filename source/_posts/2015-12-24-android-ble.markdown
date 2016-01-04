@@ -75,9 +75,9 @@ APIの使いやすさもそうですが、Android 4.3, Android 4.4ではBLE Cent
 
 ##BLE Central実験用アプリ
 
-iOS BLEテスト用アプリといえば、[Light Blue](https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8)がデファクトだと思いますが、AndroidでCentral機能を[BLE Scanner: Read,Write,Notify](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&hl=ja)です。
+iOS BLEテスト用アプリといえば、[Light Blue](https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8)がデファクトだと思いますが、AndroidでCentral機能を試すときは[BLE Scanner: Read,Write,Notify](https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&hl=ja)です。
 
-BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、かつ安定しているのでテストによく使います。
+BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、テストによく使います。
 
 ##その他注意というかBad Know-How
 * BLE接続機能の安定性は端末差が大きい
@@ -100,7 +100,7 @@ BLEアプリを作る場合、大抵はクロスプラットフォーム（と�
 
 * [`BluetoothDevice#getType`](http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothDevice.html)が`DEVICE_TYPE_DUAL`のデバイスへの接続が頻繁に失敗する
 
-startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様。
+startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様です。
 
 [Issue 58942 - android - BluetoothDevice.connectGATT Will Not Connect to BluetoothDevice.DEVICE_TYPE_DUAL - Android Open Source Project - Issue Tracker - Google Project Hosting](https://code.google.com/p/android/issues/detail?id=58942)
 
@@ -136,11 +136,11 @@ BLE Peripheral機能が使える端末のリストは、以下が一番まとま
 ##BLE Peripheral機能で使うクラス、メソッド
 GattServerの初期化は[`BluetoothManager#openGattServer`](http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothManager.html)から行います。
 
-Advertiseの開始は[`BluetoothAdapter#getBluetoothLeAdvertiser`](http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html)からの[`BluetoothLeAdvertiser#startScan`](http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html)を使います。
+Advertiseの開始は[`BluetoothAdapter#getBluetoothLeAdvertiser`](http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html)からの[`BluetoothLeAdvertiser#startAdvertising`](http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html)を使います。
 
 ##BLE Peripheral機能の諸注意
 
-* [`AdvertiseData.Builder#setIncludeDevicename`](http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html)を`true`にすると、Advertiseが不安定になることがある。
+* [`AdvertiseData.Builder#setIncludeDeviceName`](http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html)を`true`にすると、Advertiseが不安定になることがある。
 
 不要な場合は、inludeするのをやめましょう。
 
