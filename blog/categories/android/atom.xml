@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Android | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/android/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2016-01-04T00:33:52+09:00</updated>
+  <updated>2016-01-04T20:08:07+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -161,9 +161,9 @@
 
 <h2>BLE Central実験用アプリ</h2>
 
-<p>iOS BLEテスト用アプリといえば、<a href="https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8">Light Blue</a>がデファクトだと思いますが、AndroidでCentral機能を<a href="https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&amp;hl=ja">BLE Scanner: Read,Write,Notify</a>です。</p>
+<p>iOS BLEテスト用アプリといえば、<a href="https://itunes.apple.com/jp/app/lightblue-explorer-bluetooth/id557428110?mt=8">Light Blue</a>がデファクトだと思いますが、AndroidでCentral機能を試すときは<a href="https://play.google.com/store/apps/details?id=com.macdom.ble.blescanner&amp;hl=ja">BLE Scanner: Read,Write,Notify</a>です。</p>
 
-<p>BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、かつ安定しているのでテストによく使います。</p>
+<p>BLE CentralのWrite, Read, Notificationといった基礎機能を全て安定して使うことができますので、テストによく使います。</p>
 
 <h2>その他注意というかBad Know-How</h2>
 
@@ -199,7 +199,7 @@
 </ul>
 
 
-<p>startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様。</p>
+<p>startLeScanで見つかったデバイスに対しても、Classic BTを接続を試みている？っぽいのが原因の模様です。</p>
 
 <p><a href="https://code.google.com/p/android/issues/detail?id=58942">Issue 58942 - android - BluetoothDevice.connectGATT Will Not Connect to BluetoothDevice.DEVICE_TYPE_DUAL - Android Open Source Project - Issue Tracker - Google Project Hosting</a></p>
 
@@ -236,12 +236,12 @@ return Build.VERSION.SDK_INT &gt; 20 &amp;&amp;
 
 <p>GattServerの初期化は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothManager.html"><code>BluetoothManager#openGattServer</code></a>から行います。</p>
 
-<p>Advertiseの開始は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeAdvertiser</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html"><code>BluetoothLeAdvertiser#startScan</code></a>を使います。</p>
+<p>Advertiseの開始は<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/BluetoothAdapter.html"><code>BluetoothAdapter#getBluetoothLeAdvertiser</code></a>からの<a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/BluetoothLeAdvertiser.html"><code>BluetoothLeAdvertiser#startAdvertising</code></a>を使います。</p>
 
 <h2>BLE Peripheral機能の諸注意</h2>
 
 <ul>
-<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html"><code>AdvertiseData.Builder#setIncludeDevicename</code></a>を<code>true</code>にすると、Advertiseが不安定になることがある。</li>
+<li><a href="http://developer.android.com/intl/ja/reference/android/bluetooth/le/AdvertiseData.html"><code>AdvertiseData.Builder#setIncludeDeviceName</code></a>を<code>true</code>にすると、Advertiseが不安定になることがある。</li>
 </ul>
 
 
