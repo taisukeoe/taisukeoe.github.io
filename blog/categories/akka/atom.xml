@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Akka | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/akka/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2016-02-05T17:15:12+09:00</updated>
+  <updated>2016-12-03T23:56:07+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,91 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Scala関西サミットでAndroid Akkaについて喋ってきた話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/"/>
+    <updated>2016-12-03T23:26:02+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2016/12/03/scala-kansai</id>
+    <content type="html"><![CDATA[<p>さて、<a href="http://qiita.com/advent-calendar/2016/scala">2016年Scalaアドベントカレンダー@Qiita</a> 3日目です。</p>
+
+<p>何を書こうかと考えていたら、そもそも10/8に開催されたScala関西サミットの話をブログに書いてないことに気づきました。</p>
+
+<p>なので今回はそのことを紹介しつつ、色々補足できたらと思っています。</p>
+
+<p>その前に。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>の感想</h1>
+
+<p>時期を逸した感じがしますが(きの子さんすいません…)、去年にも増して楽しかったです！</p>
+
+<p>(結果的に)タイムテーブルの組み方が非常によくできていて、特にB会場のトラックがActorモデルの解説から、Akka-Stream、と続いていき、最後にAkka Clusterの闇の話が入る、という最高の流れでした。</p>
+
+<p>そして日本各地からだけでなく、台湾からの参加者もいらっしゃるなど、多様性という意味でも大きくグレードアップしていました。</p>
+
+<p>これが無料イベントって… 運営のことが非常に心配になりますので、お金払いますから今後もぜひ続けて下さい、という気持ちです。</p>
+
+<p></br></p>
+
+<p><a href="http://2017.scalamatsuri.org/">ScalaMatsuri</a>も負けてられません！</p>
+
+<p>というわけで、ただいまセッション投票の集計＆選考＆タイムテーブル準備などの真っ最中でございます。</p>
+
+<p>近々、遅くとも年内にはまとまった情報を出せると思いますので、しばしお待ちくださいませ。</p>
+
+<p>僕の主観ですが、今までにも増して豪華で面白いトークの集まる、素晴らしい２日間になると思います。</p>
+
+<p>さて、本題。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>のスライド</h1>
+
+<p><a href="http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a>&#8220;>http://www.slideshare.net/TaisukeOe/real-world-android-akka&#8221;>http://www.slideshare.net/TaisukeOe/real-world-android-akka</a></a></p>
+
+<p>このトークではActorモデルの解説と、Actorモデルがなぜ<a href="">BONX</a>というVoIPアプリにフィットしたのか、という話をさせていただきました。</p>
+
+<p>ただ、あまりAkkaのカスタマイズ性がVoIPのチューニングにどう役立つのか、という話は出来ずじまいでした。
+今回はそこにフォーカスをあてます。</p>
+
+<h1>非機能要件の改善</h1>
+
+<p>VoIPアプリの場合、機能要件の実装・テストより、非機能要件の改善に時間を使います。
+具体的には音質と遅延の改善です。</p>
+
+<h2>音質の改善</h2>
+
+<p>Actorモデルで設計されたVoIPモジュールにおいて何が一番音質の劣化原因になるかといえば、フレーム間で発生した遅延や、フレームの欠落です。</p>
+
+<p>あるフレームが再生されてから、次のフレームが再生されるまでに間に大きく遅延すると、そこで波形が途切れること（非線形）になりますので聴感上ブツッというノイズに感じます。</p>
+
+<p>同様にして、フレームの欠落が起きると、やはり前後のフレームが非連続になりますのでノイズに感じます。</p>
+
+<p>大雑把に言えば、遅延の改善が音質の改善に繋がります。</p>
+
+<h2>遅延の改善</h2>
+
+<p>では、遅延をどのように改善したら良いでしょう。</p>
+
+<p>安定している条件では、Akkaというより、個々の計算量を減らすなどモジュールごとのチューニングが必要となることが多いです。</p>
+
+<p>しかし音声ストリーム処理の、しかもグループ通話など負荷が時間とともに変わりうる場合だと、Actorシステムにボトルネックが生じることが往々にしてあります。</p>
+
+<p>まず測定・監視して詰まりやすいhotspotになる場所を探し出し、その後で負荷を分散・解消する方策を考え試行錯誤する必要があります。</p>
+
+<p>解決策は十分にdispatcherの並列度を上げる必要があるときもあれば、局所的にActorを並列化するべきなケース、throughtputなどのパラメーターが重要になるケースなど様々です。</p>
+
+<p>Akkaではこういた実行モデルのチューニングの大部分を、confファイルで簡便に変更出来る点で優れています。</p>
+
+<p>また、Mailboxのサイズを適切に設定することも重要です。</p>
+
+<p>小さすぎて溢れるとフレームの欠落になりますし、かといって大きすぎると遅延の解消に時間がかかります。</p>
+
+<p>音声ストリーム処理の改善、とても難しいけど、チューニングがユーザー体験に直結するのはなかなかレアなので面白いです。</p>
+
+<p>そんなAkkaのチューニングをやりたい方、今Androidエンジニアを絶賛募集中ですので、よかったら<a href="https://www.wantedly.com/projects/76119">こちら</a>からどうぞ。</p>
+
+<p>それでは。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Akka Transactorsはオワコン]]></title>

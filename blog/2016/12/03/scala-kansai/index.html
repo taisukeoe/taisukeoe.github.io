@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Scala関西サミットでAndroid Akkaについて喋ってきた話 - OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="さて、2016年Scalaアドベントカレンダー@Qiita 3日目です。 何を書こうかと考えていたら、そもそも10/8に開催されたScala関西サミットの話をブログに書いてないことに気づきました。 なので今回はそのことを紹介しつつ、色々補足できたらと思っています。 その前に。 &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2016/12/03/scala-kansai">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:taisukeoe.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Scala関西サミットでAndroid Akkaについて喋ってきた話</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-12-03T23:26:02+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:26 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>さて、<a href="http://qiita.com/advent-calendar/2016/scala">2016年Scalaアドベントカレンダー@Qiita</a> 3日目です。</p>
+
+<p>何を書こうかと考えていたら、そもそも10/8に開催されたScala関西サミットの話をブログに書いてないことに気づきました。</p>
+
+<p>なので今回はそのことを紹介しつつ、色々補足できたらと思っています。</p>
+
+<p>その前に。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>の感想</h1>
+
+<p>時期を逸した感じがしますが(きの子さんすいません…)、去年にも増して楽しかったです！</p>
+
+<p>(結果的に)タイムテーブルの組み方が非常によくできていて、特にB会場のトラックがActorモデルの解説から、Akka-Stream、と続いていき、最後にAkka Clusterの闇の話が入る、という最高の流れでした。</p>
+
+<p>そして日本各地からだけでなく、台湾からの参加者もいらっしゃるなど、多様性という意味でも大きくグレードアップしていました。</p>
+
+<p>これが無料イベントって… 運営のことが非常に心配になりますので、お金払いますから今後もぜひ続けて下さい、という気持ちです。</p>
+
+<p></br></p>
+
+<p><a href="http://2017.scalamatsuri.org/">ScalaMatsuri</a>も負けてられません！</p>
+
+<p>というわけで、ただいまセッション投票の集計＆選考＆タイムテーブル準備などの真っ最中でございます。</p>
+
+<p>近々、遅くとも年内にはまとまった情報を出せると思いますので、しばしお待ちくださいませ。</p>
+
+<p>僕の主観ですが、今までにも増して豪華で面白いトークの集まる、素晴らしい２日間になると思います。</p>
+
+<p>さて、本題。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>のスライド</h1>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/s1dtP0W2KDMXOD" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/TaisukeOe/real-world-android-akka" title="Real world android akka" target="_blank">Real world android akka</a> </strong> from <strong><a target="_blank" href="http://www.slideshare.net/TaisukeOe">Taisuke Oe</a></strong> </div></p>
+
+<p>このトークではActorモデルの解説と、Actorモデルがなぜ<a href="">BONX</a>というVoIPアプリにフィットしたのか、という話をさせていただきました。</p>
+
+<p>ただ、あまりAkkaのカスタマイズ性がVoIPのチューニングにどう役立つのか、という話は出来ずじまいでした。
+今回はそこにフォーカスをあてます。</p>
+
+<h1>非機能要件の改善</h1>
+
+<p>VoIPアプリの場合、機能要件の実装・テストより、非機能要件の改善に時間を使います。
+具体的には音質と遅延の改善です。</p>
+
+<h2>音質の改善</h2>
+
+<p>Actorモデルで設計されたVoIPモジュールにおいて何が一番音質の劣化原因になるかといえば、フレーム間で発生した遅延や、フレームの欠落です。</p>
+
+<p>あるフレームが再生されてから、次のフレームが再生されるまでに間に大きく遅延すると、そこで波形が途切れること（非線形）になりますので聴感上ブツッというノイズに感じます。</p>
+
+<p>同様にして、フレームの欠落が起きると、やはり前後のフレームが非連続になりますのでノイズに感じます。</p>
+
+<p>大雑把に言えば、遅延の改善が音質の改善に繋がります。</p>
+
+<h2>遅延の改善</h2>
+
+<p>では、遅延をどのように改善したら良いでしょう。</p>
+
+<p>安定している条件では、Akkaというより、個々の計算量を減らすなどモジュールごとのチューニングが必要となることが多いです。</p>
+
+<p>しかし音声ストリーム処理の、しかもグループ通話など負荷が時間とともに変わりうる場合だと、Actorシステムにボトルネックが生じることが往々にしてあります。</p>
+
+<p>まず測定・監視して詰まりやすいhotspotになる場所を探し出し、その後で負荷を分散・解消する方策を考え試行錯誤する必要があります。</p>
+
+<p>解決策は十分にdispatcherの並列度を上げる必要があるときもあれば、局所的にActorを並列化するべきなケース、throughtputなどのパラメーターが重要になるケースなど様々です。</p>
+
+<p>Akkaではこういた実行モデルのチューニングの大部分を、confファイルで簡便に変更出来る点で優れています。</p>
+
+<p>また、Mailboxのサイズを適切に設定することも重要です。</p>
+
+<p>小さすぎて溢れるとフレームの欠落になりますし、かといって大きすぎると遅延の解消に時間がかかります。</p>
+
+<p>音声ストリーム処理の改善、とても難しいけど、チューニングがユーザー体験に直結するのはなかなかレアなので面白いです。</p>
+
+<p>そんなAkkaのチューニングをやりたい方、今Androidエンジニアを絶賛募集中ですので、よかったら<a href="https://www.wantedly.com/projects/76119">こちら</a>からどうぞ。</p>
+
+<p>それでは。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Taisuke Oe</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-12-03T23:26:02+09:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2016</span></span> <span class='time'>11:26 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/akka/'>akka</a>, <a class='category' href='/blog/categories/scala/'>scala</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/05/internationalize-scalamatsuri/" title="Previous Post: ローカルカンファレンスを無理なく国際化する方法 - ScalaMatsuri 2016を振り返って">&laquo; ローカルカンファレンスを無理なく国際化する方法 - ScalaMatsuri 2016を振り返って</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/12/03/scala-kansai/">Scala関西サミットでAndroid Akkaについて喋ってきた話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/internationalize-scalamatsuri/">ローカルカンファレンスを無理なく国際化する方法 - ScalaMatsuri 2016を振り返って</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/31/android-ios-ble/">AndroidとiOSのBLE仕様で注意すべき点</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/24/android-ble/">そこまで怖くないAndroid BLE</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/12/15/scala-promise-sample-for-android/">Scala標準のPromiseがAndroidで便利だという話</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating&#8230;</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
