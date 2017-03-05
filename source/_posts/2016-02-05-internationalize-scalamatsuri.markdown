@@ -3,7 +3,7 @@ layout: post
 title: "ローカルカンファレンスを無理なく国際化する方法 - ScalaMatsuri 2016を振り返って"
 date: 2016-02-05 15:25:24 +0900
 comments: true
-categories:
+categories: scala scalamatsuri
 ---
 2016年1月30日及び31日に、アジア最大のScalaカンファレンス「[ScalaMatsuri 2016](http://scalamatsuri.org/)」を開催しました。
 
