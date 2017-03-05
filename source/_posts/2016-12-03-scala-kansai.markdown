@@ -6,7 +6,7 @@ comments: true
 categories: scala akka
 ---
 
-さて、2016年Scalaアドベントカレンダー@Qiita 3日目です。
+さて、[2016年Scalaアドベントカレンダー@Qiita](http://qiita.com/advent-calendar/2016/scala) 3日目です。
 
 何を書こうかと考えていたら、そもそも10/8に開催されたScala関西サミットの話をブログに書いてないことに気づきました。
 
