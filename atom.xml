@@ -4,7 +4,7 @@
   <title><![CDATA[OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-03-05T17:47:02+09:00</updated>
+  <updated>2017-03-05T18:03:04+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -18,11 +18,11 @@
     <link href="http://taisukeoe.github.io/blog/2017/03/05/scalamatsuri-employee/"/>
     <updated>2017-03-05T17:23:56+09:00</updated>
     <id>http://taisukeoe.github.io/blog/2017/03/05/scalamatsuri-employee</id>
-    <content type="html"><![CDATA[<p>ScalaMatsuriにご参加いただいた皆さん、ありがとうございました。</p>
+    <content type="html"><![CDATA[<p><a href="http://2017.scalamatsuri.org/">ScalaMatsuri</a>にご参加いただいた皆さん、ありがとうございました。</p>
 
 <p>ScalaMatsuri座長の麻植(<a href="https://twitter.com/oe_uia">@OE_uia</a>)です。</p>
 
-<p>一般販売のチケット販売＋スポンサー招待枠＋関係者もろもろを合わせまして、総勢600名程度の方にご参加いただきました(実数はまだ集計中です)。
+<p>2017年2月25日、26日に開催された<a href="http://2017.scalamatsuri.org/">ScalaMatsuri 2017</a>では、一般販売のチケット販売＋スポンサー招待枠＋関係者もろもろを合わせまして、<strong> 総勢600名程度 </strong> の方にご参加いただきました(実数はまだ集計中です)。
 参加、登壇、協賛、そしてスタッフとして、皆さんがScalaMatsuriという神輿を担いでくださったお陰で、今年も盛況のうちに幕を閉じることが出来ました。</p>
 
 <h2>国際化の進むScalaMatsuri</h2>
