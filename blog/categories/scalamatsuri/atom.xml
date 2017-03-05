@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scalamatsuri | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/scalamatsuri/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-03-05T18:03:04+09:00</updated>
+  <updated>2017-03-05T22:06:39+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -78,7 +78,7 @@
 
 <p><a href="https://twitter.com/OE_uia/status/696361023410835456">https://twitter.com/OE_uia/status/696361023410835456</a>&#8220;>https://twitter.com/OE_uia/status/696361023410835456&#8221;>https://twitter.com/OE_uia/status/696361023410835456</a></a></p>
 
-<p>時は前後しますがこの半年ほど前、私が信頼を寄せている友人である高橋さんが、結婚したので家事と両立できる仕事を事務職を探している、という話を聞いた時、ScalaMatsuriの事務仕事はほぼ100%リモートワークだけど、興味はないかと申し出ました。</p>
+<p>時は前後しますがこの半年ほど前、私が信頼を寄せている友人である高橋さんが、結婚したので家事と両立できる仕事を事務職で探している、という話を聞いた時、ScalaMatsuriの事務仕事はほぼ100%リモートワークだけど、興味はないかと申し出ました。</p>
 
 <p>そのときから、給与体系、勤務体系、仕事内容などなどの説明や調整をしながら、およそ１年弱の時を経て、今年度のScalaMatsuri準備委員会の事務サポートとして入ってもらうことになったのです。</p>
 
@@ -256,8 +256,7 @@
 
 <p>また、スポンサーのWebロゴ掲載のサイズ変更等の編集にはImage Magick CLIを使用しています。</p>
 
-<p>もちろん、非エンジニアにgit、Zapier、Image Magickといったツールを使いこなしてもらうのは簡単なことではありませんが、
-gitの場合はSource TreeなどのGUIツールも有りますし、特に高橋さんの場合は意欲高く学んでもらえました。</p>
+<p>もちろん、非エンジニアにgit、Zapier、Image Magickといったツールを使いこなしてもらうのは簡単なことではありませんが、gitの場合はSource TreeなどのGUIツールも有りますし、特に高橋さんの場合は意欲高く学んでもらえました。</p>
 
 <p>最初に丁寧に教えて、あと困った時の質問への回答を何度かした程度で、実際に彼女は今ではGitHubにも慣れIssue管理をしたりPullRequestを送れるようになったり、またZapierでGoogle FormとSlackの連携の自動化をしたり、その他ツール周りにも慣れてもらうまでになりました。</p>
 
