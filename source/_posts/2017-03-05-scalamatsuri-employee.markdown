@@ -5,11 +5,11 @@ date: 2017-03-05 17:23:56 +0900
 comments: true
 categories: scala scalamatsuri
 ---
-ScalaMatsuriにご参加いただいた皆さん、ありがとうございました。
+[ScalaMatsuri](http://2017.scalamatsuri.org/)にご参加いただいた皆さん、ありがとうございました。
 
 ScalaMatsuri座長の麻植([@OE_uia](https://twitter.com/oe_uia))です。
 
-一般販売のチケット販売＋スポンサー招待枠＋関係者もろもろを合わせまして、総勢600名程度の方にご参加いただきました(実数はまだ集計中です)。
+2017年2月25日、26日に開催された[ScalaMatsuri 2017](http://2017.scalamatsuri.org/)では、一般販売のチケット販売＋スポンサー招待枠＋関係者もろもろを合わせまして、** 総勢600名程度 ** の方にご参加いただきました(実数はまだ集計中です)。
 参加、登壇、協賛、そしてスタッフとして、皆さんがScalaMatsuriという神輿を担いでくださったお陰で、今年も盛況のうちに幕を閉じることが出来ました。
 
 ## 国際化の進むScalaMatsuri
