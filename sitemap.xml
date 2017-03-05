@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://taisukeoe.github.io/blog/2017/03/05/scalamatsuri-employee/</loc>
+    <lastmod>2017-03-05T17:23:56+09:00</lastmod>
+  </url>
+  <url>
     <loc>http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/</loc>
     <lastmod>2016-12-03T23:26:02+09:00</lastmod>
   </url>
@@ -134,8 +138,5 @@
   </url>
   <url>
     <loc>http://taisukeoe.github.io/blog/categories/ble/</loc>
-  </url>
-  <url>
-    <loc>http://taisukeoe.github.io/posts/2/</loc>
   </url>
 </urlset>
