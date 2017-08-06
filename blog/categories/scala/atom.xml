@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scala | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/scala/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-03-05T22:06:39+09:00</updated>
+  <updated>2017-08-06T12:50:05+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BONX社を退職するので、これまでの仕事について振り返ってみた]]></title>
+    <link href="http://taisukeoe.github.io/blog/2017/08/06/bonx-retire/"/>
+    <updated>2017-08-06T10:00:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2017/08/06/bonx-retire</id>
+    <content type="html"><![CDATA[<p><img src="/images/20170806/ss_cph.png" width="1280" height="720"></p>
+
+<p>2015年5月から関わっていた <strong><a href="https://bonx.co/ja/">BONX</a>社の最終出社を7/31に済ませまして、来る8月末で退職</strong> します。</p>
+
+<p>これを機に、自分のBONX社での仕事を公に出来る範囲でまとめてみることにしました。</p>
+
+<h2>BONX社でやっていたこと</h2>
+
+<!-- more -->
+
+
+<p>BONXの創業当初からずっと<a href="https://play.google.com/store/apps/details?id=co.bonx.go">Androidアプリ</a>を作ってました。</p>
+
+<p>マンションの一室で、社内にはCEO,CTOと僕含め4,5人しかいないぐらいのアーリーステージのスタートアップということもありまして、
+プロジェクト開始当初の状況を振り返ると、<strong>なかなかチャレンジング</strong> でした。</p>
+
+<p>まず、人生で初めてVoIPクライアントをスクラッチから書くことになったものの、Androidではどのような設計にするのが一番良いか見当つかなかったので、とにかく試行錯誤の連続でした。<strong>何度書き直したかもう覚えていません</strong>。</p>
+
+<p>また、悪名高きAndroidのBluetooth Low Energyを初めて、しかもCentralとPeripheral両面で使い倒すことになりました。最終的には機種依存バグとの戦いで、バッドノウハウがひたすら溜まり続けました。</p>
+
+<p>また、BONXイヤフォンのBLE/SPP絡みのハードウェアのファーム仕様を策定することになったり、スポットですがBONXイヤフォンのファームウェア改善のために中国に飛んだり、IoTスタートアップっぽい仕事も若干ありました。</p>
+
+<p>ただアプリ開発とハードウェア生産が並列して同時に走ったときが一番体力的に厳しく、最初のバージョンのリリース直前で心身ともにすり減っていた時期(しかも<a href="http://2016.scalamatsuri.org/">ScalaMatsuri 2016</a>開催前月)に、
+<strong><a href="http://tech.bonx.co/entry/2016/05/13/161606">当日夜に急遽中国行きの深夜フライトが決まって</a>、翌朝から工場で中国のエンジニア達と缶詰で喧々諤々の議論をした</strong> のがピークでした。</p>
+
+<p>そのとき、<strong>非エンジニアの通訳を介して、排他制御などの並行プログラミングの概念を伝えるのがいかに無理ゲー</strong> かもよく分かりました。<strong>やっぱりエンジニアでも語学大事</strong> だと改めて思ったし、英語だけだと厳しい…という初めての経験でした。</p>
+
+<p><a href="https://twitter.com/OE_uia/status/673854001939537920">https://twitter.com/OE_uia/status/673854001939537920</a>&#8220;>https://twitter.com/OE_uia/status/673854001939537920&#8221;>https://twitter.com/OE_uia/status/673854001939537920</a></a></p>
+
+<p>色々しんどかったけど、だからこそ面白くて、2年以上関わることになったんだろうなと思います。</p>
+
+<p>そうこうしているうちに、ユーザーからの評価も安定しだしてちゃんと遊べるプロダクトになり、今年駆け足ながらもDDD/Clean Architectureベースの設計にリファクタリングできて、
+ようやく一区切りつけられたかなと思っています。</p>
+
+<p>その集大成として、<strong>世界最大のScalaカンファレンス<a href="http://scaladays.org/">ScalaDays</a>に出したプロポーザルが幸運にも通りまして、BONXの事例についてシカゴとコペンハーゲンで講演することができました(※)</strong>。</p>
+
+<p><em>※ 元々の<a href="https://www.slideshare.net/TaisukeOe/real-world-android-akka-75288411">スライド</a>及び<a href="https://www.youtube.com/watch?v=kGH0mbjA2_U">発表</a>は英語ですが、以下のスライドは<a href="https://shinjuku-geek-lounge.connpass.com/event/59099/">新宿Geek Lounge</a>で喋った日本語版の資料になります</em></p>
+
+<p><a href="https://www.slideshare.net/TaisukeOe/real-world-android-akka-77574727">https://www.slideshare.net/TaisukeOe/real-world-android-akka-77574727</a>&#8220;>https://www.slideshare.net/TaisukeOe/real-world-android-akka-77574727&#8221;>https://www.slideshare.net/TaisukeOe/real-world-android-akka-77574727</a></a></p>
+
+<p>Bluetoothの話は、日本の勉強会で喋ったこちらのスライドにまとめてあります。</p>
+
+<p><a href="http://www.slideshare.net/TaisukeOe/bonxbluetooth-bluetooth120">http://www.slideshare.net/TaisukeOe/bonxbluetooth-bluetooth120</a>&#8220;>http://www.slideshare.net/TaisukeOe/bonxbluetooth-bluetooth120&#8221;>http://www.slideshare.net/TaisukeOe/bonxbluetooth-bluetooth120</a></a></p>
+
+<h2>BONX社をなぜ辞めるのか？</h2>
+
+<p>BONX社以外の、<strong>個人ワークでやりたいことが溜まりすぎた</strong>、というのが一番の原因です。</p>
+
+<p>幾度となくBONX社の仕事をする傍らやろうと試していたのですが、<strong>トータルの活動時間が自分のキャパを越えてしまって体調を崩す</strong> ということを繰り返し、頓挫していました。
+ある時、これ以上タスクを増やすのは現実的ではないなということに気づき、今取り組んでいる何かを諦めることを決めました。</p>
+
+<p>では今携わっているプロジェクトの中でも、なぜBONXを辞めることにしたのか？というと：</p>
+
+<ul>
+<li>限られた活動時間の枠の中で、一番シェアが大きかった</li>
+<li>(先述の通り)BONX Androidアプリについて、色々やりきったところでちょうど一区切りついてしまった</li>
+<li>特殊なアプリではあるものの、僕以外の人の手でメンテできることを確認できた</li>
+<li>会社のフェーズが変わり、これからのBONX社には、僕よりもっと適任な人がいるだろう、と思えた</li>
+</ul>
+
+
+<p><strong>BONX自体は今でも好き</strong> だし、たぶん来冬も一ユーザーとして使って遊んでると思います。</p>
+
+<p>今もBONX社は<a href="https://www.wantedly.com/companies/bonx">Androidエンジニア含め色んなポジションで募集してる</a>ので、よかったら是非どうぞ(宣伝)。</p>
+
+<h2>今後何をするのか？</h2>
+
+<p>今後しばらくはフルタイムの仕事はせず、アドバイザーの仕事を続けながら <strong><a href="https://ja.wikipedia.org/wiki/%E3%82%B5%E3%83%90%E3%83%86%E3%82%A3%E3%82%AB%E3%83%AB">サバティカル</a>のつもりで個人プロジェクト中心に進捗出していきたい</strong> 所存です。具体的には下記に挙げたようなことを、少なくとも3ヶ月は取り組むつもりです。</p>
+
+<ul>
+<li><a href="http://www.septeni-original.co.jp/">セプテーニ・オリジナル</a>社の技術アドバイザーとして、粛々とお仕事</li>
+<li><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>の講演準備</li>
+<li>進捗が遅れてる某プロジェクトの巻取り</li>
+<li>OSS活動</li>
+<li>勉強(コンパイラ、言語処理系、機械学習など)</li>
+<li>引き続き<a href="http://scalamatsuri.org/">ScalaMatsuri</a> (<strong>8月26日にScalaMatsuri 2018キックオフを開催します！一緒に盛り上げてくれる人募集!</strong>)</li>
+</ul>
+
+
+<p>このサバティカル後のことは未定ですが、近々発表できそうな進行中の話があったり、近い将来チャレンジしたいことも色々あったりするので、何らかの形で追々アップデートできたら良いなと思います。</p>
+
+<p>そんなわけでこれから所属は若干変わりますが、引き続きどうぞよろしくお願いします。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ScalaMatsuriの初社員採用プロジェクト これまでの運営の失敗と成功の歴史 ~ScalaMatsuri 2017を振り返って~]]></title>
@@ -700,71 +790,6 @@ lazy val uiContext = UIContext(this)
 <p><code>Promise</code>って意外と使えるジャン、と思ってもらえれば幸いです。</p>
 
 <p>それでは。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Implicitには型注釈をつけましょう]]></title>
-    <link href="http://taisukeoe.github.io/blog/2015/07/11/scala-implicits/"/>
-    <updated>2015-07-11T22:52:58+09:00</updated>
-    <id>http://taisukeoe.github.io/blog/2015/07/11/scala-implicits</id>
-    <content type="html"><![CDATA[<p>Scalaには(とても今更ですが) Implicit/暗黙 というキーワードがあります。Implicitキーワードを宣言する場所をざっくり分けると、以下の4つ。</p>
-
-<p>1) implicit class &hellip;</p>
-
-<p>2) implicit parameter (e.g. (implicit a:A) )</p>
-
-<p>3) implicit def &hellip;</p>
-
-<p>4) implicit (var | val) &hellip;</p>
-
-<p>この中で1,2は(明示的に)型を書かざるを得ませんが、3のdefの戻り値、及び4については、型注釈を明示的に書かずに型推論を働かせることが(少なくとも最新の2.11.7でも)可能です。</p>
-
-<p>しかし型注釈を書かなかった場合、<strong>以下のような（一見理由の分かりにくい）コンパイルエラーに遭遇する可能性が有る</strong>ことはご存知でしょうか？</p>
-
-<!--more-->
-
-
-<pre><code class="scala">//compile success in declaring A, then B
-scala&gt; :paste
-object A {implicit val a = 1}
-object B {import A._;implicitly[Int]}
-
-//compile success in annotating type of A.a
-scala&gt; :paste
-object B {import A._ ; implicitly[Int]}
-object A {implicit val a:Int = 1}
-
-//COMPILE ERROR in declaring B, then A without type annotation
-scala&gt; :paste
-object B {import A._ ; implicitly[Int]}
-object A {implicit val a = 1}
-</code></pre>
-
-<p>JIRAにも同種のissueが多数報告されています。</p>
-
-<ul>
-<li><p><a href="https://issues.scala-lang.org/browse/SI-9130">[SI-9130] destructuring binds, implicit resolution, and declaration order - Scala</a></p></li>
-<li><p><a href="https://issues.scala-lang.org/browse/SI-5265">[SI-5265] warn on implicit def without explicit result type - Scala</a></p></li>
-<li><p><a href="https://issues.scala-lang.org/browse/SI-5348">[SI-5348] Type errors overriding implicit vals - Scala</a></p></li>
-</ul>
-
-
-<p>この問題を防ぐために、コンパイラチームは<strong>暗黙の値やメソッドに型注釈をつけることを強く推奨</strong>しています。</p>
-
-<blockquote><p>Implicits must be explicitly type annotated, otherwise the typechecker may ignore them from preceding parts of the same source file. This is done to avoid triggering spurious cycles in type inference.</p>
-
-<p>暗黙(の値及びメソッド)には明示的に型注釈がつける必要があります。もし型注釈がないと、同じソースファイル上の前方から後方に向かって暗黙を参照している際に、型チェッカーが見落としてしまう恐れがあります。これは型推論をする際に、間違ったサイク
-ルを引き起こさないために行っています。</p>
-
-<ul>
-<li>Comment by Jason Zaugg on <a href="https://issues.scala-lang.org/browse/SI-9130?focusedCommentId=71712&amp;page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-71712">SI-9130</a></li>
-</ul>
-</blockquote>
-
-<p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
-
-<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
 ]]></content>
   </entry>
   

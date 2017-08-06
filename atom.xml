@@ -4,7 +4,7 @@
   <title><![CDATA[OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-03-05T22:06:39+09:00</updated>
+  <updated>2017-08-06T12:50:05+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,106 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BONX社を退職するので、これまでの仕事について振り返ってみた]]></title>
+    <link href="http://taisukeoe.github.io/blog/2017/08/06/bonx-retire/"/>
+    <updated>2017-08-06T10:00:00+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2017/08/06/bonx-retire</id>
+    <content type="html"><![CDATA[<p><img src="http://taisukeoe.github.io/images/20170806/ss_cph.png" width="1280" height="720"></p>
+
+<p>2015年5月から関わっていた <strong><a href="https://bonx.co/ja/">BONX</a>社の最終出社を7/31に済ませまして、来る8月末で退職</strong> します。</p>
+
+<p>これを機に、自分のBONX社での仕事を公に出来る範囲でまとめてみることにしました。</p>
+
+<h2>BONX社でやっていたこと</h2>
+
+<!-- more -->
+
+
+<p>BONXの創業当初からずっと<a href="https://play.google.com/store/apps/details?id=co.bonx.go">Androidアプリ</a>を作ってました。</p>
+
+<p>マンションの一室で、社内にはCEO,CTOと僕含め4,5人しかいないぐらいのアーリーステージのスタートアップということもありまして、
+プロジェクト開始当初の状況を振り返ると、<strong>なかなかチャレンジング</strong> でした。</p>
+
+<p>まず、人生で初めてVoIPクライアントをスクラッチから書くことになったものの、Androidではどのような設計にするのが一番良いか見当つかなかったので、とにかく試行錯誤の連続でした。<strong>何度書き直したかもう覚えていません</strong>。</p>
+
+<p>また、悪名高きAndroidのBluetooth Low Energyを初めて、しかもCentralとPeripheral両面で使い倒すことになりました。最終的には機種依存バグとの戦いで、バッドノウハウがひたすら溜まり続けました。</p>
+
+<p>また、BONXイヤフォンのBLE/SPP絡みのハードウェアのファーム仕様を策定することになったり、スポットですがBONXイヤフォンのファームウェア改善のために中国に飛んだり、IoTスタートアップっぽい仕事も若干ありました。</p>
+
+<p>ただアプリ開発とハードウェア生産が並列して同時に走ったときが一番体力的に厳しく、最初のバージョンのリリース直前で心身ともにすり減っていた時期(しかも<a href="http://2016.scalamatsuri.org/">ScalaMatsuri 2016</a>開催前月)に、
+<strong><a href="http://tech.bonx.co/entry/2016/05/13/161606">当日夜に急遽中国行きの深夜フライトが決まって</a>、翌朝から工場で中国のエンジニア達と缶詰で喧々諤々の議論をした</strong> のがピークでした。</p>
+
+<p>そのとき、<strong>非エンジニアの通訳を介して、排他制御などの並行プログラミングの概念を伝えるのがいかに無理ゲー</strong> かもよく分かりました。<strong>やっぱりエンジニアでも語学大事</strong> だと改めて思ったし、英語だけだと厳しい…という初めての経験でした。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">今晩急遽中国行くことになりました（今年２回目） <a href="https://t.co/gV0WGTjIxS">pic.twitter.com/gV0WGTjIxS</a></p>&mdash; Taisuke OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/673854001939537920">December 7, 2015</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>色々しんどかったけど、だからこそ面白くて、2年以上関わることになったんだろうなと思います。</p>
+
+<p>そうこうしているうちに、ユーザーからの評価も安定しだしてちゃんと遊べるプロダクトになり、今年駆け足ながらもDDD/Clean Architectureベースの設計にリファクタリングできて、
+ようやく一区切りつけられたかなと思っています。</p>
+
+<p>その集大成として、<strong>世界最大のScalaカンファレンス<a href="http://scaladays.org/">ScalaDays</a>に出したプロポーザルが幸運にも通りまして、BONXの事例についてシカゴとコペンハーゲンで講演することができました(※)</strong>。</p>
+
+<p><em>※ 元々の<a href="https://www.slideshare.net/TaisukeOe/real-world-android-akka-75288411">スライド</a>及び<a href="https://www.youtube.com/watch?v=kGH0mbjA2_U">発表</a>は英語ですが、以下のスライドは<a href="https://shinjuku-geek-lounge.connpass.com/event/59099/">新宿Geek Lounge</a>で喋った日本語版の資料になります</em></p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/5NPoLg6X76yDiL" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/TaisukeOe/real-world-android-akka-77574727" title="Real World Android Akka - 日本語版" target="_blank">Real World Android Akka - 日本語版</a> </strong> from <strong><a target="_blank" href="https://www.slideshare.net/TaisukeOe">Taisuke Oe</a></strong> </div></p>
+
+<p>Bluetoothの話は、日本の勉強会で喋ったこちらのスライドにまとめてあります。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/gf8TSM0U43pmye" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/TaisukeOe/bonxbluetooth-bluetooth120" title="BONXを支える技術：Bluetooth編 ~Bluetoothを120%使い倒す方法~" target="_blank">BONXを支える技術：Bluetooth編 ~Bluetoothを120%使い倒す方法~</a> </strong> from <strong><a target="_blank" href="https://www.slideshare.net/TaisukeOe">Taisuke Oe</a></strong> </div></p>
+
+<h2>BONX社をなぜ辞めるのか？</h2>
+
+<p>BONX社以外の、<strong>個人ワークでやりたいことが溜まりすぎた</strong>、というのが一番の原因です。</p>
+
+<p>幾度となくBONX社の仕事をする傍らやろうと試していたのですが、<strong>トータルの活動時間が自分のキャパを越えてしまって体調を崩す</strong> ということを繰り返し、頓挫していました。
+ある時、これ以上タスクを増やすのは現実的ではないなということに気づき、今取り組んでいる何かを諦めることを決めました。</p>
+
+<p>では今携わっているプロジェクトの中でも、なぜBONXを辞めることにしたのか？というと：</p>
+
+<ul>
+<li>限られた活動時間の枠の中で、一番シェアが大きかった</li>
+<li>(先述の通り)BONX Androidアプリについて、色々やりきったところでちょうど一区切りついてしまった</li>
+<li>特殊なアプリではあるものの、僕以外の人の手でメンテできることを確認できた</li>
+<li>会社のフェーズが変わり、これからのBONX社には、僕よりもっと適任な人がいるだろう、と思えた</li>
+</ul>
+
+
+<p><strong>BONX自体は今でも好き</strong> だし、たぶん来冬も一ユーザーとして使って遊んでると思います。</p>
+
+<p>今もBONX社は<a href="https://www.wantedly.com/companies/bonx">Androidエンジニア含め色んなポジションで募集してる</a>ので、よかったら是非どうぞ(宣伝)。</p>
+
+<h2>今後何をするのか？</h2>
+
+<p>今後しばらくはフルタイムの仕事はせず、アドバイザーの仕事を続けながら <strong><a href="https://ja.wikipedia.org/wiki/%E3%82%B5%E3%83%90%E3%83%86%E3%82%A3%E3%82%AB%E3%83%AB">サバティカル</a>のつもりで個人プロジェクト中心に進捗出していきたい</strong> 所存です。具体的には下記に挙げたようなことを、少なくとも3ヶ月は取り組むつもりです。</p>
+
+<ul>
+<li><a href="http://www.septeni-original.co.jp/">セプテーニ・オリジナル</a>社の技術アドバイザーとして、粛々とお仕事</li>
+<li><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>の講演準備</li>
+<li>進捗が遅れてる某プロジェクトの巻取り</li>
+<li>OSS活動</li>
+<li>勉強(コンパイラ、言語処理系、機械学習など)</li>
+<li>引き続き<a href="http://scalamatsuri.org/">ScalaMatsuri</a> (<strong>8月26日にScalaMatsuri 2018キックオフを開催します！一緒に盛り上げてくれる人募集!</strong>)</li>
+</ul>
+
+
+<p>このサバティカル後のことは未定ですが、近々発表できそうな進行中の話があったり、近い将来チャレンジしたいことも色々あったりするので、何らかの形で追々アップデートできたら良いなと思います。</p>
+
+<p>そんなわけでこれから所属は若干変わりますが、引き続きどうぞよろしくお願いします。</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ScalaMatsuriの初社員採用プロジェクト これまでの運営の失敗と成功の歴史 ~ScalaMatsuri 2017を振り返って~]]></title>
