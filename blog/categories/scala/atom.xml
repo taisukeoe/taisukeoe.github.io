@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scala | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/scala/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-09-19T13:09:17+09:00</updated>
+  <updated>2017-09-19T13:20:03+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,129 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Scala関西サミットに向けて色々仕込んでいた話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/"/>
+    <updated>2017-09-17T23:52:33+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017</id>
+    <content type="html"><![CDATA[<p>9/9に大阪で開催された<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>に参加してきました。いつもながら非常に楽しかったです。<strong>主催のきの子(<a href="https://twitter.com/aa7th">@aa7th</a>)さん、スタッフの皆さんお疲れ様でした！</strong></p>
+
+<p>今回のScala関西サミットは、自分にとって３つのミッションがありました。</p>
+
+<ul>
+<li>自分のセッションの発表</li>
+<li>エフ・コード社の準備のお手伝い</li>
+<li>発表資料レビューのお手伝い</li>
+</ul>
+
+
+<p>それぞれ別種の忙しさがありましたが、なんとか乗り切ることができたので、ようやく肩の荷がちょっと降りた気持ちです。</p>
+
+<p>最近僕がどんな仕事をしているか見えにくいと思いますので、良い機会ですし今回の記事では上記３つそれぞれについて、ご紹介しようと思います。</p>
+
+<h2>自分のセッションの発表</h2>
+
+<p>今回Androidネタは封印して、Dottyネタで喋ってきました。</p>
+
+<p><a href="https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala</a>">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala</a></a></p>
+
+<!-- more -->
+
+
+<p>内容としては、Scala2系のつらみと、その対処法を2系とDottyで比較する話です。Dottyは非常に面白いけどまだ色々変わりうるし、それ単体で今すぐ役立つ話ではないので、敢えてScala2系にスポットをあてました。</p>
+
+<p>サブトピックとして、暗黙展開の発散(<code>implicit expansion divergence</code>)についてきちんと説明しているドキュメントがあまり見当たらなかったので、丁寧目に解説を書いてみました。</p>
+
+<h2>エフ・コード社の準備のお手伝い</h2>
+
+<p>9/8のプレスリリースの通り、<strong><a href="https://f-code.co.jp/">株式会社エフ・コード</a>の商品開発部顧問に就任</strong>しました。</p>
+
+<p>エフ・コード取締役の門田(<a href="https://twitter.com/yoshinorikadota">@yoshinorikadota</a>)さんが４年来の友人で、かつエフ・コード社に<a href="http://2017.scalamatsuri.org/">ScalaMatsuri 2017</a>のスポンサーになっていただいたことがご縁の始まりです。</p>
+
+<p>会社のビジネスモデルを転換するにあたり、ソフトウェア部門を組織建てる初期から関われることが面白く、顧問のオファーをお引き受けすることにしました。職務内容としては、エンジニア組織の設計・プロセス改善を主として、自分が貢献できそうなところを見つけては落穂拾い的に様々なお手伝いをしています。</p>
+
+<p>僕は基本的には黒子の立場だと自認しているのですが、同時期に<strong>がくぞ(<a href="https://twitter.com/gakuzzzz">@gakuzzzz</a>)さんの入社と水島(<a href="https://twitter.com/kmizu">@kmizu</a>)さんの技術顧問就任</strong>という一大ニュースがあるということで、これを機にエフ・コード社をScala企業として認知してもらうため、既にエフ・コード社がスポンサーすることが決まっていた<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>にプレスリリースを合わせましょう、と持ちかけました。</p>
+
+<p>スケジュールの言い出しっぺということもありまして、プレスの構成及び文面レビュー、撮影のセッティング、パネルをふくめた写真の構図決めなど、お手伝い諸々をしていました。</p>
+
+<p>その結果のプレスリリースがこちら。お陰様でTwitter上でもScala関西サミットでも話題になりました。</p>
+
+<p><a href="https://twitter.com/codezine/status/905961159940902912">https://twitter.com/codezine/status/905961159940902912</a>">https://twitter.com/codezine/status/905961159940902912">https://twitter.com/codezine/status/905961159940902912</a></a></p>
+
+<p><img class="<a" src="href="https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg">https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg</a>" width="800" height="600"></p>
+
+<p>そして当日にブースで配布する、来場者の記憶に残るノベルティグッズを何にしようか、というミーティングで僭越ながら僕がアイディアを出しまして、とてもキャッチーなコピーやポップとともに実現していただきました。</p>
+
+<p><strong>そう、null消しです。</strong></p>
+
+<p><a href="https://twitter.com/ma2saka/status/906334211811840000">https://twitter.com/ma2saka/status/906334211811840000</a>">https://twitter.com/ma2saka/status/906334211811840000">https://twitter.com/ma2saka/status/906334211811840000</a></a></p>
+
+<p>お察しのとおり、<strong>がくぞさん公式の肩書き <code>Professional Null Cleaner</code> (<a href="http://gakuzzzz.github.io/slides/refactoring_in_scala/#3">参考</a>)に因んでいます</strong>。がくぞさん、ネタにするのを快く承諾くださりありがとうございました。</p>
+
+<p>こちらも非常にご好評いただいたので、ホッと胸を撫で下ろしています。</p>
+
+<p><a href="https://twitter.com/takezoen/status/907410282506358785">https://twitter.com/takezoen/status/907410282506358785</a>">https://twitter.com/takezoen/status/907410282506358785">https://twitter.com/takezoen/status/907410282506358785</a></a></p>
+
+<p><strong>一刻も早いnullの撲滅を祈っています。</strong></p>
+
+<h2>発表資料レビューのお手伝い</h2>
+
+<p>技術アドバイザーをさせていただいているセプテーニ・オリジナルさんと、前述のエフ・コードさんから<strong>スピーカーが総勢7名</strong>（顧問も入れたらのべ11名？）も出るのを受けまして、せっかくなので社内練習会やりましょうと言い出したり、希望者ベースですが発表資料レビューのお手伝いをしていました。</p>
+
+<p>どんなレビューをしたか振り返ると、そのときの準備の進捗度によって、ざっくり４パターンありました。</p>
+
+<ul>
+<li>講演主旨・メッセージの洗い出し/壁打ち</li>
+<li>主旨を伝えるために最適な構成の整理/壁打ち</li>
+<li>論理展開の整理/壁打ち</li>
+<li>言葉の選び方 / 図の構成 / 技術的誤謬などの細部のレビュー</li>
+</ul>
+
+
+<p>皆さん優秀ですし、教えるというよりもむしろ論旨を明確にしたり迷子にならないよう誘導するための、<strong>壁打ち相手としてレビュアー参加</strong>させてもらいました。</p>
+
+<h2>カンファレンス外の催し</h2>
+
+<p>僕は基本的にカンファレンスには、本体よりむしろそれ付随する懇親会等で、<strong>集った人達とわいわい議論したり喋るのを楽しみに参加しています</strong>。</p>
+
+<p>というわけで、河内(<a href="https://twitter.com/kawachi">@kawachi</a>)さん主催の前夜祭?(@airbnbの宿)に乗っかったり、2次会、3次会を企画させていただきました。</p>
+
+<p>前夜祭？</p>
+
+<p><a href="https://twitter.com/OE_uia/status/906148935860813824">https://twitter.com/OE_uia/status/906148935860813824</a>">https://twitter.com/OE_uia/status/906148935860813824">https://twitter.com/OE_uia/status/906148935860813824</a></a></p>
+
+<p>2次会</p>
+
+<p><a href="https://twitter.com/itohiro73/status/906504180440764416">https://twitter.com/itohiro73/status/906504180440764416</a>">https://twitter.com/itohiro73/status/906504180440764416">https://twitter.com/itohiro73/status/906504180440764416</a></a></p>
+
+<p>3次会</p>
+
+<p><img src="/images/20170917/3jikai.jpg" width="600" height="450"></p>
+
+<p>Scala関西サミット史上最大？の2次回、3次会参加者数で、色んな方とも喋れてとても楽しかった！ご参加いただいた皆さん、ありがとうございました 🙌</p>
+
+<h3>和装でぶらり京都旅</h3>
+
+<p>カンファレンス翌日の9/10は、なんとなく3次会で「和装したいよね！」という話になり、京都でこんな感じになって、ぶらぶらと清水のあたりを散策していました。</p>
+
+<p><img src="/images/20170917/wasou.jpg" width="1280" height="720"></p>
+
+<p>和装の手配をしてくれた堀内(<a href="https://twitter.com/noriakihoriuchi">@noriakihoriuch</a>)さん、どうもありがとうございました。</p>
+
+<h3>関西のScala企業訪問</h3>
+
+<p>せっかく関西に来たということで、ご厚意に甘えて関西のScala企業にもお邪魔させていただきました。</p>
+
+<p>粕谷(<a href="https://twitter.com/daiksy">@daiksy</a>)さんに連れられて、<a href="http://www.hatena.ne.jp/">はてな</a>さんでランチごちそうになりつつ、Scalaの事例のお話をお伺いしてました。有り難うございました！</p>
+
+<p>また藤井(<a href="https://twitter.com/yoshiyoshifujii">@yoshiyoshifujii</a>)さんのご厚意で、<a href="http://www.motex.co.jp/">MOTEX</a>さんにお邪魔してモブプロ初体験してきました。</p>
+
+<p>ペアプロだと「ここは〜を使う方が良いですよ」でその場では終わりやすいですが、モブプロだと更に他の人が乗っかって「それなら〜という方法もありますよ」と複数の手段のどちらが適切か議論しやすい点が面白いですね。その文脈において、ペアプロは並列数上げたスキルエクスチェンジが捗りますが、<strong>モブプロはレビュアー含めて弁証法的に知見が深まる</strong>のが良いところだと感じました。必要な場面でそれぞれ使い分けたいです。</p>
+
+<p>藤井さん、体験ツアー組んでくださり有り難うございました！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BONX社を退職するので、これまでの仕事について振り返ってみた]]></title>
@@ -644,152 +767,6 @@
 <p>ようやく3年目にしてScalaMatsuriとしての独自色を出せるようになってきましたので、そこで蓄えた知見を少しでもコミュニティ内外に還元できたらと考えています。その一環としての、このブログ記事という側面もあったりします。</p>
 
 <p>これからも ScalaMatsuriをどうぞよろしくお願いします。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scala標準のPromiseがAndroidで便利だという話]]></title>
-    <link href="http://taisukeoe.github.io/blog/2015/12/15/scala-promise-sample-for-android/"/>
-    <updated>2015-12-15T23:10:05+09:00</updated>
-    <id>http://taisukeoe.github.io/blog/2015/12/15/scala-promise-sample-for-android</id>
-    <content type="html"><![CDATA[<p>この記事は、<a href="http://www.adventar.org/calendars/904">Scala Advent Calendar</a> 13日目です。</p>
-
-<p>今日は<code>scala.concurrent.Promise</code>の話をします。</p>
-
-<p><a href="http://www.scala-lang.org/api/current/index.html#scala.concurrent.Promise">Promise - Scala Standard Library 2.11.7 - scala.concurrent.Promise</a></p>
-
-<p>そもそも<code>Promise</code>って使いどころがわかりにくいですよね。他人のコードで使ってるの、ほとんど見たことがありません。</p>
-
-<p>公式ドキュメントではProducer-Consumerパターンでの使い方を解説していますが、現実にこの使い方が必要になるケースってあまり遭遇せず、たいていの場合はFuture同士のflatMapによる合成で事足りてしまうと思います。</p>
-
-<p><a href="http://docs.scala-lang.org/ja/overviews/core/futures.html">Future と Promise - Scala Documentation</a></p>
-
-<p>ところが、実はAndroidアプリ開発では頻繁に遭遇するあのパターンが、<code>Promise</code>を使うと非常に取り回しが良くなりますので、紹介したいと思います。</p>
-
-<!--more-->
-
-
-<p>それは、<code>Intent</code>で外部<code>Activity</code>から何かしらの値を取得し、<code>onActivityResult</code>でその値を受け取るパターンです。</p>
-
-<p><a href="https://developer.android.com/intl/ja/reference/android/content/Intent.html">Intent | Android Developers</a></p>
-
-<p><a href="http://developer.android.com/intl/ja/reference/android/app/Activity.html#onActivityResult(int,%20int,%20android.content.Intent">Activity#onActivityResult | Android Developers</a></p>
-
-<p>Androidでは、アプリ外部との連携を<code>Intent</code>という仕組みを使って制御しています。</p>
-
-<p>取得したい情報や実行したい処理(Action)を<code>Intent</code>にセットし、<code>startActivityForResult</code>メソッドに渡すことで、外部アプリなどを起動し必要なデータを取得させたうえで、自分のアプリに返ってくる（<code>onActivityResult</code>メソッドが呼ばれ、引数にデータが渡される)ことが出来ます。</p>
-
-<p>この<code>Intent</code>は大変便利な仕組みですが、その一方で<strong><em>一連のパイプラインの記述が<code>startActivityForResult</code>と<code>onActivityResult</code>の間で分断されてしまい、データの流れが追いにくい</em></strong>コードになっています。</p>
-
-<p>例えば以下のような、ボタンをクリックすると外部アプリで写真を選択させて、自アプリに表示するだけのアプリについて考えてみましょう。</p>
-
-<table>
-<thead>
-<tr>
-<th style="text-align:center;"> ~<code>startActivityForResult</code> </th>
-<th style="text-align:center;"> <code>onActivityResult</code> ~ </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center;"> <img src="/images/20151215/app-1-small.png" width="300" height="300"> </td>
-<td style="text-align:center;"> <img src="/images/20151215/app-2-small.png" width="300" height="300"> </td>
-</tr>
-</tbody>
-</table>
-
-
-<pre><code class="scala Promise無しの例(パイプラインが分断される)">class MyActivity extends Activity with TypedFindView{
-lazy val IMAGE_FETCH_ID = 12345
-
-override def onCreate(bundle: Bundle) {
-   //Activity初期化処理など
-   //...
-   findView(TR.button_image).onClick{
-     _ =&gt;
-      val intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-      intent.setType("image/*")
-      startActivityForResult(intent, IMAGE_FETCH_ID)
-      //データパイプラインがここで分断
-    }
- }
-
- override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Unit = {
-  requestCode match {
-    case IMAGE_FETCH_ID =&gt;
-    //データパイプラインがここから継続
-    if (resultCode == Activity.RESULT_OK)
-      findView(TR.image).setImageURI(data.getData)
-     else{
-       //failed. Do something if needed.  
-     }
-    case _ =&gt; //do nothing
-  }
-}
-}
-</code></pre>
-
-<p>これを<code>Promise</code>を使って書き換えてみましょう。</p>
-
-<p><strong><code>Promise</code>によって、<code>startActivityForResult</code>から <code>onActivityResult</code>までの流れを、単一<code>Future</code>インスタンスの中に閉じ込めたかのように扱うことが出来ます。</strong></p>
-
-<p>これでパイプラインの記述をスッキリ書くことが出来るようになりました。</p>
-
-<pre><code class="scala Promise有りの例">class MainActivity extends Activity with TypedFindView with ImageLoadable{
-lazy val uiContext = UIContext(this)
- override def onCreate(bundle: Bundle) {
-   //Activity初期化処理など
-   //...
-
-   //データパイプラインを分断させず、そのまま記述できる
-   findView(TR.button_image).onClick{
-    _ =&gt; chooseImageUri().foreach{
-      bmp =&gt; findView(TR.image).setImageURI(bmp)
-    }(uiContext)
-   }
- }
-}
-</code></pre>
-
-<pre><code class="scala">trait ImageLoadable extends Activity {
-  lazy val IMAGE_FETCH_ID = 12345
-  private var promise: Option[Promise[Uri]] = None
-
-  def chooseImageUri(): Future[Uri] = {
-    promise.filterNot(_.isCompleted).foreach(_.failure(new InterruptedException("Asked to load another image. Aborted.")))
-    val p = Promise[Uri]()
-    promise = Some(p)
-    val intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-    intent.setType("image/*")
-    startActivityForResult(intent, IMAGE_FETCH_ID)
-    p.future
-  }
-
-  override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent): Unit = {
-    super.onActivityResult(requestCode,resultCode,data)
-    requestCode match {
-      case IMAGE_FETCH_ID =&gt; if (resultCode == Activity.RESULT_OK)
-        promise.foreach(_.success(data.getData))
-      else
-        promise.foreach(_.failure(ImageNotAvailableException("Failed to fetch image.")))
-      case _ =&gt; //do nothing
-    }
-  }
-}
-</code></pre>
-
-<p>ビルド可能なサンプルソースコードはこちらです。</p>
-
-<p><a href="https://github.com/taisukeoe/ScalaPromiseDemo">taisukeoe/ScalaPromiseDemo</a></p>
-
-<p>この例と似た、より一般的な例が以下の<code>Promise</code>を使ったCallback APIの<code>Future</code>化です。
-しかしCallback APIの<code>Future</code>化は<code>scalaz.concurrent.Task.async</code>でも実現できますが、上記の例は実現できません（<code>onActivityResult</code>のせい）。</p>
-
-<p><a href="https://github.com/taisukeoe/ScalaFPEvent/blob/aa6f784353e8e9147fd47ff6303407bd6faf345c/src/main/scala/ScalaStdFutureExample.scala">ScalaFPEvent - ScalaStdFutureExmaple</a></p>
-
-<p><code>Promise</code>って意外と使えるジャン、と思ってもらえれば幸いです。</p>
-
-<p>それでは。</p>
 ]]></content>
   </entry>
   

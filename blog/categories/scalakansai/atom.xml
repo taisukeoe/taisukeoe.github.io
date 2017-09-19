@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Scalakansai | OE_uia Tech Blog]]></title>
+  <link href="http://taisukeoe.github.io/blog/categories/scalakansai/atom.xml" rel="self"/>
+  <link href="http://taisukeoe.github.io/"/>
+  <updated>2017-09-19T13:20:03+09:00</updated>
+  <id>http://taisukeoe.github.io/</id>
+  <author>
+    <name><![CDATA[Taisuke Oe]]></name>
+    <email><![CDATA[oeuia.t@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Scala関西サミットに向けて色々仕込んでいた話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/"/>
+    <updated>2017-09-17T23:52:33+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017</id>
+    <content type="html"><![CDATA[<p>9/9に大阪で開催された<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>に参加してきました。いつもながら非常に楽しかったです。<strong>主催のきの子(<a href="https://twitter.com/aa7th">@aa7th</a>)さん、スタッフの皆さんお疲れ様でした！</strong></p>
+
+<p>今回のScala関西サミットは、自分にとって３つのミッションがありました。</p>
+
+<ul>
+<li>自分のセッションの発表</li>
+<li>エフ・コード社の準備のお手伝い</li>
+<li>発表資料レビューのお手伝い</li>
+</ul>
+
+
+<p>それぞれ別種の忙しさがありましたが、なんとか乗り切ることができたので、ようやく肩の荷がちょっと降りた気持ちです。</p>
+
+<p>最近僕がどんな仕事をしているか見えにくいと思いますので、良い機会ですし今回の記事では上記３つそれぞれについて、ご紹介しようと思います。</p>
+
+<h2>自分のセッションの発表</h2>
+
+<p>今回Androidネタは封印して、Dottyネタで喋ってきました。</p>
+
+<p><a href="https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala</a>">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala">https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala</a></a></p>
+
+<!-- more -->
+
+
+<p>内容としては、Scala2系のつらみと、その対処法を2系とDottyで比較する話です。Dottyは非常に面白いけどまだ色々変わりうるし、それ単体で今すぐ役立つ話ではないので、敢えてScala2系にスポットをあてました。</p>
+
+<p>サブトピックとして、暗黙展開の発散(<code>implicit expansion divergence</code>)についてきちんと説明しているドキュメントがあまり見当たらなかったので、丁寧目に解説を書いてみました。</p>
+
+<h2>エフ・コード社の準備のお手伝い</h2>
+
+<p>9/8のプレスリリースの通り、<strong><a href="https://f-code.co.jp/">株式会社エフ・コード</a>の商品開発部顧問に就任</strong>しました。</p>
+
+<p>エフ・コード取締役の門田(<a href="https://twitter.com/yoshinorikadota">@yoshinorikadota</a>)さんが４年来の友人で、かつエフ・コード社に<a href="http://2017.scalamatsuri.org/">ScalaMatsuri 2017</a>のスポンサーになっていただいたことがご縁の始まりです。</p>
+
+<p>会社のビジネスモデルを転換するにあたり、ソフトウェア部門を組織建てる初期から関われることが面白く、顧問のオファーをお引き受けすることにしました。職務内容としては、エンジニア組織の設計・プロセス改善を主として、自分が貢献できそうなところを見つけては落穂拾い的に様々なお手伝いをしています。</p>
+
+<p>僕は基本的には黒子の立場だと自認しているのですが、同時期に<strong>がくぞ(<a href="https://twitter.com/gakuzzzz">@gakuzzzz</a>)さんの入社と水島(<a href="https://twitter.com/kmizu">@kmizu</a>)さんの技術顧問就任</strong>という一大ニュースがあるということで、これを機にエフ・コード社をScala企業として認知してもらうため、既にエフ・コード社がスポンサーすることが決まっていた<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>にプレスリリースを合わせましょう、と持ちかけました。</p>
+
+<p>スケジュールの言い出しっぺということもありまして、プレスの構成及び文面レビュー、撮影のセッティング、パネルをふくめた写真の構図決めなど、お手伝い諸々をしていました。</p>
+
+<p>その結果のプレスリリースがこちら。お陰様でTwitter上でもScala関西サミットでも話題になりました。</p>
+
+<p><a href="https://twitter.com/codezine/status/905961159940902912">https://twitter.com/codezine/status/905961159940902912</a>">https://twitter.com/codezine/status/905961159940902912">https://twitter.com/codezine/status/905961159940902912</a></a></p>
+
+<p><img class="<a" src="href="https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg">https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg</a>" width="800" height="600"></p>
+
+<p>そして当日にブースで配布する、来場者の記憶に残るノベルティグッズを何にしようか、というミーティングで僭越ながら僕がアイディアを出しまして、とてもキャッチーなコピーやポップとともに実現していただきました。</p>
+
+<p><strong>そう、null消しです。</strong></p>
+
+<p><a href="https://twitter.com/ma2saka/status/906334211811840000">https://twitter.com/ma2saka/status/906334211811840000</a>">https://twitter.com/ma2saka/status/906334211811840000">https://twitter.com/ma2saka/status/906334211811840000</a></a></p>
+
+<p>お察しのとおり、<strong>がくぞさん公式の肩書き <code>Professional Null Cleaner</code> (<a href="http://gakuzzzz.github.io/slides/refactoring_in_scala/#3">参考</a>)に因んでいます</strong>。がくぞさん、ネタにするのを快く承諾くださりありがとうございました。</p>
+
+<p>こちらも非常にご好評いただいたので、ホッと胸を撫で下ろしています。</p>
+
+<p><a href="https://twitter.com/takezoen/status/907410282506358785">https://twitter.com/takezoen/status/907410282506358785</a>">https://twitter.com/takezoen/status/907410282506358785">https://twitter.com/takezoen/status/907410282506358785</a></a></p>
+
+<p><strong>一刻も早いnullの撲滅を祈っています。</strong></p>
+
+<h2>発表資料レビューのお手伝い</h2>
+
+<p>技術アドバイザーをさせていただいているセプテーニ・オリジナルさんと、前述のエフ・コードさんから<strong>スピーカーが総勢7名</strong>（顧問も入れたらのべ11名？）も出るのを受けまして、せっかくなので社内練習会やりましょうと言い出したり、希望者ベースですが発表資料レビューのお手伝いをしていました。</p>
+
+<p>どんなレビューをしたか振り返ると、そのときの準備の進捗度によって、ざっくり４パターンありました。</p>
+
+<ul>
+<li>講演主旨・メッセージの洗い出し/壁打ち</li>
+<li>主旨を伝えるために最適な構成の整理/壁打ち</li>
+<li>論理展開の整理/壁打ち</li>
+<li>言葉の選び方 / 図の構成 / 技術的誤謬などの細部のレビュー</li>
+</ul>
+
+
+<p>皆さん優秀ですし、教えるというよりもむしろ論旨を明確にしたり迷子にならないよう誘導するための、<strong>壁打ち相手としてレビュアー参加</strong>させてもらいました。</p>
+
+<h2>カンファレンス外の催し</h2>
+
+<p>僕は基本的にカンファレンスには、本体よりむしろそれ付随する懇親会等で、<strong>集った人達とわいわい議論したり喋るのを楽しみに参加しています</strong>。</p>
+
+<p>というわけで、河内(<a href="https://twitter.com/kawachi">@kawachi</a>)さん主催の前夜祭?(@airbnbの宿)に乗っかったり、2次会、3次会を企画させていただきました。</p>
+
+<p>前夜祭？</p>
+
+<p><a href="https://twitter.com/OE_uia/status/906148935860813824">https://twitter.com/OE_uia/status/906148935860813824</a>">https://twitter.com/OE_uia/status/906148935860813824">https://twitter.com/OE_uia/status/906148935860813824</a></a></p>
+
+<p>2次会</p>
+
+<p><a href="https://twitter.com/itohiro73/status/906504180440764416">https://twitter.com/itohiro73/status/906504180440764416</a>">https://twitter.com/itohiro73/status/906504180440764416">https://twitter.com/itohiro73/status/906504180440764416</a></a></p>
+
+<p>3次会</p>
+
+<p><img src="/images/20170917/3jikai.jpg" width="600" height="450"></p>
+
+<p>Scala関西サミット史上最大？の2次回、3次会参加者数で、色んな方とも喋れてとても楽しかった！ご参加いただいた皆さん、ありがとうございました 🙌</p>
+
+<h3>和装でぶらり京都旅</h3>
+
+<p>カンファレンス翌日の9/10は、なんとなく3次会で「和装したいよね！」という話になり、京都でこんな感じになって、ぶらぶらと清水のあたりを散策していました。</p>
+
+<p><img src="/images/20170917/wasou.jpg" width="1280" height="720"></p>
+
+<p>和装の手配をしてくれた堀内(<a href="https://twitter.com/noriakihoriuchi">@noriakihoriuch</a>)さん、どうもありがとうございました。</p>
+
+<h3>関西のScala企業訪問</h3>
+
+<p>せっかく関西に来たということで、ご厚意に甘えて関西のScala企業にもお邪魔させていただきました。</p>
+
+<p>粕谷(<a href="https://twitter.com/daiksy">@daiksy</a>)さんに連れられて、<a href="http://www.hatena.ne.jp/">はてな</a>さんでランチごちそうになりつつ、Scalaの事例のお話をお伺いしてました。有り難うございました！</p>
+
+<p>また藤井(<a href="https://twitter.com/yoshiyoshifujii">@yoshiyoshifujii</a>)さんのご厚意で、<a href="http://www.motex.co.jp/">MOTEX</a>さんにお邪魔してモブプロ初体験してきました。</p>
+
+<p>ペアプロだと「ここは〜を使う方が良いですよ」でその場では終わりやすいですが、モブプロだと更に他の人が乗っかって「それなら〜という方法もありますよ」と複数の手段のどちらが適切か議論しやすい点が面白いですね。その文脈において、ペアプロは並列数上げたスキルエクスチェンジが捗りますが、<strong>モブプロはレビュアー含めて弁証法的に知見が深まる</strong>のが良いところだと感じました。必要な場面でそれぞれ使い分けたいです。</p>
+
+<p>藤井さん、体験ツアー組んでくださり有り難うございました！</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Scala関西サミットでAndroid Akkaについて喋ってきた話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2016/12/03/scala-kansai/"/>
+    <updated>2016-12-03T23:26:02+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2016/12/03/scala-kansai</id>
+    <content type="html"><![CDATA[<p>さて、<a href="http://qiita.com/advent-calendar/2016/scala">2016年Scalaアドベントカレンダー@Qiita</a> 3日目です。</p>
+
+<p>何を書こうかと考えていたら、そもそも10/8に開催されたScala関西サミットの話をブログに書いてないことに気づきました。</p>
+
+<p>なので今回はそのことを紹介しつつ、色々補足できたらと思っています。</p>
+
+<p>その前に。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>の感想</h1>
+
+<p>時期を逸した感じがしますが(きの子さんすいません…)、去年にも増して楽しかったです！</p>
+
+<p>(結果的に)タイムテーブルの組み方が非常によくできていて、特にB会場のトラックがActorモデルの解説から、Akka-Stream、と続いていき、最後にAkka Clusterの闇の話が入る、という最高の流れでした。</p>
+
+<p>そして日本各地からだけでなく、台湾からの参加者もいらっしゃるなど、多様性という意味でも大きくグレードアップしていました。</p>
+
+<p>これが無料イベントって… 運営のことが非常に心配になりますので、お金払いますから今後もぜひ続けて下さい、という気持ちです。</p>
+
+<p></br></p>
+
+<p><a href="http://2017.scalamatsuri.org/">ScalaMatsuri</a>も負けてられません！</p>
+
+<p>というわけで、ただいまセッション投票の集計＆選考＆タイムテーブル準備などの真っ最中でございます。</p>
+
+<p>近々、遅くとも年内にはまとまった情報を出せると思いますので、しばしお待ちくださいませ。</p>
+
+<p>僕の主観ですが、今までにも増して豪華で面白いトークの集まる、素晴らしい２日間になると思います。</p>
+
+<p>さて、本題。</p>
+
+<h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>のスライド</h1>
+
+<p><a href="http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a>">http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a></a></p>
+
+<p>このトークではActorモデルの解説と、Actorモデルがなぜ<a href="">BONX</a>というVoIPアプリにフィットしたのか、という話をさせていただきました。</p>
+
+<p>ただ、あまりAkkaのカスタマイズ性がVoIPのチューニングにどう役立つのか、という話は出来ずじまいでした。
+今回はそこにフォーカスをあてます。</p>
+
+<h1>非機能要件の改善</h1>
+
+<p>VoIPアプリの場合、機能要件の実装・テストより、非機能要件の改善に時間を使います。
+具体的には音質と遅延の改善です。</p>
+
+<h2>音質の改善</h2>
+
+<p>Actorモデルで設計されたVoIPモジュールにおいて何が一番音質の劣化原因になるかといえば、フレーム間で発生した遅延や、フレームの欠落です。</p>
+
+<p>あるフレームが再生されてから、次のフレームが再生されるまでに間に大きく遅延すると、そこで波形が途切れること（非線形）になりますので聴感上ブツッというノイズに感じます。</p>
+
+<p>同様にして、フレームの欠落が起きると、やはり前後のフレームが非連続になりますのでノイズに感じます。</p>
+
+<p>大雑把に言えば、遅延の改善が音質の改善に繋がります。</p>
+
+<h2>遅延の改善</h2>
+
+<p>では、遅延をどのように改善したら良いでしょう。</p>
+
+<p>安定している条件では、Akkaというより、個々の計算量を減らすなどモジュールごとのチューニングが必要となることが多いです。</p>
+
+<p>しかし音声ストリーム処理の、しかもグループ通話など負荷が時間とともに変わりうる場合だと、Actorシステムにボトルネックが生じることが往々にしてあります。</p>
+
+<p>まず測定・監視して詰まりやすいhotspotになる場所を探し出し、その後で負荷を分散・解消する方策を考え試行錯誤する必要があります。</p>
+
+<p>解決策は十分にdispatcherの並列度を上げる必要があるときもあれば、局所的にActorを並列化するべきなケース、throughtputなどのパラメーターが重要になるケースなど様々です。</p>
+
+<p>Akkaではこういた実行モデルのチューニングの大部分を、confファイルで簡便に変更出来る点で優れています。</p>
+
+<p>また、Mailboxのサイズを適切に設定することも重要です。</p>
+
+<p>小さすぎて溢れるとフレームの欠落になりますし、かといって大きすぎると遅延の解消に時間がかかります。</p>
+
+<p>音声ストリーム処理の改善、とても難しいけど、チューニングがユーザー体験に直結するのはなかなかレアなので面白いです。</p>
+
+<p>そんなAkkaのチューニングをやりたい方、今Androidエンジニアを絶賛募集中ですので、よかったら<a href="https://www.wantedly.com/projects/76119">こちら</a>からどうぞ。</p>
+
+<p>それでは。</p>
+]]></content>
+  </entry>
+  
+</feed>
