@@ -4,7 +4,7 @@
   <title><![CDATA[OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -12,6 +12,152 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Scala関西サミットに向けて色々仕込んでいた話]]></title>
+    <link href="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/"/>
+    <updated>2017-09-17T23:52:33+09:00</updated>
+    <id>http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017</id>
+    <content type="html"><![CDATA[<p>9/9に大阪で開催された<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>に参加してきました。いつもながら非常に楽しかったです。<strong>主催のきの子(<a href="https://twitter.com/aa7th">@aa7th</a>)さん、スタッフの皆さんお疲れ様でした！</strong></p>
+
+<p>今回のScala関西サミットは、自分にとって３つのミッションがありました。</p>
+
+<ul>
+<li>自分のセッションの発表</li>
+<li>エフ・コード社の準備のお手伝い</li>
+<li>発表資料レビューのお手伝い</li>
+</ul>
+
+
+<p>それぞれ別種の忙しさがありましたが、なんとか乗り切ることができたので、ようやく肩の荷がちょっと降りた気持ちです。</p>
+
+<p>最近僕がどんな仕事をしているか見えにくいと思いますので、良い機会ですし今回の記事では上記３つそれぞれについて、ご紹介しようと思います。</p>
+
+<h2>自分のセッションの発表</h2>
+
+<p>今回Androidネタは封印して、Dottyネタで喋ってきました。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/HqnCYMxQKwLdgC" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala" title="What Dotty fixes @ Scala関西サミット" target="_blank">What Dotty fixes @ Scala関西サミット</a> </strong> from <strong><a href="https://www.slideshare.net/TaisukeOe" target="_blank">Taisuke Oe</a></strong> </div></p>
+
+<!-- more -->
+
+
+<p>内容としては、Scala2系のつらみと、その対処法を2系とDottyで比較する話です。Dottyは非常に面白いけどまだ色々変わりうるし、それ単体で今すぐ役立つ話ではないので、敢えてScala2系にスポットをあてました。</p>
+
+<p>サブトピックとして、暗黙展開の発散(<code>implicit expansion divergence</code>)についてきちんと説明しているドキュメントがあまり見当たらなかったので、丁寧目に解説を書いてみました。</p>
+
+<h2>エフ・コード社の準備のお手伝い</h2>
+
+<p>9/8のプレスリリースの通り、<strong><a href="https://f-code.co.jp/">株式会社エフ・コード</a>の商品開発部顧問に就任</strong>しました。</p>
+
+<p>エフ・コード取締役の門田(<a href="https://twitter.com/yoshinorikadota">@yoshinorikadota</a>)さんが４年来の友人で、かつエフ・コード社に<a href="http://2017.scalamatsuri.org/">ScalaMatsuri 2017</a>のスポンサーになっていただいたことがご縁の始まりです。</p>
+
+<p>会社のビジネスモデルを転換するにあたり、ソフトウェア部門を組織建てる初期から関われることが面白く、顧問のオファーをお引き受けすることにしました。職務内容としては、エンジニア組織の設計・プロセス改善を主として、自分が貢献できそうなところを見つけては落穂拾い的に様々なお手伝いをしています。</p>
+
+<p>僕は基本的には黒子の立場だと自認しているのですが、同時期に<strong>がくぞ(<a href="https://twitter.com/gakuzzzz">@gakuzzzz</a>)さんの入社と水島(<a href="https://twitter.com/kmizu">@kmizu</a>)さんの技術顧問就任</strong>という一大ニュースがあるということで、これを機にエフ・コード社をScala企業として認知してもらうため、既にエフ・コード社がスポンサーすることが決まっていた<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>にプレスリリースを合わせましょう、と持ちかけました。</p>
+
+<p>スケジュールの言い出しっぺということもありまして、プレスの構成及び文面レビュー、撮影のセッティング、パネルをふくめた写真の構図決めなど、お手伝い諸々をしていました。</p>
+
+<p>その結果のプレスリリースがこちら。お陰様でTwitter上でもScala関西サミットでも話題になりました。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">エフ・コード、中村学氏がチーフアーキテクトとして入社、水島宏太氏・麻植泰輔氏が顧問に <a href="https://t.co/IDaDEdk1B6">https://t.co/IDaDEdk1B6</a></p>&mdash; CodeZine (@codezine) <a href="https://twitter.com/codezine/status/905961159940902912">September 8, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p><img src="https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg" width="800" height="600"></p>
+
+<p>そして当日にブースで配布する、来場者の記憶に残るノベルティグッズを何にしようか、というミーティングで僭越ながら僕がアイディアを出しまして、とてもキャッチーなコピーやポップとともに実現していただきました。</p>
+
+<p><strong>そう、null消しです。</strong></p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">株式会社エフ・コードでは本日大阪で行われているScala関西サミットにスポンサードさせていただいております。ブースでは煩わしいNullを消すためのCleanerを配布し、大阪からNullを一掃する構えです。よろしくお願いいたします。<a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/R0afY5yURZ">pic.twitter.com/R0afY5yURZ</a></p>&mdash; まつさか (@ma2saka) <a href="https://twitter.com/ma2saka/status/906334211811840000">September 9, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>お察しのとおり、<strong>がくぞさん公式の肩書き <code>Professional Null Cleaner</code> (<a href="http://gakuzzzz.github.io/slides/refactoring_in_scala/#3">参考</a>)に因んでいます</strong>。がくぞさん、ネタにするのを快く承諾くださりありがとうございました。</p>
+
+<p>こちらも非常にご好評いただいたので、ホッと胸を撫で下ろしています。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">社内でエフコードさんからいただいたnull消しを配布している。これで弊社からnullぽが撲滅されるはずだ…。 <a href="https://t.co/varGAYvprI">pic.twitter.com/varGAYvprI</a></p>&mdash; Naoki Takezoe (@takezoen) <a href="https://twitter.com/takezoen/status/907410282506358785">September 12, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p><strong>一刻も早いnullの撲滅を祈っています。</strong></p>
+
+<h2>発表資料レビューのお手伝い</h2>
+
+<p>技術アドバイザーをさせていただいているセプテーニ・オリジナルさんと、前述のエフ・コードさんから<strong>スピーカーが総勢7名</strong>（顧問も入れたらのべ11名？）も出るのを受けまして、せっかくなので社内練習会やりましょうと言い出したり、希望者ベースですが発表資料レビューのお手伝いをしていました。</p>
+
+<p>どんなレビューをしたか振り返ると、そのときの準備の進捗度によって、ざっくり４パターンありました。</p>
+
+<ul>
+<li>講演主旨・メッセージの洗い出し/壁打ち</li>
+<li>主旨を伝えるために最適な構成の整理/壁打ち</li>
+<li>論理展開の整理/壁打ち</li>
+<li>言葉の選び方 / 図の構成 / 技術的誤謬などの細部のレビュー</li>
+</ul>
+
+
+<p>皆さん優秀ですし、教えるというよりもむしろ論旨を明確にしたり迷子にならないよう誘導するための、<strong>壁打ち相手としてレビュアー参加</strong>させてもらいました。</p>
+
+<h2>カンファレンス外の催し</h2>
+
+<p>僕は基本的にカンファレンスには、本体よりむしろそれ付随する懇親会等で、<strong>集った人達とわいわい議論したり喋るのを楽しみに参加しています</strong>。</p>
+
+<p>というわけで、河内(<a href="https://twitter.com/kawachi">@kawachi</a>)さん主催の前夜祭?(@airbnbの宿)に乗っかったり、2次会、3次会を企画させていただきました。</p>
+
+<p>前夜祭？</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Scala関西サミット参加者でairbnbの宿に集合してます！ <a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/EBweC9qo0p">pic.twitter.com/EBweC9qo0p</a></p>&mdash; Taisuke OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/906148935860813824">September 8, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>2次会</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Scala関西 Summit 懇親会二次会！おえさんの幹事力ぱねぇ （東京勢なのに！！） <a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/IWT6dvqfZW">pic.twitter.com/IWT6dvqfZW</a></p>&mdash; Hiroshi (@itohiro73) <a href="https://twitter.com/itohiro73/status/906504180440764416">September 9, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>3次会</p>
+
+<p><img src="http://taisukeoe.github.io/images/20170917/3jikai.jpg" width="600" height="450"></p>
+
+<p>Scala関西サミット史上最大？の2次回、3次会参加者数で、色んな方とも喋れてとても楽しかった！ご参加いただいた皆さん、ありがとうございました 🙌</p>
+
+<h3>和装でぶらり京都旅</h3>
+
+<p>カンファレンス翌日の9/10は、なんとなく3次会で「和装したいよね！」という話になり、京都でこんな感じになって、ぶらぶらと清水のあたりを散策していました。</p>
+
+<p><img src="http://taisukeoe.github.io/images/20170917/wasou.jpg" width="1280" height="720"></p>
+
+<p>和装の手配をしてくれた堀内(<a href="https://twitter.com/noriakihoriuchi">@noriakihoriuch</a>)さん、どうもありがとうございました。</p>
+
+<h3>関西のScala企業訪問</h3>
+
+<p>せっかく関西に来たということで、ご厚意に甘えて関西のScala企業にもお邪魔させていただきました。</p>
+
+<p>粕谷(<a href="https://twitter.com/daiksy">@daiksy</a>)さんに連れられて、<a href="http://www.hatena.ne.jp/">はてな</a>さんでランチごちそうになりつつ、Scalaの事例のお話をお伺いしてました。有り難うございました！</p>
+
+<p>また藤井(<a href="https://twitter.com/yoshiyoshifujii">@yoshiyoshifujii</a>)さんのご厚意で、<a href="http://www.motex.co.jp/">MOTEX</a>さんにお邪魔してモブプロ初体験してきました。</p>
+
+<p>ペアプロだと「ここは〜を使う方が良いですよ」でその場では終わりやすいですが、モブプロだと更に他の人が乗っかって「それなら〜という方法もありますよ」と複数の手段のどちらが適切か議論しやすい点が面白いですね。その文脈において、ペアプロは並列数上げたスキルエクスチェンジが捗りますが、<strong>モブプロはレビュアー含めて弁証法的に知見が深まる</strong>のが良いところだと感じました。必要な場面でそれぞれ使い分けたいです。</p>
+
+<p>藤井さん、体験ツアー組んでくださり有り難うございました！</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BONX社を退職するので、これまでの仕事について振り返ってみた]]></title>
@@ -1256,7 +1402,7 @@
 
 <p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
 
-<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
+<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・')</p>
 ]]></content>
   </entry>
   
@@ -1952,7 +2098,7 @@ ScalaのREPLは<code>scala</code>コマンドから開始できる。</p>
 
 <p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
 
-<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的"性"におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
 
 <p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
 
@@ -2093,7 +2239,7 @@ LinkedIn内で行っているWeb Framework比較結果の、一番良いとこ�
 
 <p>Apache SparkコミッタのAaron Davidson氏による、Sparkの解説とLive Demo。</p>
 
-<p>実はこのとき直前の映像関係のトラブルでAaron Davidson氏のPCがプロジェクタに映らず、急遽私のPCで発表からLive Demoまでやる(しかもハイクオリティ)という離れ業をやってのけました。昨年の<a href="http://scalamatsuri.org/2013/ja/program/index.html#A16402">James Roper氏のデモ</a>といい、どうもScalaMatsuriのゲストはLive Demoが抜群に上手い傾向にあるようです。でもJISキーボードはだいぶ苦戦されてました。プレゼン中、私が隣に座って「&#8221;_&ldquo;はどこ？」「ここだよ」みたいなことをずっとやっていたり。</p>
+<p>実はこのとき直前の映像関係のトラブルでAaron Davidson氏のPCがプロジェクタに映らず、急遽私のPCで発表からLive Demoまでやる(しかもハイクオリティ)という離れ業をやってのけました。昨年の<a href="http://scalamatsuri.org/2013/ja/program/index.html#A16402">James Roper氏のデモ</a>といい、どうもScalaMatsuriのゲストはLive Demoが抜群に上手い傾向にあるようです。でもJISキーボードはだいぶ苦戦されてました。プレゼン中、私が隣に座って「"_&ldquo;はどこ？」「ここだよ」みたいなことをずっとやっていたり。</p>
 
 <p>皆さんの声を聞いていると、Databricks Cloudのvisualization機能に驚いた方も多かったようです。このサービスは現在closedβで、価格は未定なもののフリーミアムモデルを検討されているとか。</p>
 
@@ -2430,7 +2576,7 @@ giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
 <li>DalvikVMのmethod数上限65,535個に引っかかる</li>
 <li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
 <li>Scalaの変なバグ(e.g.<a href="http://taisukeoe.github.io/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
-<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
+<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true"推奨？</li>
 </ul>
 
 
@@ -2717,7 +2863,7 @@ android:screenshot-device   …USB経由でAndroid端末のスクリーンショ
 
 <p><img src="http://taisukeoe.github.io/images/20130608/project_structure_add_sdk.jpg" width="600" height="450"></p>
 
-<p>追加した&#8221;Android&#8221;を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の&#8221;.idea_modules&#8221;を全て&#8221;src/main&#8221;に変更します。Native libs directoryは&#8221;.idea_modules&#8221;を削除しましょう。下記スクリーンショットのような感じです。</p>
+<p>追加した"Android"を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の".idea_modules"を全て"src/main"に変更します。Native libs directoryは".idea_modules"を削除しましょう。下記スクリーンショットのような感じです。</p>
 
 <p><img src="http://taisukeoe.github.io/images/20130608/project_structure_path.jpg" width="600" height="450"></p>
 
@@ -2867,7 +3013,7 @@ gradlew.bat
 <h1>1. これは意図された仕様変更なのか？</h1>
 
 <p>特段意図されたものではなく、Scala2.10でコンパイラをfjbgからasmへ変更した際に、紛れ込んだ模様です。
-(該当commitのauthorのPaul Phillipsさんが&#8221;I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
+(該当commitのauthorのPaul Phillipsさんが"I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
 
 <p><a href="https://github.com/scala/scala/commit/0bea2ab5f6">Fix for erroneous bytecode generation. · 0bea2ab · scala/scala</a></p>
 
@@ -2876,19 +3022,19 @@ gradlew.bat
 <p>バグのようです。根拠として引用された、Java Language Specification(以下JLS)内の<a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html">Binary Compatibility</a>に関する記述は以下の通り。</p>
 
 <blockquote><ul>
-<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)&#8221;</p></li>
+<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)"</p></li>
 <li><p>&ldquo;A reference to a method must be resolved at compile time to <strong>a symbolic reference to the erasure (§4.6) of the qualifying type of the invocation</strong>, plus the erasure of the signature of the method (§8.4.2).&rdquo;(メソッド又はコンストラクタへの参照は，そのqualifying typeへの記号参照に，そのメソッド又はコンストラクタのシグネチャを加えて，コンパイル時に解決しなければならない。)</p></li>
 <li><p>If the expression is of the form <strong>Primary.f</strong> then:</p>
 
 <p>   If the compile-time type of Primary is an intersection type (§4.9) V1 &amp; &hellip; &amp; Vn, then the qualifying type of the reference is V1.</p>
 
-<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>&#8221;</p>
+<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>"</p>
 
 <p>   (Pimary.fという表現があったとき、Primaryがintersectional type以外の場合、Primaryがqualifying typeとなる。)</p></li>
 </ul>
 </blockquote>
 
-<p>それに対して、以下のような反論がありました（が、反論の発言主が&#8221;You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
+<p>それに対して、以下のような反論がありました（が、反論の発言主が"You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
 
 <ul>
 <li>JLSはbackward compatibility(後方互換性)について定めたもので、今回のケースのようなforward compatibility(前方互換性)については当てはまらない。</li>
@@ -3033,7 +3179,7 @@ E/AndroidRuntime(7951):     at dalvik.system.NativeStart.main(Native Method)
 <li><p>ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。</p></li>
 <li><p>気象学でよく使われる「<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96">データ同化</a>」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは<a href="http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF">カルマンフィルタ</a>(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。</p>
 
-<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー&#8221;Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
+<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー"Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
 <li><p>現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO(<a href="http://ja.wikipedia.org/wiki/Gene_Ontology">遺伝子オントロジー</a>)と<a href="http://ja.wikipedia.org/wiki/MeSH">MeSH</a>(Medical Subject Headings)。
 MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。</p></li>
 </ul>
@@ -3042,121 +3188,6 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
 <h3>最後に</h3>
 
 <p>バイオの知識だけじゃなく、統計学(とR)の知識が重要な模様。こういう複合領域の戦場にはどんどん攻め入りたいですね。</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scala Conference 2013 in Japanの振り返り]]></title>
-    <link href="http://taisukeoe.github.io/blog/2013/03/10/scalaconfjp/"/>
-    <updated>2013-03-10T23:53:00+09:00</updated>
-    <id>http://taisukeoe.github.io/blog/2013/03/10/scalaconfjp</id>
-    <content type="html"><![CDATA[<h3>Asia初の大規模なScalaカンファレンス</h3>
-
-<p>2013年3/2から3/3にかけて、プログラミング言語<a href="http://ja.wikipedia.org/wiki/Scala">Scala</a>に関する大規模なイベント <a href="http://www.scalaconf.jp/">Scala Conference 2013 in Japan</a> を開催しました。
-ゲストはScala言語, PlayFramework, Akkaなどを開発している<a href="http://typesafe.com/">Typesafe</a>より4人も招くという豪華仕様。</p>
-
-<p>TypeSafe CTOの<a href="https://twitter.com/jboner">Jonas Bonér</a>さんもこんな感想をつぶやいてくださったり</p>
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">Scala Conference Japan was awesome. Scala community is thriving. Next stop is Niseko and Rusutsu for some Japanese powder skiing. <a href="https://twitter.com/hashtag/lovejapan?src=hash">#lovejapan</a></p>&mdash; Jonas Bonér (@jboner) <a href="https://twitter.com/jboner/status/308059379465338881">March 3, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<p>Twitterのトレンドを日中ずっと独占したり</p>
-
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">なんと日本のTwitterトレンドのトップに!  <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a> <a href="http://t.co/vwXSoozFI9">pic.twitter.com/vwXSoozFI9</a></p>&mdash; OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/307702444874420224">March 2, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<p>新興言語のカンファレンスとは思えない盛り上がりを見せました。</p>
-
-<p>既にカンファレンスのレポートを書いてらっしゃる方が沢山いるので、僕は個人的なラーニングを備忘録として書こうかと思います。</p>
-
-<!-- more -->
-
-
-<h3>「迷ったらやってみる」</h3>
-
-<p>カンファレンス実行委員の中で会計チームリーダー、当日の司会、英語講演のゲリラ的翻訳など色々やらせてもらいましたが、今回のラーニングはこの一言につきました。「迷った末、やってみたらすごく良かった」というのもあったし、「迷った末、やらなかったらすごく後悔した」というのもありました。その辺りを書き下しておこうと思います。</p>
-
-<h4>「迷った末、やってみたら良かったこと」</h4>
-
-<ul>
-<li><p>カンファレンスの実行委員に参加したこと。 当時、座長@kmizuさんはおろか、他のスタッフとも殆ど面識ない中飛び込んでみたら、たまたま会計を出来る人がいなかった。そこにちょうど僕のスキルセット(経営管理の業務経験有り)とマッチしてたので、会計としてjoinすることになった、というのが経緯。思い切って飛び込むって大事だなと改めて実感。</p></li>
-<li><p>今回来てくれたゲストに、お土産として「こことここに行くと良いよ！」と書き込んだ観光マップをあげたこと。Nice Service!!と喜ばれました。</p></li>
-</ul>
-
-
-<p><img src="https://fbcdn-sphotos-d-a.akamaihd.net/hphotos-ak-prn1/s320x320/525192_10200417515034085_419545240_n.jpg" alt="w/ Josh" /></p>
-
-<ul>
-<li>英語講演をゲリラ的に翻訳し、twitterに流したこと。翻訳チームの神速タイピングがある中too muchかなと思ったのですが、助かったとの声を懇親会で複数の方からいただきました。とはいえ、細かなところはtsudaる速度が追いつかず訳せなかったりしたので、反省もあります。</li>
-</ul>
-
-
-<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">同時翻訳のためのサブスクリーンが小さくて、後ろの方から見づらいということがあり、　別途 .<a href="https://twitter.com/OE_uia">@OE_uia</a> さんに発表内容の要約をTsudaってもらっています。 <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a></p>&mdash; 水島 宏太(肩こり中) (@kmizu) <a href="https://twitter.com/kmizu/status/307664957548404736">March 2, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<ul>
-<li>ゲストに色々疑問をぶつけたこと。正直ちょっと緊張しましたが、皆さんナイスな人なので、sbtに関する本がもうじき出ること、ScalaでAndroidアプリ開発するときのTipsなど、色々教えてくれました。また話の流れで、2日目のHackathonでは<a href="https://twitter.com/jsuereth">Josh</a>とペアプロ状態になるなど、超贅沢な展開にも。彼のデバッグを横目でずーっと眺めているのは凄くexcitingでinspiringな経験でした！この辺のラーニングはまた詳しくブログに書きたい。</li>
-</ul>
-
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> Maybe we should try some Android Scala work here. I&#39;d like to get more familiar with these issues and build tools&#8230;</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/308051543037472768">March 3, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<h4>「迷った末、やらなかったら後悔したこと」</h4>
-
-<ul>
-<li><p>AkkaとPlayを事前にちゃんと触れなかったこと。
-カンファレンスの準備と仕事の納期と会社の決算締めが重なって全く余裕がなかったことが敗因。。。</p></li>
-<li><p>なにも発表できなかったこと。これもキャパシティ的に無理でした。。。</p></li>
-<li><p>思い出のお菓子を準備できなかったこと。キリンレモンとチョコボールのキャラメル味は用意しておきたかった。(チョコボールのピーナッツ味は見つかったので差し上げたところ、Jamieさんの娘さんが喜んでくれたみたいですw)</p></li>
-</ul>
-
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">For the life of me, I can&#39;t find any Kirin Lemon, a favorite soda from my childhood here. Nor any caramel ChocoBalls. Bummed. <a href="https://twitter.com/hashtag/scalaconfjp?src=hash">#scalaconfjp</a></p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/308080921960132609">March 3, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">My daughters love the kokusai (the pink one) and daruma dolls I got them. And now they love ChocoBalls, too! <a href="http://t.co/xHUihxeAjf">pic.twitter.com/xHUihxeAjf</a></p>&mdash; Jamie Allen (@jamie_allen) <a href="https://twitter.com/jamie_allen/status/309478481098588162">March 7, 2013</a></blockquote>
-
-
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<h3>レポート/感想ブログへのリンク(順次追記)</h3>
-
-<p>先ほどちょっと触れましたが、ありがたいことに参加者で既にレポート/感想ブログなどを書いてくださっている方が沢山。</p>
-
-<p><a href="http://togetter.com/li/464683">2013/03/02 Scala Conference in Japan 2013 #scalaconfjp - Togetter</a></p>
-
-<p>実行委員の<a href="https://twitter.com/sawakun/">@sawakun</a>くんの<a href="http://storys.jp/yohei.sawayama/story/Scala%20Conference%20in%20Japan%202013%E3%81%AE%E8%A3%8F%E5%81%B4">stories.jp</a></p>
-
-<p><a href="http://d.hatena.ne.jp/tototoshi/20130305/1362488819">Scala Conference in Japan の感想 - tototoshiの日記</a></p>
-
-<p><a href="http://mironal-memo.blogspot.jp/2013/03/scala-conference-in-japan-2013.html">Wokashi: Scala Conference in Japan 2013に行って、型安全という言葉を沢山聞いて来ました。</a></p>
-
-<p><a href="http://labs.enrapt.jp/2013/03/scala-conference-in-japan-2013.html?spref=tw">Scala Conference in Japan 2013 に参加しました | Enrapt Labs</a></p>
-
-<p><a href="http://teppei.hateblo.jp/entry/2013/03/09/165000">Scala Conference in Japan 2013に参加してきました - TEPPEI STUDIO</a></p>
-
-<p><a href="http://d.hatena.ne.jp/aoe-tk/20130310/1362909741">Scala Conference in Japan 2013に参加してきました - AOEの日記</a></p>
-
-<h3>最後に</h3>
-
-<p>これからはもっと<strong>攻め攻めでいきます</strong> ©高城れに。</p>
 ]]></content>
   </entry>
   

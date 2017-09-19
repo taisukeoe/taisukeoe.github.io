@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Sbt | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/sbt/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -143,7 +143,7 @@ giter8が入っていない人は<em>brew install giter8</em>とかで。</p>
 <li>DalvikVMのmethod数上限65,535個に引っかかる</li>
 <li>DalvikVMのLinearAllocの上限を超えてinstall_failed_dexoptエラー</li>
 <li>Scalaの変なバグ(e.g.<a href="/blog/2013/03/22/scala-2-dot-10-bytecode/">こんなの</a>)を踏みやすくなる&hellip;けど、そのぶんScalaに貢献できる（Scalazみたいに！）</li>
-<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true&#8221;推奨？</li>
+<li>あんまりimmutable collectionを多用するとGCが頻繁走ってカクカクする。mutable collectionを多用しつつandroid:largeHeap=&ldquo;true"推奨？</li>
 </ul>
 
 
@@ -375,7 +375,7 @@ android:screenshot-device   …USB経由でAndroid端末のスクリーンショ
 
 <p><img src="/images/20130608/project_structure_add_sdk.jpg" width="600" height="450"></p>
 
-<p>追加した&#8221;Android&#8221;を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の&#8221;.idea_modules&#8221;を全て&#8221;src/main&#8221;に変更します。Native libs directoryは&#8221;.idea_modules&#8221;を削除しましょう。下記スクリーンショットのような感じです。</p>
+<p>追加した"Android"を選択し、Manifest file/ Resources directory/ Assets directoryのパス中の".idea_modules"を全て"src/main"に変更します。Native libs directoryは".idea_modules"を削除しましょう。下記スクリーンショットのような感じです。</p>
 
 <p><img src="/images/20130608/project_structure_path.jpg" width="600" height="450"></p>
 

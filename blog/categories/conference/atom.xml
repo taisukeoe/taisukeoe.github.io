@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Conference | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/conference/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -44,7 +44,7 @@
 <li><p>ネットワーク解析は、社会学やSNSだけでなく、生物学にも利用されている(Network Biology)。Network Biologyの例として、タンパク質の相互作用ネットワークを次数中心性(ネットワーク上でのハブとしての枝数の多さに応じて重み付け)に基づいて解析した結果、次数中心性の高いタンパク質ほど進化の速度(ここでは変異の入る速度)が遅いことが分かりNatureに掲載。</p></li>
 <li><p>気象学でよく使われる「<a href="http://ja.wikipedia.org/wiki/%E3%83%87%E3%83%BC%E3%82%BF%E5%90%8C%E5%8C%96">データ同化</a>」という手法の紹介。観測値と数理モデルから、パラメータの推定やノイズ除去を行うためのもの。有名どころは<a href="http://ja.wikipedia.org/wiki/%E3%82%AB%E3%83%AB%E3%83%9E%E3%83%B3%E3%83%95%E3%82%A3%E3%83%AB%E3%82%BF">カルマンフィルタ</a>(1960年代に月探査船の軌道計算に使用)や粒子フィルタなど。</p>
 
-<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー&#8221;Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
+<p>  ちなみに、データ同化におけるポリシーは「使えるものは何でも入れろ」。ErlangやScalaのActorモデルのポリシー"Let it crash (クラッシュさせろ)&ldquo;もそうだけど、こういう雑で実践的なポリシーは大好きwww</p></li>
 <li><p>現在集まっている大量のゲノミクス情報の再利用性を高めるために、遺伝子の役割に応じて注釈(遺伝子アノテーション)が付けられている。有名どころはGO(<a href="http://ja.wikipedia.org/wiki/Gene_Ontology">遺伝子オントロジー</a>)と<a href="http://ja.wikipedia.org/wiki/MeSH">MeSH</a>(Medical Subject Headings)。
 MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが、GOにあるけどMeSHに無い語彙などもあるので用途に応じて使い分けるべきとのこと。</p></li>
 </ul>
@@ -110,7 +110,7 @@ MeSHの方が語彙が倍以上あり、グルーピングもずっと多いが�
 </ul>
 
 
-<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> Maybe we should try some Android Scala work here. I&#39;d like to get more familiar with these issues and build tools&#8230;</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/308051543037472768">March 3, 2013</a></blockquote>
+<p><blockquote class="twitter-tweet"><p lang="en" dir="ltr"><a href="https://twitter.com/OE_uia">@OE_uia</a> Maybe we should try some Android Scala work here. I&#39;d like to get more familiar with these issues and build tools...</p>&mdash; Josh Suereth (@jsuereth) <a href="https://twitter.com/jsuereth/status/308051543037472768">March 3, 2013</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script></p>
 
 <h4>「迷った末、やらなかったら後悔したこと」</h4>

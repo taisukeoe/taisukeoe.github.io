@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Akka | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/akka/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -50,7 +50,7 @@
 
 <h1><a href="http://summit.scala-kansai.org/">Scala関西サミット</a>のスライド</h1>
 
-<p><a href="http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a>&#8220;>http://www.slideshare.net/TaisukeOe/real-world-android-akka&#8221;>http://www.slideshare.net/TaisukeOe/real-world-android-akka</a></a></p>
+<p><a href="http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a>">http://www.slideshare.net/TaisukeOe/real-world-android-akka">http://www.slideshare.net/TaisukeOe/real-world-android-akka</a></a></p>
 
 <p>このトークではActorモデルの解説と、Actorモデルがなぜ<a href="">BONX</a>というVoIPアプリにフィットしたのか、という話をさせていただきました。</p>
 

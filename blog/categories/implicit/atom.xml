@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Implicit | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/implicit/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -74,7 +74,7 @@ object A {implicit val a = 1}
 
 <p>というわけで、<strong>Implicitsには必ず型注釈をつけましょう！</strong></p>
 
-<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・&#8217;)</p>
+<p>繰り返し<a href="https://gitter.im/scalajp/public">scalajp/public</a>で話題になるし、gitterのログ遡るのつらいしで記事にしてみました(`・ω・')</p>
 ]]></content>
   </entry>
   

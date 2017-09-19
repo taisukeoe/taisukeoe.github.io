@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Code-of-conduct | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/code-of-conduct/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -41,7 +41,7 @@
 
 <p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
 
-<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的"性"におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
 
 <p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
 

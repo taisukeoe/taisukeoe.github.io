@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Jvm | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/jvm/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -24,7 +24,7 @@
 
 <p>詳しくは第99回<a href="http://www.scala-users.org/shibuya/">rpscala</a>で発表したスライドをどうぞ。</p>
 
-<p><a href="http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android">http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a>&#8220;>http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android&#8221;>http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a></a></p>
+<p><a href="http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android">http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a>">http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android">http://www.slideshare.net/oeuia/scala210x-bytecode-problems-in-android</a></a></p>
 
 <p>このバグと同種のものがJIRAでも見つからなかったので、issue報告を上げた結果、3/23に無事修正されたようです。</p>
 
@@ -45,7 +45,7 @@
 <h1>1. これは意図された仕様変更なのか？</h1>
 
 <p>特段意図されたものではなく、Scala2.10でコンパイラをfjbgからasmへ変更した際に、紛れ込んだ模様です。
-(該当commitのauthorのPaul Phillipsさんが&#8221;I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
+(該当commitのauthorのPaul Phillipsさんが"I don&rsquo;t think this is asm&rsquo;s doing, but not sure of that either.(ASMのせいじゃないように思うけど、どうだか分からないな。)&ldquo;と発言している。)</p>
 
 <p><a href="https://github.com/scala/scala/commit/0bea2ab5f6">Fix for erroneous bytecode generation. · 0bea2ab · scala/scala</a></p>
 
@@ -54,19 +54,19 @@
 <p>バグのようです。根拠として引用された、Java Language Specification(以下JLS)内の<a href="http://docs.oracle.com/javase/specs/jls/se7/html/jls-13.html">Binary Compatibility</a>に関する記述は以下の通り。</p>
 
 <blockquote><ul>
-<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)&#8221;</p></li>
+<li><p>&ldquo;<strong>Moving a method upward in the class hierarchy.</strong>&rdquo;(メソッドがクラス構成の上流に移動することについては、バイナリ互換性を保たなければいけない)"</p></li>
 <li><p>&ldquo;A reference to a method must be resolved at compile time to <strong>a symbolic reference to the erasure (§4.6) of the qualifying type of the invocation</strong>, plus the erasure of the signature of the method (§8.4.2).&rdquo;(メソッド又はコンストラクタへの参照は，そのqualifying typeへの記号参照に，そのメソッド又はコンストラクタのシグネチャを加えて，コンパイル時に解決しなければならない。)</p></li>
 <li><p>If the expression is of the form <strong>Primary.f</strong> then:</p>
 
 <p>   If the compile-time type of Primary is an intersection type (§4.9) V1 &amp; &hellip; &amp; Vn, then the qualifying type of the reference is V1.</p>
 
-<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>&#8221;</p>
+<p>   Otherwise, <strong>the compile-time type of Primary is the qualifying type of the reference.</strong>"</p>
 
 <p>   (Pimary.fという表現があったとき、Primaryがintersectional type以外の場合、Primaryがqualifying typeとなる。)</p></li>
 </ul>
 </blockquote>
 
-<p>それに対して、以下のような反論がありました（が、反論の発言主が&#8221;You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
+<p>それに対して、以下のような反論がありました（が、反論の発言主が"You got me, it&rsquo;s a bug.&ldquo;(やっぱりあれはバグだったよ。)と訂正済み。）</p>
 
 <ul>
 <li>JLSはbackward compatibility(後方互換性)について定めたもので、今回のケースのようなforward compatibility(前方互換性)については当てはまらない。</li>

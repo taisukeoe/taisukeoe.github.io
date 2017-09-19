@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scalamatsuri | OE_uia Tech Blog]]></title>
   <link href="http://taisukeoe.github.io/blog/categories/scalamatsuri/atom.xml" rel="self"/>
   <link href="http://taisukeoe.github.io/"/>
-  <updated>2017-08-06T12:50:05+09:00</updated>
+  <updated>2017-09-19T13:09:17+09:00</updated>
   <id>http://taisukeoe.github.io/</id>
   <author>
     <name><![CDATA[Taisuke Oe]]></name>
@@ -29,11 +29,11 @@
 
 <p><a href="http://taisukeoe.github.io/blog/2016/02/05/internationalize-scalamatsuri/">昨年の振り返りブログ</a>では言及したScalaMatsuriの国際化はさらに進み、フィリピンのパーペチュアル・ヘルプ大学から30人ほどの団体参加者と、Scala Taiwanの団体参加者、そしてその他の国からの参加者も増えました。</p>
 
-<p><a href="https://twitter.com/ktosopl/status/836537725926912001">https://twitter.com/ktosopl/status/836537725926912001</a>&#8220;>https://twitter.com/ktosopl/status/836537725926912001&#8221;>https://twitter.com/ktosopl/status/836537725926912001</a></a></p>
+<p><a href="https://twitter.com/ktosopl/status/836537725926912001">https://twitter.com/ktosopl/status/836537725926912001</a>">https://twitter.com/ktosopl/status/836537725926912001">https://twitter.com/ktosopl/status/836537725926912001</a></a></p>
 
 <p>また、それ以上に参加者全体の意識の変化も見て取れました。去年はまだまだ日本ローカルの参加者と、海外からの参加者が別れて交流しがちだったのですが、2日目夜の有志による寿司ディナーでは入り混じり、国際カンファレンスらしい交流がそこかしこで繰り広げられるようになりました。</p>
 
-<p><a href="https://twitter.com/rabbitonweb/status/835830465181278208">https://twitter.com/rabbitonweb/status/835830465181278208</a>&#8220;>https://twitter.com/rabbitonweb/status/835830465181278208&#8221;>https://twitter.com/rabbitonweb/status/835830465181278208</a></a></p>
+<p><a href="https://twitter.com/rabbitonweb/status/835830465181278208">https://twitter.com/rabbitonweb/status/835830465181278208</a>">https://twitter.com/rabbitonweb/status/835830465181278208">https://twitter.com/rabbitonweb/status/835830465181278208</a></a></p>
 
 <p>とまあ、国際化は引き続き順調に進んでいるので敢えて言うほどのこともないですし、今回の振り返りブログはScalaMatsuri運営の内情と、今年度の構造改革の中身についてお話します。</p>
 
@@ -74,9 +74,9 @@
 
 <p>そんな状態だったので、昨年のScalaMatsuri振り返りブログを書いた後、竹添さんとこんな会話をしたことを覚えています。</p>
 
-<p><a href="https://twitter.com/takezoen/status/695891610555420672">https://twitter.com/takezoen/status/695891610555420672</a>&#8220;>https://twitter.com/takezoen/status/695891610555420672&#8221;>https://twitter.com/takezoen/status/695891610555420672</a></a></p>
+<p><a href="https://twitter.com/takezoen/status/695891610555420672">https://twitter.com/takezoen/status/695891610555420672</a>">https://twitter.com/takezoen/status/695891610555420672">https://twitter.com/takezoen/status/695891610555420672</a></a></p>
 
-<p><a href="https://twitter.com/OE_uia/status/696361023410835456">https://twitter.com/OE_uia/status/696361023410835456</a>&#8220;>https://twitter.com/OE_uia/status/696361023410835456&#8221;>https://twitter.com/OE_uia/status/696361023410835456</a></a></p>
+<p><a href="https://twitter.com/OE_uia/status/696361023410835456">https://twitter.com/OE_uia/status/696361023410835456</a>">https://twitter.com/OE_uia/status/696361023410835456">https://twitter.com/OE_uia/status/696361023410835456</a></a></p>
 
 <p>時は前後しますがこの半年ほど前、私が信頼を寄せている友人である高橋さんが、結婚したので家事と両立できる仕事を事務職で探している、という話を聞いた時、ScalaMatsuriの事務仕事はほぼ100%リモートワークだけど、興味はないかと申し出ました。</p>
 
@@ -327,7 +327,7 @@
 
 <p>フィードバックについてはまだ集計中ですが、Twitterハッシュタグを確認する限りにおいて、マジョリティの日本人参加者と、海外からの一般参加者、どちらに寄り過ぎることもなく、楽しんでもらうことができたと感じています。</p>
 
-<p><a href="https://twitter.com/blast_hardchese/status/693833381545512960">https://twitter.com/blast_hardchese/status/693833381545512960</a>&#8220;>https://twitter.com/blast_hardchese/status/693833381545512960&#8221;>https://twitter.com/blast_hardchese/status/693833381545512960</a></a></p>
+<p><a href="https://twitter.com/blast_hardchese/status/693833381545512960">https://twitter.com/blast_hardchese/status/693833381545512960</a>">https://twitter.com/blast_hardchese/status/693833381545512960">https://twitter.com/blast_hardchese/status/693833381545512960</a></a></p>
 
 <p>そのことが、個人的にはちょっとした節目のように感じており、なぜ国際化をしたいのか、無理なく国際化をする上で何をしたのかについて、整理するいい機会なのでしたいと思います。</p>
 
@@ -398,7 +398,7 @@
 
 <p>もっといえば、Scala Daysの1日目までの段階では正直なところ、秋開催のつもりで考えていました。ただあまりにも冬を希望する声が多く、また他の日本の言語カンファレンスがことごとく秋開催で日付がかぶるリスクなどがあったこと、またCFPでの応募集めという大きな課題への解決策になってくれる可能性を鑑みて、その日のうちに同じく参加していたYokotaさんや、夜に日本のメンバーとチャットで相談して冬開催に決めました。2日目から改めて冬開催ということで宣伝したところ、そのときScalaMatsuriの話をした<a href="https://twitter.com/jboner">Jonas</a>さん、<a href="https://twitter.com/ktosopl">Konrad</a>さん、Billさん、<a href="https://twitter.com/tomerg">Tomer</a>さん、Alexyさんなどが今回実際にScalaMatsuriに来てくれました。特にTypesafeチームはScalaMatsuriの前に北海道のニセコでスキーを楽しんでいたようです。（僕も行きたかった…)</p>
 
-<p><a href="https://twitter.com/jboner/status/692317240046170112">https://twitter.com/jboner/status/692317240046170112</a>&#8220;>https://twitter.com/jboner/status/692317240046170112&#8221;>https://twitter.com/jboner/status/692317240046170112</a></a></p>
+<p><a href="https://twitter.com/jboner/status/692317240046170112">https://twitter.com/jboner/status/692317240046170112</a>">https://twitter.com/jboner/status/692317240046170112">https://twitter.com/jboner/status/692317240046170112</a></a></p>
 
 <p>次に今回から思い切ってCFPを投票制にし、投票上位者には最大$2,000の旅費サポートを提供することにしました。これによりありがちな政治色を排除することと、金銭的なハードルを超えられるようにしました。結果的に、従来招待講演者として招聘していたような人たちが続々と応募してくれて、また実際に多くの人が参加してくれたので、十二分に元は取れています。</p>
 
@@ -446,7 +446,7 @@
 
 <p>そこで、今回は行動規範の紹介と、それに準じたマナーを啓蒙するための動画を友人のプロのイラストレーターの<a href="https://twitter.com/hinatique">ひなたかほり(@hinatique)</a>さんに依頼して制作しました。動画自体は楽しんでいただけたようでホッとしています。</p>
 
-<p><a href="https://youtu.be/lIfOQNTWdxI">https://youtu.be/lIfOQNTWdxI</a>&#8220;>https://youtu.be/lIfOQNTWdxI&#8221;>https://youtu.be/lIfOQNTWdxI</a></a></p>
+<p><a href="https://youtu.be/lIfOQNTWdxI">https://youtu.be/lIfOQNTWdxI</a>">https://youtu.be/lIfOQNTWdxI">https://youtu.be/lIfOQNTWdxI</a></a></p>
 
 <p>ただその一方で、3分半程度と短い動画の中に色々詰め込まなければいけないため、かなりの部分を簡略化した、わかりやすさを重視した作りになっているのも事実です。</p>
 
@@ -500,7 +500,7 @@
 
 <p>そもそもこういった注意喚起が必要だと考えた理由は、欧米圏のカンファレンスでハラスメント・フリーな行動規範を掲げる潮流があったこと、また他のカンファレンスなどで実際にトラブルに発展した事が発端だ。特に、ScalaMatsuriも現時点の参加者の大部分が日本人男性と偏った集団なので、同様のトラブルが起きるリスクを無視できない。こういった事故からScalaMatsuriに関わる人全員を守るために、何らかの注意喚起やガイドラインが必要であるという認識は、特に議論もなく準備委員会内でも共有できていたと思う。</p>
 
-<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的&#8221;性&#8221;におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
+<p>実際今年のScalaMatsuriでも、運営内で議論が大きく別れたコンテンツがあった。なぜなら、(比較的"性"におおらかな)日本のイベントでは一般的なものでも、アメリカ東西海岸を中心としたScalaの国際カンファレンス(e.g. NEScala,PNWScala,ScalaDays)など、一部の海外カンファレンスでは望ましくないとされるものが少なくないからだ。</p>
 
 <p>ScalaMatsuriとしての方針が明確でないままでは、トラブルに発展した際に対応が遅れて参加者・発表者・招待講演者・スポンサー全員に迷惑をかけてしまう恐れがある。ここで、どういった思想方針でScalaMatsuriで運営するのか明文化する必要が生まれた。</p>
 
@@ -579,7 +579,7 @@
 
 <p><a href="http://d.hatena.ne.jp/xuwei/20140911/1410398113">ScalaはPizzaで作られていた？</a>という<a href="https://twitter.com/xuwei_k">@xuwei_k</a>さんの記事もご覧になると、より楽しめるかも。</p>
 
-<p><a href="http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala">http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala</a>&#8220;>http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala&#8221;>http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala</a></a></p>
+<p><a href="http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala">http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala</a>">http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala">http://www.slideshare.net/scalaconfjp/the-evolution-of-scala-scala</a></a></p>
 
 <h3>■sbt,傾向と対策</h3>
 
@@ -587,7 +587,7 @@
 
 <p>今回はmkdirから始まるライブコーディングや、sbt server,　Auto Plugins, Consolidated resolutionといった新機能の紹介まで盛りだくさんなセッション。</p>
 
-<p><a href="http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374">http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374</a>&#8220;>http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374&#8221;>http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374</a></a></p>
+<p><a href="http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374">http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374</a>">http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374">http://www.slideshare.net/scalaconfjp/sbt-past-and-future-sbt-39003374</a></a></p>
 
 <h3>■Fifty Rapture One-Liners in Forty Minutes</h3>
 
@@ -606,7 +606,7 @@ HTTPやFileのI/Oも簡単で魅力的ですが、JSON周り、特にString Inte
 <p>LinkedInでPlayチームのリーダーを務めていたYevgeniy(Jim) Brikman氏。
 LinkedIn内で行っているWeb Framework比較結果の、一番良いところだけ見せていただいているという大変贅沢なセッション。網羅的で内容も大変参考になりますし、翻訳に先んじて日本人聴衆の笑いをかっさらっていく話の上手さ。後述しますが色んな意味でイケメン。</p>
 
-<p><a href="http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles">http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles</a>&#8220;>http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles&#8221;>http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles</a></a></p>
+<p><a href="http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles">http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles</a>">http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles">http://www.slideshare.net/brikis98/nodejs-vs-play-framework-with-japanese-subtitles</a></a></p>
 
 <p>あと築地の寿司が大変美味しかったそうで、感激されていました。</p>
 
@@ -620,11 +620,11 @@ LinkedIn内で行っているWeb Framework比較結果の、一番良いとこ�
 
 <p>Apache SparkコミッタのAaron Davidson氏による、Sparkの解説とLive Demo。</p>
 
-<p>実はこのとき直前の映像関係のトラブルでAaron Davidson氏のPCがプロジェクタに映らず、急遽私のPCで発表からLive Demoまでやる(しかもハイクオリティ)という離れ業をやってのけました。昨年の<a href="http://scalamatsuri.org/2013/ja/program/index.html#A16402">James Roper氏のデモ</a>といい、どうもScalaMatsuriのゲストはLive Demoが抜群に上手い傾向にあるようです。でもJISキーボードはだいぶ苦戦されてました。プレゼン中、私が隣に座って「&#8221;_&ldquo;はどこ？」「ここだよ」みたいなことをずっとやっていたり。</p>
+<p>実はこのとき直前の映像関係のトラブルでAaron Davidson氏のPCがプロジェクタに映らず、急遽私のPCで発表からLive Demoまでやる(しかもハイクオリティ)という離れ業をやってのけました。昨年の<a href="http://scalamatsuri.org/2013/ja/program/index.html#A16402">James Roper氏のデモ</a>といい、どうもScalaMatsuriのゲストはLive Demoが抜群に上手い傾向にあるようです。でもJISキーボードはだいぶ苦戦されてました。プレゼン中、私が隣に座って「"_&ldquo;はどこ？」「ここだよ」みたいなことをずっとやっていたり。</p>
 
 <p>皆さんの声を聞いていると、Databricks Cloudのvisualization機能に驚いた方も多かったようです。このサービスは現在closedβで、価格は未定なもののフリーミアムモデルを検討されているとか。</p>
 
-<p><a href="http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark">http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark</a>&#8220;>http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark&#8221;>http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark</a></a></p>
+<p><a href="http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark">http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark</a>">http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark">http://www.slideshare.net/scalaconfjp/building-a-unified-data-pipline-in-spark</a></a></p>
 
 <h3>■Getting started with Scalding, Storm and Summingbird</h3>
 
@@ -634,7 +634,7 @@ LinkedIn内で行っているWeb Framework比較結果の、一番良いとこ�
 
 <p>という風に、ネタスライドからScalding,Storm,Summingbirdに繋げる話の上手さ。</p>
 
-<p><a href="https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird">https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird</a>&#8220;>https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird&#8221;>https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird</a></a></p>
+<p><a href="https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird">https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird</a>">https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird">https://speakerdeck.com/niw/getting-started-with-scalding-storm-and-summingbird</a></a></p>
 
 <p>あと<a href="https://twitter.com/xuwei_k">@xuwei_k</a>さんがこんなことを仰ってるぐらい、講演以外のトークも面白かったです。ありがとうございました。</p>
 
@@ -651,7 +651,7 @@ LinkedIn内で行っているWeb Framework比較結果の、一番良いとこ�
 
 <p>宋さんのようなアカデミアにいらっしゃる方が、ScalaMatsuriのCFPに応募してくださって嬉しいですし、アカデミアの方が市井のScalaのコアな開発者と出会う機会をもっと作りたい。</p>
 
-<p><a href="http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben">http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben</a>&#8220;>http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben&#8221;>http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben</a></a></p>
+<p><a href="http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben">http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben</a>">http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben">http://www.slideshare.net/scalaconfjp/scalamatsuri-sohscaraben</a></a></p>
 
 <h3>■懇親会</h3>
 
@@ -688,7 +688,7 @@ LinkedIn内で行っているWeb Framework比較結果の、一番良いとこ�
 
 <p>Odersky教授によるセッション2個目。一時期Twitterでも話題になった、CanBuildFromの話を直接聞けたのが私としては良かった。</p>
 
-<p><a href="http://www.slideshare.net/Odersky/scala-the-simple-parts">http://www.slideshare.net/Odersky/scala-the-simple-parts</a>&#8220;>http://www.slideshare.net/Odersky/scala-the-simple-parts&#8221;>http://www.slideshare.net/Odersky/scala-the-simple-parts</a></a></p>
+<p><a href="http://www.slideshare.net/Odersky/scala-the-simple-parts">http://www.slideshare.net/Odersky/scala-the-simple-parts</a>">http://www.slideshare.net/Odersky/scala-the-simple-parts">http://www.slideshare.net/Odersky/scala-the-simple-parts</a></a></p>
 
 <h3>■Code clinic by guest speakers</h3>
 

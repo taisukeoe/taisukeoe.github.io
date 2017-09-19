@@ -1,0 +1,419 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Scala関西サミットに向けて色々仕込んでいた話 - OE_uia Tech Blog</title>
+  <meta name="author" content="Taisuke Oe">
+
+  
+  <meta name="description" content="9/9に大阪で開催されたScala関西サミットに参加してきました。いつもながら非常に楽しかったです。主催のきの子(@aa7th)さん、スタッフの皆さんお疲れ様でした！ 今回のScala関西サミットは、自分にとって３つのミッションがありました。 自分のセッションの発表
+エフ・コード社の準備のお手伝い &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="OE_uia Tech Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-39038510-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">OE_uia Tech Blog</a></h1>
+  
+    <h2>ScalaMatsuri / Scala / Android / Bioinfomatics</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="taisukeoe.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Scala関西サミットに向けて色々仕込んでいた話</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-09-17T23:52:33+09:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>11:52 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://taisukeoe.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>9/9に大阪で開催された<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>に参加してきました。いつもながら非常に楽しかったです。<strong>主催のきの子(<a href="https://twitter.com/aa7th">@aa7th</a>)さん、スタッフの皆さんお疲れ様でした！</strong></p>
+
+<p>今回のScala関西サミットは、自分にとって３つのミッションがありました。</p>
+
+<ul>
+<li>自分のセッションの発表</li>
+<li>エフ・コード社の準備のお手伝い</li>
+<li>発表資料レビューのお手伝い</li>
+</ul>
+
+
+<p>それぞれ別種の忙しさがありましたが、なんとか乗り切ることができたので、ようやく肩の荷がちょっと降りた気持ちです。</p>
+
+<p>最近僕がどんな仕事をしているか見えにくいと思いますので、良い機会ですし今回の記事では上記３つそれぞれについて、ご紹介しようと思います。</p>
+
+<h2>自分のセッションの発表</h2>
+
+<p>今回Androidネタは封印して、Dottyネタで喋ってきました。</p>
+
+<iframe src="https://www.slideshare.net/slideshow/embed_code/key/HqnCYMxQKwLdgC" width="427" height="356" frameborder="0" marginwidth="0" marginheight="0" scrolling="no" style="border:1px solid #CCC; border-width:1px; margin-bottom:5px; max-width: 100%;" allowfullscreen> </iframe>
+
+
+<p> <div style="margin-bottom:5px"> <strong> <a href="https://www.slideshare.net/TaisukeOe/what-dotty-fixes-scala" title="What Dotty fixes @ Scala関西サミット" target="_blank">What Dotty fixes @ Scala関西サミット</a> </strong> from <strong><a href="https://www.slideshare.net/TaisukeOe" target="_blank">Taisuke Oe</a></strong> </div></p>
+
+<!-- more -->
+
+
+<p>内容としては、Scala2系のつらみと、その対処法を2系とDottyで比較する話です。Dottyは非常に面白いけどまだ色々変わりうるし、それ単体で今すぐ役立つ話ではないので、敢えてScala2系にスポットをあてました。</p>
+
+<p>サブトピックとして、暗黙展開の発散(<code>implicit expansion divergence</code>)についてきちんと説明しているドキュメントがあまり見当たらなかったので、丁寧目に解説を書いてみました。</p>
+
+<h2>エフ・コード社の準備のお手伝い</h2>
+
+<p>9/8のプレスリリースの通り、<strong><a href="https://f-code.co.jp/">株式会社エフ・コード</a>の商品開発部顧問に就任</strong>しました。</p>
+
+<p>エフ・コード取締役の門田(<a href="https://twitter.com/yoshinorikadota">@yoshinorikadota</a>)さんが４年来の友人で、かつエフ・コード社に<a href="http://2017.scalamatsuri.org/">ScalaMatsuri 2017</a>のスポンサーになっていただいたことがご縁の始まりです。</p>
+
+<p>会社のビジネスモデルを転換するにあたり、ソフトウェア部門を組織建てる初期から関われることが面白く、顧問のオファーをお引き受けすることにしました。職務内容としては、エンジニア組織の設計・プロセス改善を主として、自分が貢献できそうなところを見つけては落穂拾い的に様々なお手伝いをしています。</p>
+
+<p>僕は基本的には黒子の立場だと自認しているのですが、同時期に<strong>がくぞ(<a href="https://twitter.com/gakuzzzz">@gakuzzzz</a>)さんの入社と水島(<a href="https://twitter.com/kmizu">@kmizu</a>)さんの技術顧問就任</strong>という一大ニュースがあるということで、これを機にエフ・コード社をScala企業として認知してもらうため、既にエフ・コード社がスポンサーすることが決まっていた<a href="http://summit.scala-kansai.org/">Scala関西サミット</a>にプレスリリースを合わせましょう、と持ちかけました。</p>
+
+<p>スケジュールの言い出しっぺということもありまして、プレスの構成及び文面レビュー、撮影のセッティング、パネルをふくめた写真の構図決めなど、お手伝い諸々をしていました。</p>
+
+<p>その結果のプレスリリースがこちら。お陰様でTwitter上でもScala関西サミットでも話題になりました。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">エフ・コード、中村学氏がチーフアーキテクトとして入社、水島宏太氏・麻植泰輔氏が顧問に <a href="https://t.co/IDaDEdk1B6">https://t.co/IDaDEdk1B6</a></p>&mdash; CodeZine (@codezine) <a href="https://twitter.com/codezine/status/905961159940902912">September 8, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p><img src="https://f-code.co.jp/assets/img/unique/home/section-card_picture.jpg" width="800" height="600"></p>
+
+<p>そして当日にブースで配布する、来場者の記憶に残るノベルティグッズを何にしようか、というミーティングで僭越ながら僕がアイディアを出しまして、とてもキャッチーなコピーやポップとともに実現していただきました。</p>
+
+<p><strong>そう、null消しです。</strong></p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">株式会社エフ・コードでは本日大阪で行われているScala関西サミットにスポンサードさせていただいております。ブースでは煩わしいNullを消すためのCleanerを配布し、大阪からNullを一掃する構えです。よろしくお願いいたします。<a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/R0afY5yURZ">pic.twitter.com/R0afY5yURZ</a></p>&mdash; まつさか (@ma2saka) <a href="https://twitter.com/ma2saka/status/906334211811840000">September 9, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>お察しのとおり、<strong>がくぞさん公式の肩書き <code>Professional Null Cleaner</code> (<a href="http://gakuzzzz.github.io/slides/refactoring_in_scala/#3">参考</a>)に因んでいます</strong>。がくぞさん、ネタにするのを快く承諾くださりありがとうございました。</p>
+
+<p>こちらも非常にご好評いただいたので、ホッと胸を撫で下ろしています。</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">社内でエフコードさんからいただいたnull消しを配布している。これで弊社からnullぽが撲滅されるはずだ…。 <a href="https://t.co/varGAYvprI">pic.twitter.com/varGAYvprI</a></p>&mdash; Naoki Takezoe (@takezoen) <a href="https://twitter.com/takezoen/status/907410282506358785">September 12, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p><strong>一刻も早いnullの撲滅を祈っています。</strong></p>
+
+<h2>発表資料レビューのお手伝い</h2>
+
+<p>技術アドバイザーをさせていただいているセプテーニ・オリジナルさんと、前述のエフ・コードさんから<strong>スピーカーが総勢7名</strong>（顧問も入れたらのべ11名？）も出るのを受けまして、せっかくなので社内練習会やりましょうと言い出したり、希望者ベースですが発表資料レビューのお手伝いをしていました。</p>
+
+<p>どんなレビューをしたか振り返ると、そのときの準備の進捗度によって、ざっくり４パターンありました。</p>
+
+<ul>
+<li>講演主旨・メッセージの洗い出し/壁打ち</li>
+<li>主旨を伝えるために最適な構成の整理/壁打ち</li>
+<li>論理展開の整理/壁打ち</li>
+<li>言葉の選び方 / 図の構成 / 技術的誤謬などの細部のレビュー</li>
+</ul>
+
+
+<p>皆さん優秀ですし、教えるというよりもむしろ論旨を明確にしたり迷子にならないよう誘導するための、<strong>壁打ち相手としてレビュアー参加</strong>させてもらいました。</p>
+
+<h2>カンファレンス外の催し</h2>
+
+<p>僕は基本的にカンファレンスには、本体よりむしろそれ付随する懇親会等で、<strong>集った人達とわいわい議論したり喋るのを楽しみに参加しています</strong>。</p>
+
+<p>というわけで、河内(<a href="https://twitter.com/kawachi">@kawachi</a>)さん主催の前夜祭?(@airbnbの宿)に乗っかったり、2次会、3次会を企画させていただきました。</p>
+
+<p>前夜祭？</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Scala関西サミット参加者でairbnbの宿に集合してます！ <a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/EBweC9qo0p">pic.twitter.com/EBweC9qo0p</a></p>&mdash; Taisuke OE (@OE_uia) <a href="https://twitter.com/OE_uia/status/906148935860813824">September 8, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>2次会</p>
+
+<blockquote class="twitter-tweet"><p lang="ja" dir="ltr">Scala関西 Summit 懇親会二次会！おえさんの幹事力ぱねぇ （東京勢なのに！！） <a href="https://twitter.com/hashtag/scala_ks?src=hash">#scala_ks</a> <a href="https://t.co/IWT6dvqfZW">pic.twitter.com/IWT6dvqfZW</a></p>&mdash; Hiroshi (@itohiro73) <a href="https://twitter.com/itohiro73/status/906504180440764416">September 9, 2017</a></blockquote>
+
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>3次会</p>
+
+<p><img src="/images/20170917/3jikai.jpg" width="600" height="450"></p>
+
+<p>Scala関西サミット史上最大？の2次回、3次会参加者数で、色んな方とも喋れてとても楽しかった！ご参加いただいた皆さん、ありがとうございました 🙌</p>
+
+<h3>和装でぶらり京都旅</h3>
+
+<p>カンファレンス翌日の9/10は、なんとなく3次会で「和装したいよね！」という話になり、京都でこんな感じになって、ぶらぶらと清水のあたりを散策していました。</p>
+
+<p><img src="/images/20170917/wasou.jpg" width="1280" height="720"></p>
+
+<p>和装の手配をしてくれた堀内(<a href="https://twitter.com/noriakihoriuchi">@noriakihoriuch</a>)さん、どうもありがとうございました。</p>
+
+<h3>関西のScala企業訪問</h3>
+
+<p>せっかく関西に来たということで、ご厚意に甘えて関西のScala企業にもお邪魔させていただきました。</p>
+
+<p>粕谷(<a href="https://twitter.com/daiksy">@daiksy</a>)さんに連れられて、<a href="http://www.hatena.ne.jp/">はてな</a>さんでランチごちそうになりつつ、Scalaの事例のお話をお伺いしてました。有り難うございました！</p>
+
+<p>また藤井(<a href="https://twitter.com/yoshiyoshifujii">@yoshiyoshifujii</a>)さんのご厚意で、<a href="http://www.motex.co.jp/">MOTEX</a>さんにお邪魔してモブプロ初体験してきました。</p>
+
+<p>ペアプロだと「ここは〜を使う方が良いですよ」でその場では終わりやすいですが、モブプロだと更に他の人が乗っかって「それなら〜という方法もありますよ」と複数の手段のどちらが適切か議論しやすい点が面白いですね。その文脈において、ペアプロは並列数上げたスキルエクスチェンジが捗りますが、<strong>モブプロはレビュアー含めて弁証法的に知見が深まる</strong>のが良いところだと感じました。必要な場面でそれぞれ使い分けたいです。</p>
+
+<p>藤井さん、体験ツアー組んでくださり有り難うございました！</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Taisuke Oe</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2017-09-17T23:52:33+09:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>11:52 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/" data-via="OE_uia" data-counturl="http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/08/06/bonx-retire/" title="Previous Post: BONX社を退職するので、これまでの仕事について振り返ってみた">&laquo; BONX社を退職するので、これまでの仕事について振り返ってみた</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2017/09/17/scala-kansai-2017/">Scala関西サミットに向けて色々仕込んでいた話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/06/bonx-retire/">BONX社を退職するので、これまでの仕事について振り返ってみた</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/05/scalamatsuri-employee/">ScalaMatsuriの初社員採用プロジェクト これまでの運営の失敗と成功の歴史 ~ScalaMatsuri 2017を振り返って~</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/12/03/scala-kansai/">Scala関西サミットでAndroid Akkaについて喋ってきた話</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/internationalize-scalamatsuri/">ローカルカンファレンスを無理なく国際化する方法 - ScalaMatsuri 2016を振り返って</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/taisukeoe">@taisukeoe</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'taisukeoe',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+<section>
+<a class="twitter-timeline" href="https://twitter.com/OE_uia" data-widget-id="514961237487017985">@OE_uia $B$+$i$N%D%$!<%H(B</a>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - Taisuke Oe -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'taisukeoe';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/';
+        var disqus_url = 'http://taisukeoe.github.io/blog/2017/09/17/scala-kansai-2017/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
